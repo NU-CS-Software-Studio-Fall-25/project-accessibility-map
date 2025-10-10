@@ -1,8 +1,10 @@
+# frozen_string_literal: true
+
 # Processes count, allows better CPU utilization when executing Ruby code.
-workers(ENV.fetch('WEB_CONCURRENCY') { 2 })
+workers(ENV.fetch("WEB_CONCURRENCY") { 2 })
 
 # Thread per process count allows context switching on IO-bound tasks for better CPU utilization.
-threads_count = ENV.fetch('RAILS_MAX_THREADS') { 3 }
+threads_count = ENV.fetch("RAILS_MAX_THREADS") { 3 }
 threads(threads_count, threads_count)
 
 # Reduce memory usage on copy-on-write (CoW) systems.
@@ -36,4 +38,3 @@ plugin(:tmp_restart)
 # ```
 # enable_keep_alives(false) if respond_to?(:enable_keep_alives)
 # ```
-
