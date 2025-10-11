@@ -18,6 +18,8 @@ locations = [
     state: "IL",
     zip: "60201",
     country: "US",
+    latitude: 42.0466157,
+    longitude: -87.6820545,
   },
   {
     name: "TEAlicious BUBBLE",
@@ -26,6 +28,8 @@ locations = [
     state: "IL",
     zip: "60201",
     country: "US",
+    latitude: 42.0460238,
+    longitude: -87.6815938,
   },
   {
     name: "UMe Tea",
@@ -34,6 +38,8 @@ locations = [
     state: "IL",
     zip: "60201",
     country: "US",
+    latitude: 42.047894,
+    longitude: -87.6800271,
   },
   {
     name: "Joy Yee Noodle",
@@ -42,9 +48,82 @@ locations = [
     state: "IL",
     zip: "60201",
     country: "US",
+    latitude: 42.0462518,
+    longitude: -87.6792726,
   },
 ]
 
-locations.each do |location_data|
-  Location.create(location_data)
+locations.each do |location|
+  Location.create(location)
+end
+
+reviews = [
+  {
+    location_id: 1,
+    body: "Moge Tee has no ramp to get in and the doorway is elevated so if you need a ramp you are not able to enter.",
+  },
+  {
+    location_id: 1,
+    body: "I thought the door was pull to open, so I pulled on it really hard and then I tore my bicep",
+  },
+  {
+    location_id: 1,
+    body: "I thought the door was push to open, so I pushed on it really hard and I tore my tricep.",
+  },
+  {
+    location_id: 1,
+    body: "Moge Tee is too narrow for my wheelchair to get through.",
+  },
+  {
+    location_id: 2,
+    body: "Tealicious has a wheelchair accessible ramp.",
+  },
+  {
+    location_id: 2,
+    body: "Tealicious has a wheelchair-accessible restroom.",
+  },
+  {
+    location_id: 2,
+    body: "It’s easy to get around Tealicious in my wheelchair!",
+  },
+  {
+    location_id: 2,
+    body: "The lighting is not too bright and doesn’t cause sensory issues.",
+  },
+  {
+    location_id: 3,
+    body: "Ume’s kiosk is not screen-reader friendly.",
+  },
+  {
+    location_id: 3,
+    body: "The text on Ume’s physical menu is so small!",
+  },
+  {
+    location_id: 3,
+    body: "Ume’s counter is too tall, so I can’t reach over to grab my drink from my wheelchair.",
+  },
+  {
+    location_id: 3,
+    body: "Ume is pet friendly so I was able to bring my service dog in, which was helpful.",
+  },
+  {
+    location_id: 4,
+    body: "Joyyee has a wheelchair-accessible entrance, seating, and an accessible toilet.",
+  },
+  {
+    location_id: 4,
+    body: "Joyyee’s tables are too tall, and I cannot reach it from my wheelchair.",
+  },
+  {
+    location_id: 4,
+    body: "I liked that Joyyee’s menu was braille-friendly. (disclaimer: i don’t actually know this)",
+  },
+  {
+    location_id: 4,
+    body: "Joyyee’s tables are spaced out so I can freely move around in my wheelchair.",
+  },
+]
+
+reviews.each do |review|
+  Review.create(review)
 end
