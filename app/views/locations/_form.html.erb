@@ -1,0 +1,57 @@
+<%= form_with(model: location, class: "contents") do |form| %>
+  <% if location.errors.any? %>
+    <div id="error_explanation" class="bg-red-50 text-red-500 px-3 py-2 font-medium rounded-md mt-3">
+      <h2><%= pluralize(location.errors.count, "error") %> prohibited this location from being saved:</h2>
+
+      <ul class="list-disc ml-6">
+        <% location.errors.each do |error| %>
+          <li><%= error.full_message %></li>
+        <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+  <div class="my-5">
+    <%= form.label :name %>
+    <%= form.textarea :name, rows: 4, class: ["block shadow-sm rounded-md border px-3 py-2 mt-2 w-full", {"border-gray-400 focus:outline-blue-600": location.errors[:name].none?, "border-red-400 focus:outline-red-600": location.errors[:name].any?}] %>
+  </div>
+
+  <div class="my-5">
+    <%= form.label :address %>
+    <%= form.textarea :address, rows: 4, class: ["block shadow-sm rounded-md border px-3 py-2 mt-2 w-full", {"border-gray-400 focus:outline-blue-600": location.errors[:address].none?, "border-red-400 focus:outline-red-600": location.errors[:address].any?}] %>
+  </div>
+
+  <div class="my-5">
+    <%= form.label :city %>
+    <%= form.textarea :city, rows: 4, class: ["block shadow-sm rounded-md border px-3 py-2 mt-2 w-full", {"border-gray-400 focus:outline-blue-600": location.errors[:city].none?, "border-red-400 focus:outline-red-600": location.errors[:city].any?}] %>
+  </div>
+
+  <div class="my-5">
+    <%= form.label :state %>
+    <%= form.textarea :state, rows: 4, class: ["block shadow-sm rounded-md border px-3 py-2 mt-2 w-full", {"border-gray-400 focus:outline-blue-600": location.errors[:state].none?, "border-red-400 focus:outline-red-600": location.errors[:state].any?}] %>
+  </div>
+
+  <div class="my-5">
+    <%= form.label :zip %>
+    <%= form.textarea :zip, rows: 4, class: ["block shadow-sm rounded-md border px-3 py-2 mt-2 w-full", {"border-gray-400 focus:outline-blue-600": location.errors[:zip].none?, "border-red-400 focus:outline-red-600": location.errors[:zip].any?}] %>
+  </div>
+
+  <div class="my-5">
+    <%= form.label :country %>
+    <%= form.textarea :country, rows: 4, class: ["block shadow-sm rounded-md border px-3 py-2 mt-2 w-full", {"border-gray-400 focus:outline-blue-600": location.errors[:country].none?, "border-red-400 focus:outline-red-600": location.errors[:country].any?}] %>
+  </div>
+
+  <div class="my-5">
+    <%= form.label :latitude %>
+    <%= form.text_field :latitude, class: ["block shadow-sm rounded-md border px-3 py-2 mt-2 w-full", {"border-gray-400 focus:outline-blue-600": location.errors[:latitude].none?, "border-red-400 focus:outline-red-600": location.errors[:latitude].any?}] %>
+  </div>
+
+  <div class="my-5">
+    <%= form.label :longitude %>
+    <%= form.text_field :longitude, class: ["block shadow-sm rounded-md border px-3 py-2 mt-2 w-full", {"border-gray-400 focus:outline-blue-600": location.errors[:longitude].none?, "border-red-400 focus:outline-red-600": location.errors[:longitude].any?}] %>
+  </div>
+
+  <div class="inline">
+    <%= form.submit class: "w-full sm:w-auto rounded-md px-3.5 py-2.5 bg-blue-600 hover:bg-blue-500 text-white inline-block font-medium cursor-pointer" %>
+  </div>
+<% end %>
