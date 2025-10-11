@@ -12,11 +12,12 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_10_10_233211) do
+ActiveRecord::Schema[8.0].define(version: 2025_10_11_182235) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
+  enable_extension "pgcrypto"
 
-  create_table "locations", force: :cascade do |t|
+  create_table "locations", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
     t.text("name")
     t.text("address")
     t.text("city")
@@ -29,11 +30,11 @@ ActiveRecord::Schema[8.0].define(version: 2025_10_10_233211) do
     t.datetime("updated_at", null: false)
   end
 
-  create_table "reviews", force: :cascade do |t|
-    t.bigint("location_id", null: false)
+  create_table "reviews", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
     t.text("body")
     t.datetime("created_at", null: false)
     t.datetime("updated_at", null: false)
+    t.uuid("location_id")
     t.index(["location_id"], name: "index_reviews_on_location_id")
   end
 
