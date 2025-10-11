@@ -12,7 +12,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_10_11_182235) do
+ActiveRecord::Schema[8.0].define(version: 2025_10_11_184153) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
   enable_extension "pgcrypto"
@@ -38,5 +38,5 @@ ActiveRecord::Schema[8.0].define(version: 2025_10_11_182235) do
     t.index(["location_id"], name: "index_reviews_on_location_id")
   end
 
-  add_foreign_key "reviews", "locations"
+  add_foreign_key "reviews", "locations", on_delete: :cascade
 end
