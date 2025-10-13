@@ -4,10 +4,28 @@
   <p class="py-2 px-3 bg-green-50 mb-5 text-green-500 font-medium rounded-md inline-block" id="notice"><%= notice %></p>
 <% end %>
 
-<div class="flex">
+<div class="flex h-full">
   <div id="map" class="sm:block hidden flex-1 min-w-1/2">
-    map placeholder
   </div>
+
+  <script>
+    const mapElement = document.getElementById('map');
+    const map = L.map(mapElement).setView([42.051279118721986, -87.67707904377073], 16);
+
+    L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+    }).addTo(map);
+
+    L.marker([42.04659758932094, -87.68204146090108]).addTo(map)
+        .bindPopup('Moge Tee')
+        .openPopup();
+
+    const resizeObserver = new ResizeObserver(() => {
+      map.invalidateSize();
+    });
+
+    resizeObserver.observe(mapElement);
+  </script>
 
   <div id="locations" class="sm:flex-initial flex-1 sm:basis-[450px] flex flex-col justify-start items-stretch gap-4 overflow-y-auto border-l border-b border-gray-200 p-4">
     <form class="w-full flex flex-rol gap-2">
