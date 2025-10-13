@@ -1,4 +1,4 @@
-<div id="<%= dom_id location %>" class="w-full flex flex-col justify-center items-start gap-2 border border-gray-200 rounded-xl p-4 shadow-md">
+<div id="<%= dom_id location %>" class="w-full [350px] flex flex-col justify-center items-start gap-2 border border-gray-200 rounded-xl p-4 shadow-md">
   <div> 
     <h2 class="font-bold text-xl">
       <%= location.name %>
@@ -10,5 +10,5 @@
       <%= location.zip %>
     </span>
   </div>
-  <%= link_to "See More", location_path(location), class: "bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium px-4 py-1.5 rounded-full" %>
+  <%= link_to "See More", location_path(location), class: "bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium px-4 py-1.5 rounded-full text-nowrap" %>
 </div>
