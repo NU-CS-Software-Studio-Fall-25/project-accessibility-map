@@ -5,30 +5,10 @@
 <% end %>
 
 <div class="flex h-full">
-  <div id="map" class="sm:block hidden flex-1 min-w-1/2">
-  </div>
-
-  <script>
-    const mapElement = document.getElementById('map');
-    const map = L.map(mapElement).setView([42.051279118721986, -87.67707904377073], 16);
-
-    L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
-        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-    }).addTo(map);
-
-    L.marker([42.04659758932094, -87.68204146090108]).addTo(map)
-        .bindPopup('Moge Tee')
-        .openPopup();
-
-    const resizeObserver = new ResizeObserver(() => {
-      map.invalidateSize();
-    });
-
-    resizeObserver.observe(mapElement);
-  </script>
+  <div id="map" class="sm:block hidden flex-1 min-w-1/2"></div>
 
   <div id="locations" class="sm:flex-initial flex-1 sm:basis-[450px] flex flex-col justify-start items-stretch gap-4 overflow-y-auto border-l border-b border-gray-200 p-4">
-    <form class="w-full flex flex-rol gap-2">
+    <form class="w-full flex gap-2">
       <div class="flex-1 relative">
         <div class="absolute inset-y-0 start-0 flex items-center ps-3 pointer-events-none">
           <svg class="w-4 h-4 text-gray-500 dark:text-gray-400" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 20 20">
@@ -53,3 +33,62 @@
     </div>
   </div>
 </div>
+
+<script>
+  let map = null;
+
+  const initializeMap = () => {
+    const mapElement = document.getElementById('map');
+
+    if (!mapElement) {
+      return;
+    }
+
+    if (map) {
+      map = null;
+    }
+
+    if (mapElement._leaflet_id) {
+      delete mapElement._leaflet_id;
+    }
+
+    map = L.map(mapElement)
+
+    L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+    }).addTo(map);
+
+    const locations = <%= raw @locations.to_json(only: [:id, :name, :latitude, :longitude]) %>;
+
+    locations.forEach((location) => {
+      if (location.latitude && location.longitude) {
+        L.marker([parseFloat(location.latitude), location.longitude])
+          .addTo(map)
+          .bindPopup(`<strong>${location.name}</string>`)
+      }
+    })
+
+    if (locations.length > 0) {
+      const bounds = L.latLngBounds(
+        locations
+          .filter((location) => { return location.latitude && location.longitude })
+          .map((location) => { return [location.latitude, location.longitude] })
+      );
+
+      map.fitBounds(bounds, { padding: [100, 100] })
+    }
+
+    const resizeObserver = new ResizeObserver(() => {
+      map.invalidateSize();
+    });
+
+    resizeObserver.observe(mapElement);
+  }
+
+  document.addEventListener("turbo:load", initializeMap);
+  document.addEventListener("turbo:before-cache", () => {
+    if (map) {
+      map = null;
+    }
+  });
+</script>
