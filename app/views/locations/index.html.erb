@@ -58,13 +58,24 @@
         attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
     }).addTo(map);
 
-    const locations = <%= raw @locations.to_json(only: [:id, :name, :latitude, :longitude]) %>;
+    const locations = <%= raw @locations.to_json() %>;
 
     locations.forEach((location) => {
       if (location.latitude && location.longitude) {
         L.marker([parseFloat(location.latitude), location.longitude])
           .addTo(map)
-          .bindPopup(`<strong>${location.name}</string>`)
+          .bindPopup(
+            `
+            <a href="locations/${location.id}" class="!text-black" target="_blank">
+              <p class="font-bold !mb-1">
+                ${location.name}
+              </string>
+              <p class="font-normal !m-0"> 
+                ${location.address}, ${location.city}, ${location.state} ${location.zip}
+              </p>
+            </div>
+            `
+          )
       }
     })
 
@@ -88,6 +99,7 @@
   document.addEventListener("turbo:load", initializeMap);
   document.addEventListener("turbo:before-cache", () => {
     if (map) {
+      map.off();
       map = null;
     }
   });
