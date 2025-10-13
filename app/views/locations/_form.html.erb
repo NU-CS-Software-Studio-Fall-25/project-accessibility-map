@@ -1,57 +1,94 @@
-<%= form_with(model: location, class: "contents") do |form| %>
+<%= form_with(model: location, class: "space-y-8") do |f| %>
   <% if location.errors.any? %>
-    <div id="error_explanation" class="bg-red-50 text-red-500 px-3 py-2 font-medium rounded-md mt-3">
-      <h2><%= pluralize(location.errors.count, "error") %> prohibited this location from being saved:</h2>
-
-      <ul class="list-disc ml-6">
-        <% location.errors.each do |error| %>
-          <li><%= error.full_message %></li>
+    <div class="rounded-md bg-red-50 p-4 text-red-700">
+      <p class="font-semibold mb-2"><%= pluralize(location.errors.count, "error") %> prohibited this location from being saved:</p>
+      <ul class="list-disc pl-5">
+        <% location.errors.full_messages.each do |msg| %>
+          <li><%= msg %></li>
         <% end %>
       </ul>
     </div>
   <% end %>
 
-  <div class="my-5">
-    <%= form.label :name %>
-    <%= form.textarea :name, rows: 4, class: ["block shadow-sm rounded-md border px-3 py-2 mt-2 w-full", {"border-gray-400 focus:outline-blue-600": location.errors[:name].none?, "border-red-400 focus:outline-red-600": location.errors[:name].any?}] %>
+  <div>
+    <label class="block text-sm font-medium mb-1">Location Name</label>
+    <%= f.text_field :name, placeholder: "ex. Moge Tee",
+          class: "w-full rounded-md border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-yellow-400" %>
   </div>
 
-  <div class="my-5">
-    <%= form.label :address %>
-    <%= form.textarea :address, rows: 4, class: ["block shadow-sm rounded-md border px-3 py-2 mt-2 w-full", {"border-gray-400 focus:outline-blue-600": location.errors[:address].none?, "border-red-400 focus:outline-red-600": location.errors[:address].any?}] %>
+  <div>
+    <label class="block text-sm font-medium mb-1">Address Line</label>
+    <%= f.text_field :address, placeholder: "ex. 1590 Sherman Ave",
+          class: "w-full rounded-md border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-yellow-400" %>
   </div>
 
-  <div class="my-5">
-    <%= form.label :city %>
-    <%= form.textarea :city, rows: 4, class: ["block shadow-sm rounded-md border px-3 py-2 mt-2 w-full", {"border-gray-400 focus:outline-blue-600": location.errors[:city].none?, "border-red-400 focus:outline-red-600": location.errors[:city].any?}] %>
+  <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+    <div>
+      <label class="block text-sm font-medium mb-1">City</label>
+      <%= f.text_field :city, placeholder: "ex. Evanston",
+            class: "w-full rounded-md border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-yellow-400" %>
+    </div>
+
+    <div>
+      <label class="block text-sm font-medium mb-1">State</label>
+      <%= f.select :state,
+          [
+            ["Select a state", ""],
+            ["Alabama", "Alabama"], ["Alaska", "Alaska"], ["Arizona", "Arizona"], ["Arkansas", "Arkansas"],
+            ["California", "California"], ["Colorado", "Colorado"], ["Connecticut", "Connecticut"],
+            ["Delaware", "Delaware"], ["Florida", "Florida"], ["Georgia", "Georgia"], ["Hawaii", "Hawaii"],
+            ["Idaho", "Idaho"], ["Illinois", "Illinois"], ["Indiana", "Indiana"], ["Iowa", "Iowa"],
+            ["Kansas", "Kansas"], ["Kentucky", "Kentucky"], ["Louisiana", "Louisiana"], ["Maine", "Maine"],
+            ["Maryland", "Maryland"], ["Massachusetts", "Massachusetts"], ["Michigan", "Michigan"],
+            ["Minnesota", "Minnesota"], ["Mississippi", "Mississippi"], ["Missouri", "Missouri"],
+            ["Montana", "Montana"], ["Nebraska", "Nebraska"], ["Nevada", "Nevada"], ["New Hampshire", "New Hampshire"],
+            ["New Jersey", "New Jersey"], ["New Mexico", "New Mexico"], ["New York", "New York"],
+            ["North Carolina", "North Carolina"], ["North Dakota", "North Dakota"],
+            ["Ohio", "Ohio"], ["Oklahoma", "Oklahoma"], ["Oregon", "Oregon"],
+            ["Pennsylvania", "Pennsylvania"], ["Rhode Island", "Rhode Island"],
+            ["South Carolina", "South Carolina"], ["South Dakota", "South Dakota"],
+            ["Tennessee", "Tennessee"], ["Texas", "Texas"], ["Utah", "Utah"],
+            ["Vermont", "Vermont"], ["Virginia", "Virginia"], ["Washington", "Washington"],
+            ["West Virginia", "West Virginia"], ["Wisconsin", "Wisconsin"], ["Wyoming", "Wyoming"]
+          ],
+          {}, class: "w-full rounded-md border border-gray-300 px-3 py-2 bg-white focus:outline-none focus:ring-2 focus:ring-yellow-400"
+      %>
+    </div>
+
+    <div>
+      <label class="block text-sm font-medium mb-1">Zip Code</label>
+      <%= f.text_field :zip, placeholder: "ex. 60201",
+            class: "w-full rounded-md border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-yellow-400" %>
+    </div>
+
+    <div>
+      <label class="block text-sm font-medium mb-1">Country</label>
+      <%= f.select :country,
+          [
+            ["Select a country", ""],
+            ["United States", "United States"],
+            ["Canada", "Canada"],
+            ["Mexico", "Mexico"],
+            ["United Kingdom", "United Kingdom"],
+            ["France", "France"],
+            ["Germany", "Germany"],
+            ["India", "India"],
+            ["China", "China"],
+            ["Japan", "Japan"],
+            ["Australia", "Australia"],
+            ["Brazil", "Brazil"],
+            ["South Korea", "South Korea"]
+          ],
+          {}, class: "w-full rounded-md border border-gray-300 px-3 py-2 bg-white focus:outline-none focus:ring-2 focus:ring-yellow-400"
+      %>
+    </div>
   </div>
 
-  <div class="my-5">
-    <%= form.label :state %>
-    <%= form.textarea :state, rows: 4, class: ["block shadow-sm rounded-md border px-3 py-2 mt-2 w-full", {"border-gray-400 focus:outline-blue-600": location.errors[:state].none?, "border-red-400 focus:outline-red-600": location.errors[:state].any?}] %>
-  </div>
+  <%= f.hidden_field :latitude %>
+  <%= f.hidden_field :longitude %>
 
-  <div class="my-5">
-    <%= form.label :zip %>
-    <%= form.textarea :zip, rows: 4, class: ["block shadow-sm rounded-md border px-3 py-2 mt-2 w-full", {"border-gray-400 focus:outline-blue-600": location.errors[:zip].none?, "border-red-400 focus:outline-red-600": location.errors[:zip].any?}] %>
-  </div>
-
-  <div class="my-5">
-    <%= form.label :country %>
-    <%= form.textarea :country, rows: 4, class: ["block shadow-sm rounded-md border px-3 py-2 mt-2 w-full", {"border-gray-400 focus:outline-blue-600": location.errors[:country].none?, "border-red-400 focus:outline-red-600": location.errors[:country].any?}] %>
-  </div>
-
-  <div class="my-5">
-    <%= form.label :latitude %>
-    <%= form.text_field :latitude, class: ["block shadow-sm rounded-md border px-3 py-2 mt-2 w-full", {"border-gray-400 focus:outline-blue-600": location.errors[:latitude].none?, "border-red-400 focus:outline-red-600": location.errors[:latitude].any?}] %>
-  </div>
-
-  <div class="my-5">
-    <%= form.label :longitude %>
-    <%= form.text_field :longitude, class: ["block shadow-sm rounded-md border px-3 py-2 mt-2 w-full", {"border-gray-400 focus:outline-blue-600": location.errors[:longitude].none?, "border-red-400 focus:outline-red-600": location.errors[:longitude].any?}] %>
-  </div>
-
-  <div class="inline">
-    <%= form.submit class: "w-full sm:w-auto rounded-md px-3.5 py-2.5 bg-blue-600 hover:bg-blue-500 text-white inline-block font-medium cursor-pointer" %>
+  <div>
+    <%= f.submit( location.persisted? ? "Save Changes" : "Add Location",
+          class: "w-full md:w-auto rounded-md bg-yellow-400 hover:bg-yellow-500 px-6 py-2 font-medium text-gray-900 transition") %>
   </div>
 <% end %>

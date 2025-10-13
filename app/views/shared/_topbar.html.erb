@@ -1,0 +1,11 @@
+<nav class="w-full border-b bg-white">
+  <div class="mx-auto max-w-6xl w-full px-4 py-4 flex items-center justify-between">
+    <h1 class="text-2xl font-bold">Accessibility Map</h1>
+    <div class="flex gap-3">
+      <%= link_to "Search Locations", locations_path,
+          class: "rounded-md border px-3 py-2 text-sm font-medium hover:bg-gray-50" %>
+      <%= link_to "Add Location", new_location_path,
+          class: "rounded-md bg-yellow-400 px-3 py-2 text-sm font-medium text-gray-900 hover:bg-yellow-500" %>
+    </div>
+  </div>
+</nav>
