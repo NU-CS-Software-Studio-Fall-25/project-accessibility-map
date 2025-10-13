@@ -28,9 +28,9 @@
 
   <!-- placeholder chips, will add once features model is in place -->
   <section class="flex flex-row gap-[4px]">
-    <span class="bg-blue-100 text-blue-800 text-xs font-medium me-2 px-2.5 py-0.5 rounded-full dark:bg-blue-900 dark:text-blue-300">Default</span>
-    <span class="bg-blue-100 text-blue-800 text-xs font-medium me-2 px-2.5 py-0.5 rounded-full dark:bg-blue-900 dark:text-blue-300">Default</span>
-    <span class="bg-blue-100 text-blue-800 text-xs font-medium me-2 px-2.5 py-0.5 rounded-full dark:bg-blue-900 dark:text-blue-300">Default</span>
+    <span class="bg-blue-400 text-white text-[16px] font-medium me-2 px-2.5 py-0.5 rounded-full dark:bg-blue-900 dark:text-blue-300">Default</span>
+    <span class="bg-blue-400 text-white text-[16px] font-medium me-2 px-2.5 py-0.5 rounded-full dark:bg-blue-900 dark:text-blue-300">Default</span>
+    <span class="bg-blue-400 text-white text-[16px] font-medium me-2 px-2.5 py-0.5 rounded-full dark:bg-blue-900 dark:text-blue-300">Default</span>
   </section>
   
   <!-- divider line -->
@@ -46,12 +46,18 @@
     <div class="flex flex-col gap-[24px]">
         <% if @location.reviews.any? %>
           <% @location.reviews.each do |review| %>
-            <div class="block w-[100%] p-6 bg-white border border-gray-200 rounded-lg shadow-sm hover:bg-gray-100 dark:bg-gray-800 dark:border-gray-700 dark:hover:bg-gray-700">
-              <h5 class="mb-2 text-2xl text-[24px] tracking-tight text-gray-900 dark:text-white">User Review</h5>
+            <article class="block w-[100%] p-6 bg-white border border-gray-200 rounded-lg shadow-sm hover:bg-gray-100 dark:bg-gray-800 dark:border-gray-700 dark:hover:bg-gray-700">
+              <div class="flex flex-row justify-between">
+                <h5 class="mb-2 text-2xl text-[24px] tracking-tight text-gray-500 dark:text-white">User Review</h5>
+                <%= link_to "Edit Review",
+                  edit_review_path(review),
+                  class: "text-gray-900"
+                %>
+              </div>
               <p class="font-normal text-gray-700 dark:text-gray-400 mb-2">
                 <%= review.body %>
               </p>
-            </div>
+            </article>
         <% end %>
         <% else %>
           <p class="font-normal text-gray-700 dark:text-gray-400 italic">
