@@ -19,9 +19,9 @@
     <div>
       <%= link_to "Edit Location",
         edit_location_path(@location),
-        class: "text-yellow-400 hover:text-white border border-yellow-400 hover:bg-yellow-500 focus:ring-4 focus:outline-none focus:ring-yellow-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:border-yellow-300 dark:text-yellow-300 dark:hover:text-white dark:hover:bg-yellow-400 dark:focus:ring-yellow-900"
+        class: "text-yellow-400 hover:text-white border border-yellow-400 hover:bg-yellow-500 focus:ring-4 focus:outline-none focus:ring-yellow-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center"
       %>
-      <a type="button" class="text-yellow-400 hover:text-white border border-yellow-400 hover:bg-yellow-500 focus:ring-4 focus:outline-none focus:ring-yellow-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:border-yellow-300 dark:text-yellow-300 dark:hover:text-white dark:hover:bg-yellow-400 dark:focus:ring-yellow-900">Add Photo</a>
+      <a type="button" class="text-yellow-400 hover:text-white border border-yellow-400 hover:bg-yellow-500 focus:ring-4 focus:outline-none focus:ring-yellow-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center">Add Photo</a>
     </div>
   </section>
     
@@ -35,9 +35,9 @@
 
   <!-- placeholder chips, will add once features model is in place -->
   <section class="flex flex-row gap-[4px]">
-    <span class="bg-blue-400 text-white text-[16px] font-medium me-2 px-2.5 py-0.5 rounded-full dark:bg-blue-900 dark:text-blue-300">Default</span>
-    <span class="bg-blue-400 text-white text-[16px] font-medium me-2 px-2.5 py-0.5 rounded-full dark:bg-blue-900 dark:text-blue-300">Default</span>
-    <span class="bg-blue-400 text-white text-[16px] font-medium me-2 px-2.5 py-0.5 rounded-full dark:bg-blue-900 dark:text-blue-300">Default</span>
+    <span class="bg-blue-400 text-white text-[16px] font-medium me-2 px-2.5 py-0.5 rounded-full">Default</span>
+    <span class="bg-blue-400 text-white text-[16px] font-medium me-2 px-2.5 py-0.5 rounded-full">Default</span>
+    <span class="bg-blue-400 text-white text-[16px] font-medium me-2 px-2.5 py-0.5 rounded-full">Default</span>
   </section>
   
   <!-- divider line -->
@@ -47,27 +47,27 @@
   <section class="flex flex-col gap-[24px]">
     <div class="flex flex-row justify-between">
       <h1 class="text-[36px] font-bold">Reviews</h1>
-      <button type="button" class="h-[100%] text-yellow-400 hover:text-white border border-yellow-400 hover:bg-yellow-500 focus:ring-4 focus:outline-none focus:ring-yellow-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center me-2 mb-2 dark:border-yellow-300 dark:text-yellow-300 dark:hover:text-white dark:hover:bg-yellow-400 dark:focus:ring-yellow-900">Add Review</button>
+      <button type="button" class="h-[100%] text-yellow-400 hover:text-white border border-yellow-400 hover:bg-yellow-500 focus:ring-4 focus:outline-none focus:ring-yellow-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center me-2 mb-2">Add Review</button>
     </div>
     
     <div class="flex flex-col gap-[24px]">
         <% if @location.reviews.any? %>
           <% @location.reviews.each do |review| %>
-            <article class="block w-[100%] p-6 bg-white border border-gray-200 rounded-lg shadow-sm hover:bg-gray-100 dark:bg-gray-800 dark:border-gray-700 dark:hover:bg-gray-700">
+            <article class="block w-[100%] p-6 bg-white border border-gray-200 rounded-lg shadow-sm hover:bg-gray-100">
               <div class="flex flex-row justify-between">
-                <h5 class="mb-2 text-2xl text-[24px] tracking-tight text-gray-500 dark:text-white">User Review</h5>
+                <h5 class="mb-2 text-2xl text-[24px] tracking-tight text-gray-500">User Review</h5>
                 <%= link_to "Edit Review",
                   edit_review_path(review),
                   class: "text-gray-900"
                 %>
               </div>
-              <p class="font-normal text-gray-700 dark:text-gray-400 mb-2">
+              <p class="font-normal text-gray-700 mb-2">
                 <%= review.body %>
               </p>
             </article>
         <% end %>
         <% else %>
-          <p class="font-normal text-gray-700 dark:text-gray-400 italic">
+          <p class="font-normal text-gray-700 italic">
             No reviews yet for this location.
           </p>
         <% end %>
