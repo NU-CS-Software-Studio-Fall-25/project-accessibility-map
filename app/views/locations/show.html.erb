@@ -1,22 +1,76 @@
 <% content_for :title, "Showing location" %>
 
-<div class="md:w-2/3 w-full">
+<div class="w-[80vw] pb-[88px] flex flex-col gap-[24px]">
   <% if notice.present? %>
     <p class="py-2 px-3 bg-green-50 mb-5 text-green-500 font-medium rounded-md inline-block" id="notice"><%= notice %></p>
   <% end %>
-
-  <h1 class="font-bold text-4xl">Showing location</h1>
-
-  <%= render @location %>
 
   <% if @location.latitude && @location.longitude %>
     <div id="ofm-map"
          data-lat="<%= @location.latitude %>"
          data-lng="<%= @location.longitude %>"
-         class="mt-4 h-72 w-full rounded-md border"></div>
+         class="mt-4 h-0 w-full opacity-0 rounded-md border">
+    </div>
   <% end %>
 
-  <%= link_to "Edit this location", edit_location_path(@location), class: "w-full sm:w-auto text-center rounded-md px-3.5 py-2.5 bg-gray-100 hover:bg-gray-50 inline-block font-medium" %>
-  <%= link_to "Back to locations", locations_path, class: "w-full sm:w-auto text-center mt-2 sm:mt-0 sm:ml-2 rounded-md px-3.5 py-2.5 bg-gray-100 hover:bg-gray-50 inline-block font-medium" %>
-  <%= button_to "Destroy this location", @location, method: :delete, form_class: "sm:inline-block mt-2 sm:mt-0 sm:ml-2", class: "w-full rounded-md px-3.5 py-2.5 text-white bg-red-600 hover:bg-red-500 font-medium cursor-pointer", data: { turbo_confirm: "Are you sure?" } %>
+  <section class="flex justify-between items-center">
+    <h1 class="text-[36px] font-bold"><%= @location.name %></h1>
+    <!-- buttons for editing location and add image -->
+    <div>
+      <%= link_to "Edit Location",
+        edit_location_path(@location),
+        class: "text-yellow-400 hover:text-white border border-yellow-400 hover:bg-yellow-500 focus:ring-4 focus:outline-none focus:ring-yellow-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:border-yellow-300 dark:text-yellow-300 dark:hover:text-white dark:hover:bg-yellow-400 dark:focus:ring-yellow-900"
+      %>
+      <a type="button" class="text-yellow-400 hover:text-white border border-yellow-400 hover:bg-yellow-500 focus:ring-4 focus:outline-none focus:ring-yellow-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:border-yellow-300 dark:text-yellow-300 dark:hover:text-white dark:hover:bg-yellow-400 dark:focus:ring-yellow-900">Add Photo</a>
+    </div>
+  </section>
+    
+
+  <!-- placeholder image gallery -->
+  <section class="flex gap-4">
+    <div class="w-[30%] h-[300px] bg-gray-300 rounded-lg shadow-md"></div>
+    <div class="w-[30%] h-[300px] bg-gray-300 rounded-lg shadow-md"></div>
+    <div class="w-[30%] h-[300px] bg-gray-300 rounded-lg shadow-md"></div>
+  </section>
+
+  <!-- placeholder chips, will add once features model is in place -->
+  <section class="flex flex-row gap-[4px]">
+    <span class="bg-blue-400 text-white text-[16px] font-medium me-2 px-2.5 py-0.5 rounded-full dark:bg-blue-900 dark:text-blue-300">Default</span>
+    <span class="bg-blue-400 text-white text-[16px] font-medium me-2 px-2.5 py-0.5 rounded-full dark:bg-blue-900 dark:text-blue-300">Default</span>
+    <span class="bg-blue-400 text-white text-[16px] font-medium me-2 px-2.5 py-0.5 rounded-full dark:bg-blue-900 dark:text-blue-300">Default</span>
+  </section>
+  
+  <!-- divider line -->
+  <hr class="h-px my-8 bg-gray-200 border-0 dark:bg-gray-700">
+
+  <!-- reviews -->
+  <section class="flex flex-col gap-[24px]">
+    <div class="flex flex-row justify-between">
+      <h1 class="text-[36px] font-bold">Reviews</h1>
+      <button type="button" class="h-[100%] text-yellow-400 hover:text-white border border-yellow-400 hover:bg-yellow-500 focus:ring-4 focus:outline-none focus:ring-yellow-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center me-2 mb-2 dark:border-yellow-300 dark:text-yellow-300 dark:hover:text-white dark:hover:bg-yellow-400 dark:focus:ring-yellow-900">Add Review</button>
+    </div>
+    
+    <div class="flex flex-col gap-[24px]">
+        <% if @location.reviews.any? %>
+          <% @location.reviews.each do |review| %>
+            <article class="block w-[100%] p-6 bg-white border border-gray-200 rounded-lg shadow-sm hover:bg-gray-100 dark:bg-gray-800 dark:border-gray-700 dark:hover:bg-gray-700">
+              <div class="flex flex-row justify-between">
+                <h5 class="mb-2 text-2xl text-[24px] tracking-tight text-gray-500 dark:text-white">User Review</h5>
+                <%= link_to "Edit Review",
+                  edit_review_path(review),
+                  class: "text-gray-900"
+                %>
+              </div>
+              <p class="font-normal text-gray-700 dark:text-gray-400 mb-2">
+                <%= review.body %>
+              </p>
+            </article>
+        <% end %>
+        <% else %>
+          <p class="font-normal text-gray-700 dark:text-gray-400 italic">
+            No reviews yet for this location.
+          </p>
+        <% end %>
+    </div>
+  </section>
 </div>
