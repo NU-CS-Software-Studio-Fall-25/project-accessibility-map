@@ -12,4 +12,11 @@ An app that lets people rate the accessibility of different public areas (ex. in
 - Map that you can navigate around, when clicking a location, the accessibility shows up.
 - Search for places.
 - Read others' reviews and write a review.
-- Show the accessibility features via ratings or UI chips. .
+- Show the accessibility features via ratings or UI chips.
+
+### Team Members
+
+- Brandon Do
+- Darian Liang
+- Larry Ling
+- Chisa Yan

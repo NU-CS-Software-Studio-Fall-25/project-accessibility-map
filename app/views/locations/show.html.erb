@@ -1,19 +1,19 @@
 <% content_for :title, "Showing location" %>
 
-<div class="w-[80vw] pb-[88px] flex flex-col gap-[24px]">
+<div class="w-full lg:px-[144px] md:px-[96px] px-[36px] pb-[88px] flex flex-col gap-[24px]">
   <% if notice.present? %>
     <p class="py-2 px-3 bg-green-50 mb-5 text-green-500 font-medium rounded-md inline-block" id="notice"><%= notice %></p>
   <% end %>
 
   <% if @location.latitude && @location.longitude %>
     <div id="ofm-map"
-         data-lat="<%= @location.latitude %>"
-         data-lng="<%= @location.longitude %>"
-         class="mt-4 h-0 w-full opacity-0 rounded-md border">
+     data-lat="<%= @location.latitude %>"
+     data-lng="<%= @location.longitude %>"
+     class="mt-4 h-0 w-full opacity-0 rounded-md border">
     </div>
   <% end %>
 
-  <section class="flex justify-between items-center">
+  <section class="flex md:flex-row flex-col justify-between md:items-center items-start gap-2">
     <h1 class="text-[36px] font-bold"><%= @location.name %></h1>
     <!-- buttons for editing location and add image -->
     <div>
@@ -24,7 +24,6 @@
       <a type="button" class="text-yellow-400 hover:text-white border border-yellow-400 hover:bg-yellow-500 focus:ring-4 focus:outline-none focus:ring-yellow-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center">Add Photo</a>
     </div>
   </section>
-    
 
   <!-- placeholder image gallery -->
   <section class="flex gap-4">
