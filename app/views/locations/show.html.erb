@@ -5,6 +5,13 @@
     <p class="py-2 px-3 bg-green-50 mb-5 text-green-500 font-medium rounded-md inline-block" id="notice"><%= notice %></p>
   <% end %>
 
+  <% if @location.latitude && @location.longitude %>
+    <div id="ofm-map"
+         data-lat="<%= @location.latitude %>"
+         data-lng="<%= @location.longitude %>"
+         class="mt-4 h-0 w-full opacity-0 rounded-md border">
+    </div>
+  <% end %>
 
   <section class="flex justify-between items-center">
     <h1 class="text-[36px] font-bold"><%= @location.name %></h1>
