@@ -1,29 +1,47 @@
 <% content_for :title, "Locations" %>
 
-<div class="w-full">
-  <% if notice.present? %>
-    <p class="py-2 px-3 bg-green-50 mb-5 text-green-500 font-medium rounded-md inline-block" id="notice"><%= notice %></p>
-  <% end %>
+<% if notice.present? %>
+  <p class="py-2 px-3 bg-green-50 mb-5 text-green-500 font-medium rounded-md inline-block" id="notice"><%= notice %></p>
+<% end %>
 
-  <div class="flex justify-between items-center">
-    <h1 class="font-bold text-4xl">Locations</h1>
-    <%= link_to "New location", new_location_path, class: "rounded-md px-3.5 py-2.5 bg-blue-600 hover:bg-blue-500 text-white block font-medium" %>
+<div class="flex h-full">
+  <div class="sm:block hidden flex-1 min-w-1/2">
+    <%= js_map locations_path(format: :json, query: params[:query]), 
+        controls: true, 
+        tooltips: { hover: false, html: true},
+        width: "100%",
+        height: "100%"
+    %>
   </div>
 
-  <div id="locations" class="min-w-full divide-y divide-gray-200 space-y-5">
-    <% if @locations.any? %>
-      <% @locations.each do |location| %>
-        <div class="flex flex-col sm:flex-row justify-between items-center pb-5 sm:pb-0">
-          <%= render location %>
-          <div class="w-full sm:w-auto flex flex-col sm:flex-row space-x-2 space-y-2">
-            <%= link_to "Show", location, class: "w-full sm:w-auto text-center rounded-md px-3.5 py-2.5 bg-gray-100 hover:bg-gray-50 inline-block font-medium" %>
-            <%= link_to "Edit", edit_location_path(location), class: "w-full sm:w-auto text-center rounded-md px-3.5 py-2.5 bg-gray-100 hover:bg-gray-50 inline-block font-medium" %>
-            <%= button_to "Destroy", location, method: :delete, class: "w-full sm:w-auto rounded-md px-3.5 py-2.5 text-white bg-red-600 hover:bg-red-500 font-medium cursor-pointer", data: { turbo_confirm: "Are you sure?" } %>
-          </div>
+  <div id="locations" class="sm:flex-initial flex-1 sm:basis-[450px] flex flex-col justify-start items-stretch gap-4 overflow-y-auto border-l border-b border-gray-200 p-4">
+    <%= form_with url: locations_path, method: :get, class: "w-full flex gap-2" do %>
+      <div class="flex-1 relative">
+        <div class="absolute inset-y-0 start-0 flex items-center ps-3 pointer-events-none">
+          <svg class="w-4 h-4 text-gray-500 dark:text-gray-400" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 20 20">
+            <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m19 19-4-4m0-7A7 7 0 1 1 1 8a7 7 0 0 1 14 0Z"/>
+          </svg>
         </div>
-      <% end %>
-    <% else %>
-      <p class="text-center my-10">No locations found.</p>
+        <%= text_field_tag :query,
+          params[:query],
+          class: "w-full ps-10 rounded-lg border border-gray-200 focus:ring-blue-500 focus:border-blue-500 truncate",
+          placeholder: "Search locations"
+        %>
+      </div>
+      <%= submit_tag "Search", class: "text-white text-md bg-blue-600 hover:bg-blue-700 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg px-4 py-2" %>
     <% end %>
+
+    <div class="h-[1px] bg-gray-200"></div>
+
+    <div class="w-full flex flex-col justify-start items-stretch gap-4 overflow-y-auto">
+      <% if @locations.any? %>
+        <% @locations.each do |location| %>
+          <%= render location %>
+        <% end %>
+      <% else %>
+        <p class="text-center my-10">No locations found.</p>
+      <% end %>
+    </div>
   </div>
 </div>
+
