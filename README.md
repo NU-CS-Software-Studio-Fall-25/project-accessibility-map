@@ -20,3 +20,7 @@ An app that lets people rate the accessibility of different public areas (ex. in
 - Darian Liang
 - Larry Ling
 - Chisa Yan
+
+### Deployed Application
+
+- Visited the deployed application [here](https://project-accessibility-map-50cd81ed0a73.herokuapp.com)
