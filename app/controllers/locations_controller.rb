@@ -5,10 +5,10 @@ class LocationsController < ApplicationController
 
   # GET /locations or /locations.json
   def index
-    if params[:query].present?
-      @locations = Location.search_locations(params[:query])
+    @locations = if params[:query].present?
+      Location.search_locations(params[:query])
     else
-      @locations = Location.all
+      Location.all
     end
   end
 

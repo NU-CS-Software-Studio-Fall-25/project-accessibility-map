@@ -160,6 +160,7 @@ GEM
       net-imap
       net-pop
       net-smtp
+    mapkick-rb (0.2.0)
     marcel (1.1.0)
     matrix (0.4.3)
     mini_mime (1.1.5)
@@ -406,6 +407,7 @@ DEPENDENCIES
   importmap-rails
   jbuilder
   kamal
+  mapkick-rb
   pg (~> 1.1)
   pg_search
   propshaft

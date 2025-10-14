@@ -5,7 +5,14 @@
 <% end %>
 
 <div class="flex h-full">
-  <div id="map" class="sm:block hidden flex-1 min-w-1/2"></div>
+  <div class="sm:block hidden flex-1 min-w-1/2">
+    <%= js_map locations_path(format: :json, query: params[:query]), 
+        controls: true, 
+        tooltips: { hover: false, html: true},
+        width: "100%",
+        height: "100%"
+    %>
+  </div>
 
   <div id="locations" class="sm:flex-initial flex-1 sm:basis-[450px] flex flex-col justify-start items-stretch gap-4 overflow-y-auto border-l border-b border-gray-200 p-4">
     <%= form_with url: locations_path, method: :get, class: "w-full flex gap-2" do %>
@@ -38,73 +45,3 @@
   </div>
 </div>
 
-<script>
-  let map = null;
-
-  const initializeMap = () => {
-    const mapElement = document.getElementById('map');
-
-    if (!mapElement) {
-      return;
-    }
-
-    if (map) {
-      map = null;
-    }
-
-    if (mapElement._leaflet_id) {
-      delete mapElement._leaflet_id;
-    }
-
-    map = L.map(mapElement)
-
-    L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
-        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-    }).addTo(map);
-
-    const locations = <%= raw @locations.to_json() %>;
-
-    locations.forEach((location) => {
-      if (location.latitude && location.longitude) {
-        L.marker([parseFloat(location.latitude), location.longitude])
-          .addTo(map)
-          .bindPopup(
-            `
-            <a href="/locations/${location.id}" class="!text-black" target="_blank" data-turbo-frame="_top>
-              <p class="font-bold !mb-1">
-                ${location.name}
-              </p>
-              <p class="font-normal !m-0"> 
-                ${location.address}, ${location.city}, ${location.state} ${location.zip}
-              </p>
-            </a>
-            `
-          )
-      }
-    })
-
-    if (locations.length > 0) {
-      const bounds = L.latLngBounds(
-        locations
-          .filter((location) => { return location.latitude && location.longitude })
-          .map((location) => { return [location.latitude, location.longitude] })
-      );
-
-      map.fitBounds(bounds, { padding: [100, 100] })
-    }
-
-    const resizeObserver = new ResizeObserver(() => {
-      map.invalidateSize();
-    });
-
-    resizeObserver.observe(mapElement);
-  }
-
-  document.addEventListener("turbo:load", initializeMap);
-  document.addEventListener("turbo:before-cache", () => {
-    if (map) {
-      map.off();
-      map = null;
-    }
-  });
-</script>
