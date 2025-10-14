@@ -1,10 +1,10 @@
 <% content_for :title, "Showing location" %>
 
-<div class="w-full lg:px-[144px] md:px-[96px] px-[36px] pb-[88px] flex flex-col gap-[24px]">
-  <% if notice.present? %>
-    <p class="py-2 px-3 bg-green-50 mb-5 text-green-500 font-medium rounded-md inline-block" id="notice"><%= notice %></p>
-  <% end %>
+<% if notice.present? %>
+  <p class="py-2 px-3 bg-green-50 mb-5 text-green-500 font-medium rounded-md inline-block" id="notice"><%= notice %></p>
+<% end %>
 
+<div class="w-full lg:px-[144px] md:px-[96px] px-[36px] py-8 [88px] flex flex-col gap-[24px]">
   <% if @location.latitude && @location.longitude %>
     <div id="ofm-map"
      data-lat="<%= @location.latitude %>"
