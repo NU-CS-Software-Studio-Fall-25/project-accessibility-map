@@ -16,6 +16,7 @@ class LocationsController < ApplicationController
   def show
     @location = Location.find(params[:id])
     @reviews = @location.reviews.order(created_at: :desc)
+    @review = @location.reviews.build
   end
 
   # GET /locations/new
