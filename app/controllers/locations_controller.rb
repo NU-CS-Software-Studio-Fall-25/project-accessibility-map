@@ -14,6 +14,8 @@ class LocationsController < ApplicationController
 
   # GET /locations/1 or /locations/1.json
   def show
+    @location = Location.find(params[:id])
+    @reviews = @location.reviews.order(created_at: :desc)
   end
 
   # GET /locations/new
