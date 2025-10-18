@@ -10,7 +10,7 @@ class ReviewsController < ApplicationController
 
     respond_to do |format|
       if @review.save
-        format.html { redirect_to(@location, notice: "Review was successfully created.") }
+        format.html { redirect_to(@location, notice: "Review was successfully created.", status: :see_other) }
         format.json { render(:show, status: :created, location: @review) }
       else
         format.html do
