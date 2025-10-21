@@ -1,4 +1,4 @@
-<%= form_with(model: location, class: "space-y-8") do |f| %>
+<%= form_with(model: location, class: "space-y-4") do |f| %>
   <% if location.errors.any? %>
     <div class="rounded-md bg-red-50 p-4 text-red-700">
       <p class="font-semibold mb-2"><%= pluralize(location.errors.count, "error") %> prohibited this location from being saved:</p>
@@ -11,26 +11,26 @@
   <% end %>
 
   <div>
-    <label class="block text-sm font-medium mb-1">Location Name</label>
+    <%= f.label :name, "Location Name", class: "block text-sm font-medium mb-1" %>
     <%= f.text_field :name, placeholder: "ex. Moge Tee",
           class: "w-full rounded-md border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-yellow-400" %>
   </div>
 
   <div>
-    <label class="block text-sm font-medium mb-1">Address Line</label>
+    <%= f.label :address, "Address Line", class: "block text-sm font-medium mb-1" %>
     <%= f.text_field :address, placeholder: "ex. 1590 Sherman Ave",
           class: "w-full rounded-md border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-yellow-400" %>
   </div>
 
-  <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+  <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
     <div>
-      <label class="block text-sm font-medium mb-1">City</label>
+      <%= f.label :city, "City", class: "block text-sm font-medium mb-1" %>
       <%= f.text_field :city, placeholder: "ex. Evanston",
             class: "w-full rounded-md border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-yellow-400" %>
     </div>
 
     <div>
-      <label class="block text-sm font-medium mb-1">State</label>
+      <%= f.label :state, "State", class: "block text-sm font-medium mb-1" %>
       <%= f.select :state,
           [
             ["Select a state", ""],
@@ -56,13 +56,13 @@
     </div>
 
     <div>
-      <label class="block text-sm font-medium mb-1">Zip Code</label>
+      <%= f.label :zip, "Zip Code", class: "block text-sm font-medium mb-1" %>
       <%= f.text_field :zip, placeholder: "ex. 60201",
             class: "w-full rounded-md border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-yellow-400" %>
     </div>
 
     <div>
-      <label class="block text-sm font-medium mb-1">Country</label>
+      <%= f.label :country, "Country", class: "block text-sm font-medium mb-1" %>
       <%= f.select :country,
           [
             ["Select a country", ""],

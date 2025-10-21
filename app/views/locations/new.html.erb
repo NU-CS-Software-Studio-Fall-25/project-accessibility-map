@@ -1,5 +1,7 @@
-<% content_for :title, "New Location" %>
-<div class="mx-auto max-w-3xl w-full px-2 md:px-0 py-8">
-  <h2 class="text-lg font-semibold mb-4">Add a New Location</h2>
-  <%= render "form", location: @location %>
+<% content_for :title, "Add Location" %>
+<div class="lg:px-[144px] md:px-[96px] px-[36px] w-full py-8 flex flex-col justify-center items-center">
+  <div class="max-w-3xl w-full">
+    <h2 class="text-xl font-semibold mb-4">Add Location</h2>
+    <%= render "form", location: @location %>
+  </div>
 </div>
