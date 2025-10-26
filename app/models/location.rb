@@ -1,6 +1,8 @@
 # frozen_string_literal: true
 class Location < ApplicationRecord
     has_many :reviews, dependent: :destroy
+    has_and_belongs_to_many :features
+
 
     include PgSearch::Model
     pg_search_scope :search_locations,
