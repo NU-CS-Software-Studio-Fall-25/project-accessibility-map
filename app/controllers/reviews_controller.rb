@@ -2,14 +2,15 @@
 
 class ReviewsController < ApplicationController
   # Run auth check before every action except what should remain public  
-  before_action :authenticate_user!, except: [:index, :show]
+  allow_unauthenticated_access only: [:index, :show]
   
   before_action :set_location
   before_action :set_review, only: [:update, :destroy]
+  before_action :authorize_user!, only: [:update, :destroy]
 
   # POST /reviews or /reviews.json
   def create
-    @review = @location.reviews.new(review_params)
+    @review = current_user.reviews.build(review_params.merge(location_id: @location.id))
 
     respond_to do |format|
       if @review.save
@@ -65,5 +66,11 @@ class ReviewsController < ApplicationController
   # Only allow a list of trusted parameters through.
   def review_params
     params.expect(review: [:body])
+  end
+
+  def authorize_user!
+    unless @review.user == current_user
+      redirect_to @location, alert: "You are not authorized to perform this action."
+    end
   end
 end
