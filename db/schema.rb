@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_10_23_051305) do
+ActiveRecord::Schema[8.0].define(version: 2025_10_27_023405) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
   enable_extension "pgcrypto"
@@ -35,8 +35,8 @@ ActiveRecord::Schema[8.0].define(version: 2025_10_23_051305) do
   end
 
   create_table "locations_features", id: false, force: :cascade do |t|
-    t.bigint "feature_id", null: false
     t.uuid "location_id", null: false
+    t.uuid "feature_id", null: false
   end
 
   create_table "reviews", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
@@ -47,6 +47,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_10_23_051305) do
     t.index ["location_id"], name: "index_reviews_on_location_id"
   end
 
+  add_foreign_key "locations_features", "features"
   add_foreign_key "locations_features", "locations"
   add_foreign_key "reviews", "locations", on_delete: :cascade
 end
