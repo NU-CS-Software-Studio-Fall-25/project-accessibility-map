@@ -1,6 +1,9 @@
 # frozen_string_literal: true
 
 class ReviewsController < ApplicationController
+  # Run auth check before every action except what should remain public  
+  before_action :authenticate_user!, except: [:index, :show]
+  
   before_action :set_location
   before_action :set_review, only: [:update, :destroy]
 

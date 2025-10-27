@@ -1,6 +1,9 @@
 # frozen_string_literal: true
 
 class LocationsController < ApplicationController
+  # Run auth check before every action except what should remain public  
+  before_action :authenticate_user!, except: [:index, :show]
+
   before_action :set_location, only: [:show, :edit, :update, :destroy]
 
   # GET /locations or /locations.json
