@@ -1,4 +1,4 @@
-<% content_for :title, "Showing location" %>
+<% content_for :title, @location.name %>
 
 <% if notice.present? %>
   <p class="py-2 px-3 bg-green-50 mb-5 text-green-500 font-medium rounded-md inline-block" id="notice"><%= notice %></p>
@@ -50,21 +50,13 @@
   <section class="flex flex-col gap-4">
     <div class="flex flex-row justify-between items-center">
       <h1 class="text-3xl font-bold"><%= pluralize(@location.reviews.count, 'Review') %></h1>
-      <button type="button" class="h-[100%] text-yellow-400 hover:text-white border border-yellow-400 hover:bg-yellow-500 focus:ring-4 focus:outline-none focus:ring-yellow-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center">Add Review</button>
+      <button data-modal-target="add-review-modal" data-modal-toggle="add-review-modal" type="button" class="text-yellow-400 hover:text-white border border-yellow-400 hover:bg-yellow-500 focus:ring-4 focus:outline-none focus:ring-yellow-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center">Add Review</button>
     </div>
     
     <div class="flex flex-col items-stretch gap-4">
-      <% if @location.reviews.any? %>
-        <% @location.reviews.each do |review| %>
-          <article class="p-4 bg-white border border-gray-200 rounded-lg shadow-sm hover:bg-gray-100 space-y-2">
-            <div class="flex flex-row justify-between items-center">
-              <h5 class="text-xl tracking-tight text-gray-900">User Review</h5>
-              <button type="button" class="hover:underline text-gray-600 text-sm">Edit Review</button>
-            </div>
-            <p class="font-normal text-gray-800">
-              <%= review.body %>
-            </p>
-          </article>
+      <% if @reviews.any? %>
+        <% @reviews.each do |review| %>
+          <%= render review %>
       <% end %>
       <% else %>
         <p class="font-normal text-gray-700 italic">
@@ -74,3 +66,27 @@
     </div>
   </section>
 </div>
+
+<div id="add-review-modal" tabindex="-1" aria-hidden="true" class="hidden overflow-y-auto overflow-x-hidden fixed top-0 right-0 left-0 z-50 justify-center items-center w-full md:inset-0 h-[calc(100%-1rem)] max-h-full">
+  <div class="relative p-4 w-full max-w-[800px] max-h-full">
+    <!-- Modal content -->
+    <div class="relative bg-white rounded-lg shadow-sm">
+      <!-- Modal header -->
+      <div class="flex items-center justify-between p-4 border-b rounded-t border-gray-200">
+        <h3 class="text-lg font-semibold text-gray-900">
+          Add Review 
+        </h3>
+        <button type="button" class="text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm w-8 h-8 ms-auto inline-flex justify-center items-center" data-modal-toggle="add-review-modal">
+          <svg class="w-3 h-3" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 14 14">
+            <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m1 1 6 6m0 0 6 6M7 7l6-6M7 7l-6 6"/>
+          </svg>
+          <span class="sr-only">Close modal</span>
+        </button>
+      </div>
+      <!-- Modal body -->
+      <div class="p-4">
+        <%= render "reviews/new_form", review: @review, location: @location %>
+      </div>
+    </div>
+  </div>
+</div> 

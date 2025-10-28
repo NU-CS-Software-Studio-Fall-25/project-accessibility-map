@@ -14,6 +14,9 @@ class LocationsController < ApplicationController
 
   # GET /locations/1 or /locations/1.json
   def show
+    @location = Location.find(params[:id])
+    @reviews = @location.reviews.order(created_at: :desc)
+    @review = @location.reviews.build
   end
 
   # GET /locations/new
@@ -31,7 +34,7 @@ class LocationsController < ApplicationController
 
     respond_to do |format|
       if @location.save
-        format.html { redirect_to(@location, notice: "Location was successfully created.") }
+        format.html { redirect_to(@location, notice: "Location was successfully created.", status: :see_other) }
         format.json { render(:show, status: :created, location: @location) }
       else
         format.html { render(:new, status: :unprocessable_entity) }
