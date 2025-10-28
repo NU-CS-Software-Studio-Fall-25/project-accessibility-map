@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_10_28_174020) do
+ActiveRecord::Schema[8.0].define(version: 2025_10_28_174614) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
   enable_extension "pgcrypto"
@@ -99,14 +99,13 @@ ActiveRecord::Schema[8.0].define(version: 2025_10_28_174020) do
   end
 
   create_table "solid_cache_entries", force: :cascade do |t|
-    t.string "key", null: false
-    t.binary "value"
-    t.integer "hits", default: 0, null: false
-    t.datetime "expires_at"
+    t.binary "key", null: false
+    t.binary "value", null: false
     t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
     t.integer "key_hash", null: false
-    t.index ["key"], name: "index_solid_cache_entries_on_key", unique: true
+    t.integer "byte_size", null: false
+    t.index ["byte_size"], name: "index_solid_cache_entries_on_byte_size"
+    t.index ["key_hash", "byte_size"], name: "index_solid_cache_entries_on_key_hash_and_byte_size"
     t.index ["key_hash"], name: "index_solid_cache_entries_on_key_hash", unique: true
   end
 
