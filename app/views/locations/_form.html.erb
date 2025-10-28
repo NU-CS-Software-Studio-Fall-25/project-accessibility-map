@@ -25,6 +25,7 @@
     <div class="flex gap-4 overflow-x-auto">
       <% if location.pictures.attached? %>
         <% location.pictures.each do |picture| %>
+          <% next unless picture.persisted? %>
           <div class="relative group">
             <%= image_tag picture.variant(resize_to_limit: [nil, 200]), class: "w-full h-64 object-cover rounded-lg" %>
             <%= link_to "Delete", 
