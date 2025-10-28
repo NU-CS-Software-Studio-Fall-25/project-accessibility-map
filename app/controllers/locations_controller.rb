@@ -1,7 +1,11 @@
 # frozen_string_literal: true
 
 class LocationsController < ApplicationController
+  # Run auth check before every action except what should remain public  
+  allow_unauthenticated_access only: [:index, :show]
+
   before_action :set_location, only: [:show, :edit, :update, :destroy]
+  before_action :authorize_user!, only: [:edit, :update, :destroy] # Add this line
 
   # GET /locations or /locations.json
   def index
@@ -30,7 +34,7 @@ class LocationsController < ApplicationController
 
   # POST /locations or /locations.json
   def create
-    @location = Location.new(location_params)
+    @location = current_user.locations.build(location_params)
 
     respond_to do |format|
       if @location.save
@@ -77,4 +81,10 @@ class LocationsController < ApplicationController
   def location_params
     params.expect(location: [:name, :address, :city, :state, :zip, :country, :latitude, :longitude, feature_ids: []])
   end
+
+  def authorize_user!
+    unless @location.user == current_user
+      redirect_to @location, alert: "You are not authorized to perform this action"
+    end
+  end 
 end

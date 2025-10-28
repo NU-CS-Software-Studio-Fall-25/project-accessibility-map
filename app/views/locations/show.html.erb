@@ -16,43 +16,46 @@
   <section class="flex md:flex-row flex-col justify-between md:items-center items-start gap-2">
     <h1 class="text-3xl font-bold"><%= @location.name %></h1>
     <!-- buttons for editing location and add image -->
-    <div class="flex gap-2 grow-0">
-      <%= link_to "Edit Location",
-        edit_location_path(@location),
-        class: "text-yellow-400 hover:text-white border border-yellow-400 hover:bg-yellow-500 focus:ring-4 focus:outline-none focus:ring-yellow-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center"
-      %>
-      <a type="button" class="text-yellow-400 hover:text-white border border-yellow-400 hover:bg-yellow-500 focus:ring-4 focus:outline-none focus:ring-yellow-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center">Add Photo</a>
-    </div>
-  </section>
-
-  <!-- placeholder image gallery -->
-  <section class="flex gap-4">
-    <div class="w-[30%] h-[300px] bg-gray-300 rounded-lg shadow-md"></div>
-    <div class="w-[30%] h-[300px] bg-gray-300 rounded-lg shadow-md"></div>
-    <div class="w-[30%] h-[300px] bg-gray-300 rounded-lg shadow-md"></div>
-  </section>
-
-  <!-- chips for feature model -->
-  <section class="flex flex-row gap-2 flex-wrap">
-    <% if @location.features.any? %>
-      <% @location.features.each do |feature| %>
-        <span class="bg-blue-400 text-white text-sm font-medium px-4 py-1.5 rounded-full text-nowrap"><%= feature.feature %></span>
-      <% end %>
-    <% else %>
-      <span class="bg-blue-400 text-white text-sm font-medium px-4 py-1.5 rounded-full text-nowrap">No features available.</span>
-    <% end %>
-  </section>
-  
-  <!-- divider line -->
-  <hr class="h-px bg-gray-200 border-0">
-
-  <!-- reviews -->
-  <section class="flex flex-col gap-4">
-    <div class="flex flex-row justify-between items-center">
-      <h1 class="text-3xl font-bold"><%= pluralize(@location.reviews.count, 'Review') %></h1>
-      <button data-modal-target="add-review-modal" data-modal-toggle="add-review-modal" type="button" class="text-yellow-400 hover:text-white border border-yellow-400 hover:bg-yellow-500 focus:ring-4 focus:outline-none focus:ring-yellow-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center">Add Review</button>
-    </div>
+        <div class="flex gap-2 grow-0">
+          <% if current_user == @location.user %>
+            <%= link_to "Edit Location",
+              edit_location_path(@location),
+              class: "text-yellow-400 hover:text-white border border-yellow-400 hover:bg-yellow-500 focus:ring-4 focus:outline-none focus:ring-yellow-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center"
+            %>
+            <a type="button" class="text-yellow-400 hover:text-white border border-yellow-400 hover:bg-yellow-500 focus:ring-4 focus:outline-none focus:ring-yellow-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center">Add Photo</a>
+          <% end %>
+        </div>
+      </section>
     
+      <!-- placeholder image gallery -->
+      <section class="flex gap-4">
+        <div class="w-[30%] h-[300px] bg-gray-300 rounded-lg shadow-md"></div>
+        <div class="w-[30%] h-[300px] bg-gray-300 rounded-lg shadow-md"></div>
+        <div class="w-[30%] h-[300px] bg-gray-300 rounded-lg shadow-md"></div>
+      </section>
+    
+      <!-- chips for feature model -->
+      <section class="flex flex-row gap-2 flex-wrap">
+         <% if @location.features.any? %>
+            <% @location.features.each do |feature| %>
+              <span class="bg-blue-400 text-white text-sm font-medium px-4 py-1.5 rounded-full text-nowrap"><%= feature.feature %></span>
+            <% end %>
+         <% else %>
+              <span class="bg-blue-400 text-white text-sm font-medium px-4 py-1.5 rounded-full text-nowrap">No features available.</span>
+         <% end %>
+      </section>
+    
+      <!-- divider line -->
+      <hr class="h-px bg-gray-200 border-0">
+    
+      <!-- reviews -->
+      <section class="flex flex-col gap-4">
+        <div class="flex flex-row justify-between items-center">
+          <h1 class="text-3xl font-bold"><%= pluralize(@location.reviews.count, 'Review') %></h1>
+          <% if current_user %>
+            <button data-modal-target="add-review-modal" data-modal-toggle="add-review-modal" type="button" class="text-yellow-400 hover:text-white border border-yellow-400 hover:bg-yellow-500 focus:ring-4 focus:outline-none focus:ring-yellow-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center">Add Review</button>
+          <% end %>
+        </div>    
     <div class="flex flex-col items-stretch gap-4">
       <% if @reviews.any? %>
         <% @reviews.each do |review| %>
