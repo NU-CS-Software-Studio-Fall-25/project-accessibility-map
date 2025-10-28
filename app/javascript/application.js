@@ -3,3 +3,6 @@ import "@hotwired/turbo-rails"
 import "controllers"
 import 'flowbite'
 import "mapkick/bundle"
+
+import "trix"
+import "@rails/actiontext"
