@@ -12,10 +12,16 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_10_11_184153) do
+ActiveRecord::Schema[8.0].define(version: 2025_10_28_030748) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
   enable_extension "pgcrypto"
+
+  create_table "features", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
+    t.text("feature")
+    t.datetime("created_at", null: false)
+    t.datetime("updated_at", null: false)
+  end
 
   create_table "locations", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
     t.text("name")
@@ -28,6 +34,13 @@ ActiveRecord::Schema[8.0].define(version: 2025_10_11_184153) do
     t.decimal("longitude", precision: 11, scale: 8)
     t.datetime("created_at", null: false)
     t.datetime("updated_at", null: false)
+    t.uuid("user_id", null: false)
+    t.index(["user_id"], name: "index_locations_on_user_id")
+  end
+
+  create_table "locations_features", id: false, force: :cascade do |t|
+    t.uuid("location_id", null: false)
+    t.uuid("feature_id", null: false)
   end
 
   create_table "reviews", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
@@ -35,8 +48,42 @@ ActiveRecord::Schema[8.0].define(version: 2025_10_11_184153) do
     t.datetime("created_at", null: false)
     t.datetime("updated_at", null: false)
     t.uuid("location_id")
+    t.uuid("user_id", null: false)
     t.index(["location_id"], name: "index_reviews_on_location_id")
+    t.index(["user_id"], name: "index_reviews_on_user_id")
   end
 
+  create_table "sessions", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
+    t.uuid("user_id", null: false)
+    t.string("ip_address")
+    t.string("user_agent")
+    t.datetime("created_at", null: false)
+    t.datetime("updated_at", null: false)
+    t.index(["user_id"], name: "index_sessions_on_user_id")
+  end
+
+  create_table "solid_cache_entries", force: :cascade do |t|
+    t.string("key", null: false)
+    t.binary("value")
+    t.integer("hits", default: 0, null: false)
+    t.datetime("expires_at")
+    t.datetime("created_at", null: false)
+    t.datetime("updated_at", null: false)
+    t.index(["key"], name: "index_solid_cache_entries_on_key", unique: true)
+  end
+
+  create_table "users", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
+    t.string("email_address", null: false)
+    t.string("password_digest", null: false)
+    t.datetime("created_at", null: false)
+    t.datetime("updated_at", null: false)
+    t.index(["email_address"], name: "index_users_on_email_address", unique: true)
+  end
+
+  add_foreign_key "locations", "users"
+  add_foreign_key "locations_features", "features"
+  add_foreign_key "locations_features", "locations"
   add_foreign_key "reviews", "locations", on_delete: :cascade
+  add_foreign_key "reviews", "users"
+  add_foreign_key "sessions", "users"
 end
