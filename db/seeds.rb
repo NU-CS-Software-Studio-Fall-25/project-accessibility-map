@@ -150,7 +150,7 @@
 #   Review.create(review)
 # end
 
-features  = [
+features = [
   "Quiet space",
   "Pet-friendly",
   "Child-friendly",
@@ -163,7 +163,7 @@ features  = [
   "Kosher",
   "Halal",
   "Wide aisles",
-  "Automatic doors"
+  "Automatic doors",
 ]
 
 features.each do |f|

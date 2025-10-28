@@ -1,11 +1,11 @@
 # frozen_string_literal: true
 
 class LocationsController < ApplicationController
-  # Run auth check before every action except what should remain public  
+  # Run auth check before every action except what should remain public
   allow_unauthenticated_access only: [:index, :show]
 
-  before_action :set_location, only: [:show, :edit, :update, :destroy]
-  before_action :authorize_user!, only: [:edit, :update, :destroy] # Add this line
+  before_action :set_location, only: [:show, :edit, :update, :destroy, :delete_picture]
+  before_action :authorize_user!, only: [:edit, :update, :destroy, :delete_picture]
 
   # GET /locations or /locations.json
   def index
@@ -49,6 +49,10 @@ class LocationsController < ApplicationController
 
   # PATCH/PUT /locations/1 or /locations/1.json
   def update
+    if params[:location][:pictures].present?
+      @location.pictures.attach(params[:location][:pictures])
+    end
+
     respond_to do |format|
       if @location.update(location_params)
         format.html { redirect_to(@location, notice: "Location was successfully updated.", status: :see_other) }
@@ -70,6 +74,17 @@ class LocationsController < ApplicationController
     end
   end
 
+  # DELETE /locations/1/delete_picture
+  def delete_picture
+    picture = @location.pictures.find(params[:picture_id])
+
+    if picture.purge
+      redirect_back(fallback_location: edit_location_path(@location), notice: "Image deleted successfully.")
+    else
+      redirect_back(fallback_location: edit_location_path(@location), alert: "Failed to delete image.")
+    end
+  end
+
   private
 
   # Use callbacks to share common setup or constraints between actions.
@@ -84,7 +99,7 @@ class LocationsController < ApplicationController
 
   def authorize_user!
     unless @location.user == current_user
-      redirect_to @location, alert: "You are not authorized to perform this action"
+      redirect_to(@location, alert: "You are not authorized to perform this action")
     end
-  end 
+  end
 end

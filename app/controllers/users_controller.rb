@@ -1,6 +1,8 @@
+# frozen_string_literal: true
+
 class UsersController < ApplicationController
   allow_unauthenticated_access only: [:new, :create]
-  
+
   def new
     @user = User.new
   end
@@ -8,9 +10,9 @@ class UsersController < ApplicationController
   def create
     @user = User.new(user_params)
     if @user.save
-      redirect_to root_path, notice: "Account created successfully!"
+      redirect_to(root_path, notice: "Account created successfully!")
     else
-      render :new, status: :unprocessable_entity
+      render(:new, status: :unprocessable_entity)
     end
   end
 
