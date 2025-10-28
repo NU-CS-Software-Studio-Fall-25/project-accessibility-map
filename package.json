@@ -1,4 +1,7 @@
 {
+	"scripts": {
+		"build:css": "tailwindcss -i ./app/assets/tailwind/application.css -o ./app/assets/builds/application.css --minify"
+	},
 	"dependencies": {
 		"flowbite": "^3.1.2"
 	}
