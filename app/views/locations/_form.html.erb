@@ -17,6 +17,21 @@
   </div>
 
   <div>
+    <%= f.label :feature_ids, "Features", class: "block text-sm font-medium mb-1" %>
+    <div class="flex flex-wrap gap-2">
+      <% Feature.all.each do |feature| %>
+        <label class="flex items-center space-x-2 bg-gray-100 hover:bg-yellow-100 px-3 py-1.5 rounded-md cursor-pointer">
+          <%= check_box_tag "location[feature_ids][]",
+            feature.id,
+            @location.features.include?(feature),   
+            class: "rounded text-yellow-500 focus:ring-yellow-400" %>
+          <span class="text-sm text-gray-800"><%= feature.feature %></span>
+        </label>
+      <% end %>
+    </div>
+  </div>
+
+  <div>
     <%= f.label :address, "Address Line", class: "block text-sm font-medium mb-1" %>
     <%= f.text_field :address, placeholder: "ex. 1590 Sherman Ave",
           class: "w-full rounded-md border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-yellow-400" %>

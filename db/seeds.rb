@@ -147,3 +147,56 @@ reviews = [
 reviews.each do |review|
   Review.create(review)
 end
+
+features  = [
+  "Quiet space",
+  "Pet-friendly",
+  "Child-friendly",
+  "Wheelchair accessible",
+  "Accessible restrooms",
+  "Elevator access",
+  "Human service",
+  "Vegetarian",
+  "Vegan",
+  "Kosher",
+  "Halal",
+  "Wide aisles",
+  "Automatic doors"
+]
+
+features.each do |f|
+  Feature.create(feature: f)
+end
+
+location_features = [
+  {
+    location_id: "254a521b-f0ef-4dfe-bd7d-873059fec190",
+    features: ["Wheelchair accessible", "Accessible restrooms"]
+  },
+  {
+    location_id: "4f6623d7-276a-4a2f-af22-435eafd7fc65",
+    features: ["Wheelchair accessible", "Wide aisles", "Human service"]
+  },
+  {
+    location_id: "b3d52740-3867-497f-bec7-1939c20ea67f",
+    features: ["Pet-friendly"]
+  },
+  {
+    location_id: "aea95612-4664-4c6b-990a-0c2aa0c909a6",
+    features: []
+  }
+]
+
+location_features.each do |entry|
+  # finds location by id in the DB, skip if it's nil
+  location = Location.find_by(id: entry[:location_id])
+  next unless location
+
+  entry[:features].each do |feature_name|
+    # find the corresponding features from the feature table
+    feature = Feature.find_by(feature: feature_name)
+    next unless feature
+    # add new row to the join table unless if it already exists
+    location.features << feature unless location.features.include?(feature)
+  end
+end

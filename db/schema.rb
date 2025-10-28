@@ -10,10 +10,16 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_10_24_224749) do
+ActiveRecord::Schema[8.0].define(version: 2025_10_27_023405) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
   enable_extension "pgcrypto"
+
+  create_table "features", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
+    t.text "feature"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+  end
 
   create_table "locations", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
     t.text "name"
@@ -28,6 +34,11 @@ ActiveRecord::Schema[8.0].define(version: 2025_10_24_224749) do
     t.datetime "updated_at", null: false
     t.uuid "user_id", null: false
     t.index ["user_id"], name: "index_locations_on_user_id"
+  end
+
+  create_table "locations_features", id: false, force: :cascade do |t|
+    t.uuid "location_id", null: false
+    t.uuid "feature_id", null: false
   end
 
   create_table "reviews", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
@@ -58,6 +69,8 @@ ActiveRecord::Schema[8.0].define(version: 2025_10_24_224749) do
   end
 
   add_foreign_key "locations", "users"
+  add_foreign_key "locations_features", "features"
+  add_foreign_key "locations_features", "locations"
   add_foreign_key "reviews", "locations", on_delete: :cascade
   add_foreign_key "reviews", "users"
   add_foreign_key "sessions", "users"

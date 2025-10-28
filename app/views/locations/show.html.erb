@@ -34,11 +34,15 @@
         <div class="w-[30%] h-[300px] bg-gray-300 rounded-lg shadow-md"></div>
       </section>
     
-      <!-- placeholder chips, will add once features model is in place -->
+      <!-- chips for feature model -->
       <section class="flex flex-row gap-2 flex-wrap">
-        <span class="bg-blue-400 text-white text-sm font-medium px-4 py-1.5 rounded-full text-nowrap">Default</span>
-        <span class="bg-blue-400 text-white text-sm font-medium px-4 py-1.5 rounded-full text-nowrap">Default</span>
-        <span class="bg-blue-400 text-white text-sm font-medium px-4 py-1.5 rounded-full text-nowrap">Default</span>
+         <% if @location.features.any? %>
+            <% @location.features.each do |feature| %>
+              <span class="bg-blue-400 text-white text-sm font-medium px-4 py-1.5 rounded-full text-nowrap"><%= feature.feature %></span>
+            <% end %>
+         <% else %>
+              <span class="bg-blue-400 text-white text-sm font-medium px-4 py-1.5 rounded-full text-nowrap">No features available.</span>
+         <% end %>
       </section>
     
       <!-- divider line -->
