@@ -1,7 +1,6 @@
 # frozen_string_literal: true
 class Location < ApplicationRecord
     has_many :reviews, dependent: :destroy
-    has_many :photos, dependent: :destroy
 
     include PgSearch::Model
     pg_search_scope :search_locations,
@@ -61,5 +60,6 @@ class Location < ApplicationRecord
         if full_address.present? && (latitude.blank? || longitude.blank?)
         errors.add(:base, "Could not geocode the provided address. Please check the address details.")
     end
+end
 end
 end
