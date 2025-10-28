@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_10_28_061215) do
+ActiveRecord::Schema[8.0].define(version: 2025_10_28_150121) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
   enable_extension "pgcrypto"
@@ -106,6 +106,19 @@ ActiveRecord::Schema[8.0].define(version: 2025_10_28_061215) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["key"], name: "index_solid_cache_entries_on_key", unique: true
+  end
+
+  create_table "solid_queue_jobs", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
+    t.string "queue"
+    t.text "payload"
+    t.integer "attempts", default: 0
+    t.datetime "run_at"
+    t.datetime "locked_at"
+    t.datetime "failed_at"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["queue"], name: "index_solid_queue_jobs_on_queue"
+    t.index ["run_at"], name: "index_solid_queue_jobs_on_run_at"
   end
 
   create_table "users", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
