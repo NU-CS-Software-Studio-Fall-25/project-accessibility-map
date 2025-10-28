@@ -11,3 +11,4 @@ pin "flowbite", to: "https://cdn.jsdelivr.net/npm/flowbite@3.1.2/dist/flowbite.t
 pin "mapkick/bundle", to: "mapkick.bundle.js"
 pin "trix"
 pin "@rails/actiontext", to: "actiontext.esm.js"
+pin "@rails/activestorage", to: "activestorage.esm.js"

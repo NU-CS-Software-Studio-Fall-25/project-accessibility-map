@@ -17,6 +17,11 @@
   </div>
 
   <div>
+    <%= f.label :pictures, "Photos", class: "block text-sm font-medium mb-1" %>
+    <%= f.file_field :pictures, multiple: true %>
+  </div>
+
+  <div>
     <%= f.label :feature_ids, "Features", class: "block text-sm font-medium mb-1" %>
     <div class="flex flex-wrap gap-2">
       <% Feature.all.each do |feature| %>

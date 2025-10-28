@@ -6,3 +6,4 @@ import "mapkick/bundle"
 
 import "trix"
 import "@rails/actiontext"
+
