@@ -150,25 +150,25 @@
 #   Review.create(review)
 # end
 
-# features  = [
-#   "Quiet space",
-#   "Pet-friendly",
-#   "Child-friendly",
-#   "Wheelchair accessible",
-#   "Accessible restrooms",
-#   "Elevator access",
-#   "Human service",
-#   "Vegetarian",
-#   "Vegan",
-#   "Kosher",
-#   "Halal",
-#   "Wide aisles",
-#   "Automatic doors"
-# ]
+features  = [
+  "Quiet space",
+  "Pet-friendly",
+  "Child-friendly",
+  "Wheelchair accessible",
+  "Accessible restrooms",
+  "Elevator access",
+  "Human service",
+  "Vegetarian",
+  "Vegan",
+  "Kosher",
+  "Halal",
+  "Wide aisles",
+  "Automatic doors"
+]
 
-# features.each do |f|
-#   Feature.create(feature: f)
-# end
+features.each do |f|
+  Feature.create(feature: f)
+end
 
 # location_features = [
 #   {
