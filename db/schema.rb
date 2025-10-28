@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_10_28_151957) do
+ActiveRecord::Schema[8.0].define(version: 2025_10_28_152840) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
   enable_extension "pgcrypto"
@@ -119,8 +119,17 @@ ActiveRecord::Schema[8.0].define(version: 2025_10_28_151957) do
     t.datetime "updated_at", null: false
     t.string "active_job_id"
     t.integer "priority"
+    t.string "class_name"
+    t.text "arguments"
+    t.datetime "scheduled_at"
+    t.datetime "finished_at"
+    t.string "concurrency_key"
+    t.index ["class_name"], name: "index_solid_queue_jobs_on_class_name"
+    t.index ["finished_at"], name: "index_solid_queue_jobs_on_finished_at"
+    t.index ["queue_name", "finished_at"], name: "index_solid_queue_jobs_for_filtering"
     t.index ["queue_name"], name: "index_solid_queue_jobs_on_queue_name"
     t.index ["run_at"], name: "index_solid_queue_jobs_on_run_at"
+    t.index ["scheduled_at", "finished_at"], name: "index_solid_queue_jobs_for_alerting"
   end
 
   create_table "users", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
