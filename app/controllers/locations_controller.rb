@@ -65,7 +65,7 @@ class LocationsController < ApplicationController
     @location.destroy!
 
     respond_to do |format|
-      format.html { redirect_to(locations_path, notice: "Location was successfully destroyed.", status: :see_other) }
+      format.html { redirect_to(locations_path, notice: "Location was successfully deleted.", status: :see_other) }
       format.json { head(:no_content) }
     end
   end
@@ -74,7 +74,7 @@ class LocationsController < ApplicationController
 
   # Use callbacks to share common setup or constraints between actions.
   def set_location
-    @location = Location.find(params.expect(:id))
+    @location = Location.find(params[:id])
   end
 
   # Only allow a list of trusted parameters through.

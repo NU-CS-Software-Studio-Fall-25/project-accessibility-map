@@ -49,22 +49,19 @@
       <%= f.select :state,
           [
             ["Select a state", ""],
-            ["Alabama", "Alabama"], ["Alaska", "Alaska"], ["Arizona", "Arizona"], ["Arkansas", "Arkansas"],
-            ["California", "California"], ["Colorado", "Colorado"], ["Connecticut", "Connecticut"],
-            ["Delaware", "Delaware"], ["Florida", "Florida"], ["Georgia", "Georgia"], ["Hawaii", "Hawaii"],
-            ["Idaho", "Idaho"], ["Illinois", "Illinois"], ["Indiana", "Indiana"], ["Iowa", "Iowa"],
-            ["Kansas", "Kansas"], ["Kentucky", "Kentucky"], ["Louisiana", "Louisiana"], ["Maine", "Maine"],
-            ["Maryland", "Maryland"], ["Massachusetts", "Massachusetts"], ["Michigan", "Michigan"],
-            ["Minnesota", "Minnesota"], ["Mississippi", "Mississippi"], ["Missouri", "Missouri"],
-            ["Montana", "Montana"], ["Nebraska", "Nebraska"], ["Nevada", "Nevada"], ["New Hampshire", "New Hampshire"],
-            ["New Jersey", "New Jersey"], ["New Mexico", "New Mexico"], ["New York", "New York"],
-            ["North Carolina", "North Carolina"], ["North Dakota", "North Dakota"],
-            ["Ohio", "Ohio"], ["Oklahoma", "Oklahoma"], ["Oregon", "Oregon"],
-            ["Pennsylvania", "Pennsylvania"], ["Rhode Island", "Rhode Island"],
-            ["South Carolina", "South Carolina"], ["South Dakota", "South Dakota"],
-            ["Tennessee", "Tennessee"], ["Texas", "Texas"], ["Utah", "Utah"],
-            ["Vermont", "Vermont"], ["Virginia", "Virginia"], ["Washington", "Washington"],
-            ["West Virginia", "West Virginia"], ["Wisconsin", "Wisconsin"], ["Wyoming", "Wyoming"]
+            ["Alabama", "AL"], ["Alaska", "AK"], ["Arizona", "AZ"], ["Arkansas", "AR"],
+            ["California", "CA"], ["Colorado", "CO"], ["Connecticut", "CT"], ["Delaware", "DE"],
+            ["Florida", "FL"], ["Georgia", "GA"], ["Hawaii", "HI"], ["Idaho", "ID"],
+            ["Illinois", "IL"], ["Indiana", "IN"], ["Iowa", "IA"], ["Kansas", "KS"],
+            ["Kentucky", "KY"], ["Louisiana", "LA"], ["Maine", "ME"], ["Maryland", "MD"],
+            ["Massachusetts", "MA"], ["Michigan", "MI"], ["Minnesota", "MN"], ["Mississippi", "MS"],
+            ["Missouri", "MO"], ["Montana", "MT"], ["Nebraska", "NE"], ["Nevada", "NV"],
+            ["New Hampshire", "NH"], ["New Jersey", "NJ"], ["New Mexico", "NM"], ["New York", "NY"],
+            ["North Carolina", "NC"], ["North Dakota", "ND"], ["Ohio", "OH"], ["Oklahoma", "OK"],
+            ["Oregon", "OR"], ["Pennsylvania", "PA"], ["Rhode Island", "RI"], ["South Carolina", "SC"],
+            ["South Dakota", "SD"], ["Tennessee", "TN"], ["Texas", "TX"], ["Utah", "UT"],
+            ["Vermont", "VT"], ["Virginia", "VA"], ["Washington", "WA"], ["West Virginia", "WV"],
+            ["Wisconsin", "WI"], ["Wyoming", "WY"]
           ],
           {}, class: "w-full rounded-md border border-gray-300 px-3 py-2 bg-white focus:outline-none focus:ring-2 focus:ring-yellow-400"
       %>
@@ -106,4 +103,14 @@
     <%= f.submit( location.persisted? ? "Save Changes" : "Add Location",
           class: "w-full md:w-auto rounded-md bg-yellow-400 hover:bg-yellow-500 px-6 py-2 font-medium text-gray-900 transition") %>
   </div>
+
+  <% if location.persisted? %>
+  <div class="mt-4 flex justify-between items-center">
+    <%= link_to "Delete Location",
+                location_path(location),
+                data: { turbo_method: :delete, turbo_confirm: "Are you sure you want to delete this location?" },
+                class: "rounded-md bg-red-500 hover:bg-red-600 px-6 py-2 font-medium text-white transition" %>
+  </div>
+<% end %>
+
 <% end %>
