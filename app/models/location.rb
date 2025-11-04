@@ -16,6 +16,8 @@ class Location < ApplicationRecord
   before_validation :normalize_fields
   before_validation :clear_coords_if_address_changed
   before_validation :geocode_safely, if: :address_fields_changed?
+  validate :zip_code_format_valid
+  validate :coordinates_required_if_address_changed, if: :address_fields_changed?
 
 
   # Let geocoded_by handle the geocoding automatically
@@ -59,6 +61,19 @@ class Location < ApplicationRecord
     end
     self.state = state.upcase if state.present?
     self.country = country.to_s.strip
+
+    # us zips to digits or digits dash
+    if country == "United States" && zip.present?
+      self.zip = zip.gsub(/[^0-9\-]/, "")
+    end
+  end
+
+  def zip_code_format_valid
+    return if zip.blank?
+    return unless country == "United States"
+    unless /\A\d{5}(-\d{4})?\z/.match?(zip)
+      errors.add(:zip, "must be in the format 12345 or 12345-6789 for United States")
+    end
   end
 
   def require_coordinates_after_geocoding
