@@ -2,6 +2,7 @@
 
 class User < ApplicationRecord
   has_secure_password
+  validates :email_address, uniqueness: true
   has_many :sessions, dependent: :destroy
   has_many :locations
   has_many :reviews
