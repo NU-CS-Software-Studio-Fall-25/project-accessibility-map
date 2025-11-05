@@ -73,7 +73,7 @@
 
       <div>
         <%= form.submit "Sign Up",
-              class: "w-full md:w-auto rounded-md bg-blue-700 hover:bg-blue-800 px-6 py-2 font-medium text-white transition",
+              class: "w-full md:w-auto rounded-md bg-blue-700 hover:bg-blue-800 px-6 py-2 font-medium text-white transition disabled:bg-gray-500 disabled:hover:bg-gray-500 disabled:cursor-not-allowed",
               data: { "signup-validation-target": "submitButton" } %>
       </div>
     <% end %>
