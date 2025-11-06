@@ -102,7 +102,7 @@ class Location < ApplicationRecord
 
       if provided.blank? || detected.blank? || provided != detected
         # Don’t set coords; fail validation later
-        errors.add(:zip, "does not match the address (found #{detected_zip.presence || 'unknown'} from geocoder)")
+        errors.add(:zip, "zip code does not match the address (found #{detected_zip.presence || 'unknown'})")
         return
       end
     end
