@@ -15,7 +15,7 @@ class Location < ApplicationRecord
 
   before_validation :normalize_fields
   before_validation :clear_coords_if_address_changed
-  before_validation :geocode_safely, if: :address_fields_changed?
+  before_validation :geocode_safely, if: -> { address_fields_changed? || latitude.blank? || longitude.blank? }
   validate :zip_code_format_valid
   validate :coordinates_required_if_address_changed, if: :address_fields_changed?
 
