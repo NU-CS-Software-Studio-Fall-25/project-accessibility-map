@@ -23,7 +23,7 @@ class Location < ApplicationRecord
   # Let geocoded_by handle the geocoding automatically
   geocoded_by :full_address
   #after_validation :geocode, if: ->(obj) { obj.address_changed? || obj.city_changed? || obj.state_changed? || obj.zip_changed? || obj.country_changed? }
-  after_validation :geocode_safely, if: :address_fields_changed?
+  #after_validation :geocode_safely, if: :address_fields_changed?
 
 
   validates :name, :address, :city, :state, :zip, :country, presence: true
@@ -90,9 +90,29 @@ class Location < ApplicationRecord
   end
 
   def geocode_safely
-    geocode
+    # Call Geocoder directly so we can inspect postal_code
+    result = Geocoder.search(full_address).first
+    return unless result
+
+    detected_zip = (result.postal_code || "").to_s
+    # Normalize to 5 digits for US comparisons
+    if country == "United States"
+      provided = zip.to_s.gsub(/\D/, "")[0,5]
+      detected = detected_zip.gsub(/\D/, "")[0,5]
+
+      if provided.blank? || detected.blank? || provided != detected
+        # Don’t set coords; fail validation later
+        errors.add(:zip, "does not match the address (found #{detected_zip.presence || 'unknown'} from geocoder)")
+        return
+      end
+    end
+
+    # ZIP matches (or non-US), accept the coordinates
+    self.latitude  = result.latitude
+    self.longitude = result.longitude
   rescue OpenSSL::SSL::SSLError, Geocoder::Error => e
     Rails.logger.warn("Geocode error, will invalidate save if coords blank: #{e.message}")
+    # leave coords nil; your validation will block save
   end
 
   def coordinates_required_if_address_changed
