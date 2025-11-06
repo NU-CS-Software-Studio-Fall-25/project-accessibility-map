@@ -1,4 +1,4 @@
-<%= form_with(model: location, class: "space-y-4") do |f| %>
+<%= form_with(model: location, class: "space-y-4", data: { controller: "location-form-validation" }) do |f| %>
   <% if location.errors.any? %>
     <div class="rounded-md bg-red-50 p-4 text-red-700">
       <p class="font-semibold mb-2"><%= pluralize(location.errors.count, "error") %> prohibited this location from being saved:</p>
@@ -13,7 +13,9 @@
   <div>
     <%= f.label :name, "Location Name", class: "block text-sm font-medium mb-1" %>
     <%= f.text_field :name, placeholder: "ex. Moge Tee",
-          class: "w-full rounded-md border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-yellow-400" %>
+          class: "w-full rounded-md border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-yellow-400",
+          data: { "location-form-validation-target": "nameInput", action: "input->location-form-validation#validate" } %>
+    <div data-location-form-validation-target="nameFeedback"></div>
   </div>
 
   <div class="space-y-4">
@@ -57,14 +59,18 @@
   <div>
     <%= f.label :address, "Address Line", class: "block text-sm font-medium mb-1" %>
     <%= f.text_field :address, placeholder: "ex. 1590 Sherman Ave",
-          class: "w-full rounded-md border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-yellow-400" %>
+          class: "w-full rounded-md border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-yellow-400",
+          data: { "location-form-validation-target": "addressInput", action: "input->location-form-validation#validate" } %>
+    <div data-location-form-validation-target="addressFeedback"></div>
   </div>
 
   <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
     <div>
       <%= f.label :city, "City", class: "block text-sm font-medium mb-1" %>
       <%= f.text_field :city, placeholder: "ex. Evanston",
-            class: "w-full rounded-md border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-yellow-400" %>
+            class: "w-full rounded-md border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-yellow-400",
+            data: { "location-form-validation-target": "cityInput", action: "input->location-form-validation#validate" } %>
+      <div data-location-form-validation-target="cityFeedback"></div>
     </div>
 
     <div>
@@ -86,14 +92,18 @@
             ["Vermont", "VT"], ["Virginia", "VA"], ["Washington", "WA"], ["West Virginia", "WV"],
             ["Wisconsin", "WI"], ["Wyoming", "WY"]
           ],
-          {}, class: "w-full rounded-md border border-gray-300 px-3 py-2 bg-white focus:outline-none focus:ring-2 focus:ring-yellow-400"
+          {}, class: "w-full rounded-md border border-gray-300 px-3 py-2 bg-white focus:outline-none focus:ring-2 focus:ring-yellow-400",
+          data: { "location-form-validation-target": "stateInput", action: "change->location-form-validation#validate" }
       %>
+      <div data-location-form-validation-target="stateFeedback"></div>
     </div>
 
     <div>
       <%= f.label :zip, "Zip Code", class: "block text-sm font-medium mb-1" %>
       <%= f.text_field :zip, placeholder: "ex. 60201",
-            class: "w-full rounded-md border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-yellow-400" %>
+            class: "w-full rounded-md border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-yellow-400",
+            data: { "location-form-validation-target": "zipInput", action: "input->location-form-validation#validate" } %>
+      <div data-location-form-validation-target="zipFeedback"></div>
     </div>
 
     <div>
@@ -114,8 +124,10 @@
             ["Brazil", "Brazil"],
             ["South Korea", "South Korea"]
           ],
-          {}, class: "w-full rounded-md border border-gray-300 px-3 py-2 bg-white focus:outline-none focus:ring-2 focus:ring-yellow-400"
+          {}, class: "w-full rounded-md border border-gray-300 px-3 py-2 bg-white focus:outline-none focus:ring-2 focus:ring-yellow-400",
+          data: { "location-form-validation-target": "countryInput", action: "change->location-form-validation#validate" }
       %>
+      <div data-location-form-validation-target="countryFeedback"></div>
     </div>
   </div>
 
@@ -124,7 +136,8 @@
 
   <div>
     <%= f.submit( location.persisted? ? "Save Changes" : "Add Location",
-          class: "w-full md:w-auto rounded-md bg-yellow-400 hover:bg-yellow-500 px-6 py-2 font-medium text-gray-900 transition") %>
+          class: "w-full md:w-auto rounded-md bg-yellow-400 hover:bg-yellow-500 px-6 py-2 font-medium text-gray-900 transition disabled:bg-gray-400 disabled:hover:bg-gray-400 disabled:cursor-not-allowed",
+          data: { "location-form-validation-target": "submitButton" }) %>
   </div>
 
   <% if location.persisted? %>
