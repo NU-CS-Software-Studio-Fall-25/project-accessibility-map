@@ -8,13 +8,17 @@ class LocationsController < ApplicationController
   before_action :authorize_user!, only: [:edit, :update, :destroy, :delete_picture]
 
   # GET /locations or /locations.json
-  def index
-    @locations = if params[:query].present?
-      Location.search_locations(params[:query])
-    else
-      Location.all
-    end
+ def index
+  @locations = Location.all
+
+  if params[:query].present?
+    @locations = @locations.merge(Location.search_locations(params[:query]))
   end
+
+  if params[:feature_id].present?
+    @locations = @locations.joins(:features).where(features: { id: params[:feature_id] })
+  end
+end
 
   # GET /locations/1 or /locations/1.json
   def show
