@@ -4,7 +4,7 @@
   <p class="py-2 px-3 bg-green-50 mb-5 text-green-500 font-medium rounded-md inline-block" id="notice"><%= notice %></p>
 <% end %>
 
-<div class="flex h-full">
+<main class="flex h-full">
   <div class="sm:block hidden flex-1 min-w-1/2">
     <%= js_map locations_path(format: :json, query: params[:query]), 
         controls: true, 
@@ -15,7 +15,7 @@
   </div>
 
   <div id="locations" class="sm:flex-initial flex-1 sm:basis-[450px] flex flex-col justify-start items-stretch gap-4 overflow-y-auto border-l border-b border-gray-200 p-4">
-    <%= form_with url: locations_path, method: :get, class: "w-full flex flex-col gap-2" do %>
+    <%= form_with url: locations_path, method: :get, class: "w-full flex flex-col gap-2", role: "search" do %>
       <label for="query" class="block text-sm font-medium text-gray-700 mb-1">Search by name or keyword</label>
       <div class="flex-1 relative">
         <div class="absolute inset-y-0 start-0 flex items-center ps-3 pointer-events-none">
@@ -31,20 +31,20 @@
       </div>
         
       <!-- Allow searching by filtering the features -->
-      <div>
+      <section>
         <label for="feature_id" class="block text-sm font-medium text-gray-700 mb-2 mt-1.5">Filter by feature</label>
         <%= select_tag :feature_id,
           options_for_select([["All features", ""]] + Feature.all.pluck(:feature, :id), params[:feature_id]),
-          class: "w-full rounded-lg border border-gray-200focus:ring-blue-500 focus:border-blue-500 h-[42px] bg-white shadow-sm text-sm"
-       %>
-        </div>
+          class: "w-full rounded-lg border border-gray-200 focus:ring-blue-500 focus:border-blue-500 h-[42px] bg-white shadow-sm text-sm"
+        %>
+      </section>
 
       <%= submit_tag "Search", class: "text-white text-md bg-blue-600 hover:bg-blue-700 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg px-4 py-2" %>
     <% end %>
 
     <div class="h-[1px] bg-gray-200"></div>
 
-    <div class="w-full flex flex-col justify-start items-stretch gap-4 overflow-y-auto">
+    <section class="w-full flex flex-col justify-start items-stretch gap-4 overflow-y-auto">
       <% if @locations.any? %>
         <% @locations.each do |location| %>
           <%= render location %>
@@ -52,7 +52,7 @@
       <% else %>
         <p class="text-center my-10">No locations found.</p>
       <% end %>
-    </div>
+    </section>
   </div>
-</div>
+</main>
 
