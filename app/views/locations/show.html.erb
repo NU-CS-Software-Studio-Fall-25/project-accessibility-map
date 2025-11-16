@@ -29,24 +29,32 @@
   <!-- placeholder image gallery -->
   <section id="gallery" class="flex gap-4 overflow-x-auto">
     <% if @location.pictures.attached? %>
-    <div class="flex gap-4 overflow-x-auto">
-      <% @location.pictures.each do |picture| %>
-        <% next unless picture.persisted? %>
-        <div class="relative group">
-          <% if picture.variable? %>
+  <div class="flex gap-4 overflow-x-auto">
+    <% @location.pictures.each do |picture| %>
+      <% next unless picture.persisted? %>
+      <div class="relative group">
+        <% if picture.variable? %>
+          <% begin %>
             <%= image_tag(
-                  picture.variant(resize_to_limit: [1200, 800]).processed,
+                  picture.variant(resize_to_limit: [1200, 800]),
                   class: "w-80 h-64 object-cover rounded-lg"
                 ) %>
-          <% else %>
+          <% rescue => e %>
+            <% Rails.logger.error("Variant render failed for attachment #{picture.id}: #{e.class} #{e.message}") %>
             <div class="w-80 h-64 flex items-center justify-center rounded-lg bg-gray-100 text-sm text-gray-600">
-              Unsupported file (not an image)
+              Image couldn’t render
             </div>
           <% end %>
-        </div>
-      <% end %>
-    </div>
-  <% end %>
+        <% else %>
+          <div class="w-80 h-64 flex items-center justify-center rounded-lg bg-gray-100 text-sm text-gray-600">
+            Unsupported file (not an image)
+          </div>
+        <% end %>
+      </div>
+    <% end %>
+  </div>
+<% end %>
+
   </section>
 
   <!-- chips for feature model -->
