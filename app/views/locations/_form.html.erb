@@ -29,7 +29,14 @@
         <% location.pictures.each do |picture| %>
           <% next unless picture.persisted? %>
           <div class="relative group">
-            <%= image_tag picture.variant(resize_to_limit: [nil, 200]), class: "w-full h-64 object-cover rounded-lg" %>
+            <% if picture.variable? %>
+              <%= image_tag picture.variant(resize_to_limit: [nil, 200]), class: "w-full h-64 object-cover rounded-lg" %>
+            <% else %>
+              <div class="w-full h-64 flex items-center justify-center rounded-lg bg-gray-100 text-sm text-gray-600">
+                Unsupported file (not an image)
+              </div>
+            <% end %>
+
             <%= link_to "Delete", 
                 delete_picture_location_path(location, picture_id: picture.id),
                 method: :delete,
@@ -39,6 +46,7 @@
         <% end %>
       <% end %>
     </div>
+
   </div>
 
   <div>

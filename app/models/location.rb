@@ -120,4 +120,21 @@ class Location < ApplicationRecord
       errors.add(:base, "Address could not be located. Please enter a valid address.")
     end
   end
+
+  validate :pictures_must_be_images
+  
+  private
+
+  def pictures_must_be_images
+    return unless pictures.attachments.any?
+
+    allowed = %w[image/png image/jpg image/jpeg]
+    pictures.each do |att|
+      ct = ct = att.blob&.content_type.to_s
+      unless allowed.include?(ct)
+        errors.add(:pictures, "must be PNG, JPG, or JPEG (got #{ct.presence || 'unknown'})")
+      end
+    end
+  end
+
 end

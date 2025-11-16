@@ -28,17 +28,22 @@
     
   <!-- placeholder image gallery -->
   <section id="gallery" class="flex gap-4 overflow-x-auto">
-    <% if @location.pictures.any? %>
-      <% @location.pictures_as_thumbnails.each do |picture| %>
-        <%= image_tag(picture, class: "rounded-lg shadow-md") %>
+    <% if @location.pictures.attached? %>
+    <div class="flex gap-4 overflow-x-auto">
+      <% @location.pictures.each do |picture| %>
+        <% next unless picture.persisted? %>
+        <div class="relative group">
+          <% if picture.variable? %>
+            <%= image_tag picture.variant(resize_to_limit: [nil, 300]), class: "w-full h-64 object-cover rounded-lg" %>
+          <% else %>
+            <div class="w-full h-64 flex items-center justify-center rounded-lg bg-gray-100 text-sm text-gray-600">
+              Unsupported file (not an image)
+            </div>
+          <% end %>
+        </div>
       <% end %>
-    <% else %>
-      <div class="h-[100px] flex items-center">
-        <p class="font-normal text-gray-700 italic">
-          No photos yet for this location.
-        </p>
-      </div>
-    <% end %>
+    </div>
+  <% end %>
   </section>
 
   <!-- chips for feature model -->
