@@ -34,9 +34,12 @@
         <% next unless picture.persisted? %>
         <div class="relative group">
           <% if picture.variable? %>
-            <%= image_tag picture.variant(resize_to_limit: [nil, 300]), class: "w-full h-64 object-cover rounded-lg" %>
+            <%= image_tag(
+                  picture.variant(resize_to_limit: [1200, 800]).processed,
+                  class: "w-80 h-64 object-cover rounded-lg"
+                ) %>
           <% else %>
-            <div class="w-full h-64 flex items-center justify-center rounded-lg bg-gray-100 text-sm text-gray-600">
+            <div class="w-80 h-64 flex items-center justify-center rounded-lg bg-gray-100 text-sm text-gray-600">
               Unsupported file (not an image)
             </div>
           <% end %>
