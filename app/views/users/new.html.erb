@@ -1,7 +1,14 @@
-<div class="lg:px-[144px] md:px-[96px] px-[36px] w-full py-8 flex flex-col justify-center items-center">
-  <div class="max-w-3xl w-full">
-    <h2 class="text-3xl font-bold mb-6">Sign Up</h2>
+<div class="h-full flex flex-col justify-center items-center">
+  <% if alert = flash[:alert] %>
+    <p class="py-2 px-3 bg-red-50 mb-5 text-red-700 font-medium rounded-lg inline-block" id="alert"><%= alert %></p>
+  <% end %>
 
+  <% if notice = flash[:notice] %>
+    <p class="py-2 px-3 bg-green-50 mb-5 text-green-700 font-medium rounded-lg inline-block" id="notice"><%= notice %></p>
+  <% end %>
+
+  <div style="max-width: 400px;" class="w-full max-w-[400px] p-6 border border-gray-200 rounded-lg shadow-xs">
+    <h2 class="text-3xl font-bold mb-6">Hello there!</h2>
     <%= form_with(model: @user, url: users_path, class: "space-y-4") do |form| %>
       <% if form.object.errors.any? %>
         <div class="rounded-md bg-red-50 p-4 text-red-700">
@@ -13,33 +20,25 @@
           </ul>
         </div>
       <% end %>
-
-      <div>
-        <%= form.label :email_address, class: "block text-sm font-medium mb-1" %>
-        <%= form.email_field :email_address,
-              class: "w-full rounded-md border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-300" %>
+      <div class="my-5">
+        <%= form.label :email_address, class: "block font-medium mb-1" %>
+        <%= form.email_field :email_address, placeholder: "Enter your email address", class: "w-full rounded-md border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-300" %>
       </div>
-
-      <div>
-        <%= form.label :password, class: "block text-sm font-medium mb-1" %>
-        <%= form.password_field :password,
-              class: "w-full rounded-md border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-300" %>
+      <div class="my-5">
+        <%= form.label :password, class: "block font-medium mb-1" %>
+        <%= form.password_field :password, placeholder: "Enter your password", class: "w-full rounded-md border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-300" %>
       </div>
-
-      <div>
-        <%= form.label :password_confirmation, class: "block text-sm font-medium mb-1" %>
-        <%= form.password_field :password_confirmation,
-              class: "w-full rounded-md border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-300" %>
+      <div class="my-5">
+        <%= form.label :password_confirmation, class: "block font-medium mb-1" %>
+        <%= form.password_field :password_confirmation, placeholder: "Confirm your password", class: "w-full rounded-md border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-300" %>
       </div>
-
-      <div>
-        <%= form.submit "Sign Up",
-              class: "w-full md:w-auto rounded-md bg-blue-700 hover:bg-blue-800 px-6 py-2 font-medium text-white transition" %>
+      <div class="w-full text-center space-y-4">
+        <%= form.submit "Sign Up", class: "w-full text-white rounded-md bg-blue-700 hover:bg-blue-800 py-2 font-medium" %>
+        <div>
+          <span>Already have an account? </span>
+          <%= link_to "Login", new_session_path, class: "text-gray-600 hover:underline" %>
+        </div>
       </div>
     <% end %>
-
-    <div class="mt-4 text-center">
-      <%= link_to "Already have an account? Log In", new_session_path, class: "text-blue-600 hover:underline" %>
-    </div>
   </div>
 </div>
