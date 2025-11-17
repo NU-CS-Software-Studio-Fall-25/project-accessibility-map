@@ -1,8 +1,8 @@
 <div class="lg:px-[144px] md:px-[96px] px-[36px] w-full py-8 flex flex-col justify-center items-center">
   <div class="max-w-3xl w-full">
-    <h1 class="text-3xl font-bold mb-6">Sign Up</h1>
+    <h2 class="text-3xl font-bold mb-6">Sign Up</h2>
 
-    <%= form_with(model: @user, url: users_path, class: "space-y-4", data: { controller: "signup-validation" }) do |form| %>
+    <%= form_with(model: @user, url: users_path, class: "space-y-4") do |form| %>
       <% if form.object.errors.any? %>
         <div class="rounded-md bg-red-50 p-4 text-red-700">
           <p class="font-semibold mb-2"><%= pluralize(form.object.errors.count, "error") %> prohibited this user from being saved:</p>
@@ -16,65 +16,25 @@
 
       <div>
         <%= form.label :email_address, class: "block text-sm font-medium mb-1" %>
-        <div class="relative">
-          <%= form.email_field :email_address,
-                class: "w-full rounded-md border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-300",
-                data: { "signup-validation-target": "emailInput", action: "input->signup-validation#validate" } %>
-        </div>
-        <div class="text-sm mt-1 text-gray-600 flex items-center">
-          <span class="w-4 h-4 mr-2" data-signup-validation-target="emailFeedback"></span>
-          Must be a valid email
-        </div>
+        <%= form.email_field :email_address,
+              class: "w-full rounded-md border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-300" %>
       </div>
 
       <div>
         <%= form.label :password, class: "block text-sm font-medium mb-1" %>
-        <div class="relative">
-          <%= form.password_field :password,
-                class: "w-full rounded-md border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-300 pr-10",
-                data: { "signup-validation-target": "passwordInput", action: "input->signup-validation#validate" } %>
-        </div>
-        <ul class="text-sm mt-2 space-y-1 text-gray-600">
-          <li class="flex items-center">
-            <span class="w-4 h-4 mr-2" data-signup-validation-target="passwordLengthFeedback"></span>
-            At least 12 characters long
-          </li>
-          <li class="flex items-center">
-            <span class="w-4 h-4 mr-2" data-signup-validation-target="passwordLowercaseFeedback"></span>
-            Includes a lowercase letter
-          </li>
-          <li class="flex items-center">
-            <span class="w-4 h-4 mr-2" data-signup-validation-target="passwordUppercaseFeedback"></span>
-            Includes an uppercase letter
-          </li>
-          <li class="flex items-center">
-            <span class="w-4 h-4 mr-2" data-signup-validation-target="passwordDigitFeedback"></span>
-            Includes a number
-          </li>
-          <li class="flex items-center">
-            <span class="w-4 h-4 mr-2" data-signup-validation-target="passwordSpecialCharFeedback"></span>
-            Includes a special character (!@#$...)
-          </li>
-        </ul>
+        <%= form.password_field :password,
+              class: "w-full rounded-md border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-300" %>
       </div>
 
       <div>
         <%= form.label :password_confirmation, class: "block text-sm font-medium mb-1" %>
-        <div class="relative">
-          <%= form.password_field :password_confirmation,
-                class: "w-full rounded-md border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-300",
-                data: { "signup-validation-target": "passwordConfirmationInput", action: "input->signup-validation#validate" } %>
-        </div>
-        <div class="text-sm mt-1 text-gray-600 flex items-center">
-          <span class="w-4 h-4 mr-2" data-signup-validation-target="passwordMatchFeedback"></span>
-          Passwords must match
-        </div>
+        <%= form.password_field :password_confirmation,
+              class: "w-full rounded-md border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-300" %>
       </div>
 
       <div>
         <%= form.submit "Sign Up",
-              class: "w-full md:w-auto rounded-md bg-blue-700 hover:bg-blue-800 px-6 py-2 font-medium text-white transition disabled:bg-gray-500 disabled:hover:bg-gray-500 disabled:cursor-not-allowed",
-              data: { "signup-validation-target": "submitButton" } %>
+              class: "w-full md:w-auto rounded-md bg-blue-700 hover:bg-blue-800 px-6 py-2 font-medium text-white transition" %>
       </div>
     <% end %>
 

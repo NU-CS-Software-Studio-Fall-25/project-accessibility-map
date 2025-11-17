@@ -13,7 +13,7 @@ class SessionsController < ApplicationController
       redirect_to(after_authentication_url)
     else
       flash.now[:alert] = "Incorrect email or password."
-      render :new, status: :unprocessable_entity
+      render(:new, status: :unprocessable_entity)
     end
   end
 

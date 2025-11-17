@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
   <head>
     <title><%= content_for(:title) || "Accessbility Map" %></title>
     <meta name="viewport" content="width=device-width,initial-scale=1">
@@ -21,7 +21,7 @@
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin=""/>
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
     <%= stylesheet_link_tag :app, "data-turbo-track": "reload" %>
-    
+
     <%= javascript_importmap_tags %>
   </head>
 
@@ -30,7 +30,7 @@
       <nav class="border-b border-gray-200">
         <div class="w-full flex flex-wrap items-center justify-between px-6 py-4">
           <a href="/" class="flex items-center space-x-3 rtl:space-x-reverse">
-            <span class="self-center text-2xl font-semibold whitespace-nowrap">Accessibility Map</span>
+            <h1 class="self-center text-2xl font-semibold whitespace-nowrap">Accessibility Map</h1>
           </a>
           <button data-collapse-toggle="navbar-solid-bg" type="button" class="inline-flex items-center p-2 w-10 h-10 justify-center text-sm text-gray-500 rounded-lg sm:hidden hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-gray-200" aria-controls="navbar-solid-bg" aria-expanded="false">
             <span class="sr-only">Open main menu</span>
@@ -52,10 +52,10 @@
                 </li>
               <% else %>
                 <li>
-                  <%= link_to "Sign Up", new_user_path, class: "block text-white bg-blue-400 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-md px-4 py-2 focus:outline-none" %>
+                  <%= link_to "Sign Up", new_user_path, class: "block text-black focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-md px-4 py-2 focus:outline-none" %>
                 </li>
                 <li>
-                  <%= link_to "Log In", new_session_path, class: "block text-white bg-blue-400 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-md px-4 py-2 focus:outline-none" %>
+                  <%= link_to "Log In", new_session_path, class: "block text-black focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-md px-4 py-2 focus:outline-none" %>
                 </li>
               <% end %>
             </ul>
@@ -66,6 +66,5 @@
         <%= yield %>
       </div>
     </main>
-    <%= render "layouts/footer" %>
   </body>
 </html>

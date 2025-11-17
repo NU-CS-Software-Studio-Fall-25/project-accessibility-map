@@ -1,6 +1,6 @@
 <article class="p-4 bg-white border border-gray-200 rounded-lg shadow-sm space-y-2">
-  <header class="flex flex-row justify-between items-center">
-    <h5 class="text-xl tracking-tight text-gray-900 font-medium">User Review</h5>
+  <div class="flex flex-row justify-between items-center">
+    <h3 class="text-xl tracking-tight text-gray-900 font-medium">User Review</h3>
     <p class="text-sm text-gray-600">Posted by: <%= review.user.email_address %></p>
         <div class="space-x-2">
           <% if current_user == review.user %>
@@ -9,8 +9,7 @@
               data: { turbo_method: :delete },
               class: "hover:text-red-700 text-red-500 text-sm" %>
           <% end %>
-        </div>  
-  </header>
+        </div>  </div>
   <p class="font-normal text-gray-800">
     <%= review.body %>
   </p>
@@ -20,9 +19,9 @@
   <div class="relative p-4 w-full max-w-[800px] max-h-full">
     <div class="relative bg-white rounded-lg shadow-sm">
       <div class="flex items-center justify-between p-4 border-b rounded-t border-gray-200">
-        <h3 class="text-lg font-semibold text-gray-900">
-          Edit Review 
-        </h3>
+        <h2 class="text-lg font-semibold text-gray-900">
+          Edit Review
+        </h2>
 
         <button type="button" class="text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm w-8 h-8 ms-auto inline-flex justify-center items-center" data-modal-toggle="edit-review-modal-<%= review.id %>">
           <svg class="w-3 h-3" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 14 14">
@@ -37,4 +36,4 @@
       </div>
     </div>
   </div>
-</div> 
+</div>

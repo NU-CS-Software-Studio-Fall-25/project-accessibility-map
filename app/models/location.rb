@@ -19,12 +19,10 @@ class Location < ApplicationRecord
   validate :zip_code_format_valid
   validate :coordinates_required_if_address_changed, if: :address_fields_changed?
 
-
   # Let geocoded_by handle the geocoding automatically
   geocoded_by :full_address
-  #after_validation :geocode, if: ->(obj) { obj.address_changed? || obj.city_changed? || obj.state_changed? || obj.zip_changed? || obj.country_changed? }
-  #after_validation :geocode_safely, if: :address_fields_changed?
-
+  # after_validation :geocode, if: ->(obj) { obj.address_changed? || obj.city_changed? || obj.state_changed? || obj.zip_changed? || obj.country_changed? }
+  # after_validation :geocode_safely, if: :address_fields_changed?
 
   validates :name, :address, :city, :state, :zip, :country, presence: true
   validates :address, uniqueness: {
@@ -71,6 +69,7 @@ class Location < ApplicationRecord
   def zip_code_format_valid
     return if zip.blank?
     return unless country == "United States"
+
     unless /\A\d{5}(-\d{4})?\z/.match?(zip)
       errors.add(:zip, "must be in the format 12345 or 12345-6789 for United States")
     end
@@ -84,7 +83,7 @@ class Location < ApplicationRecord
 
   def clear_coords_if_address_changed
     return unless address_fields_changed?
-    
+
     self.latitude = nil
     self.longitude = nil
   end
@@ -97,12 +96,12 @@ class Location < ApplicationRecord
     detected_zip = (result.postal_code || "").to_s
     # Normalize to 5 digits for US comparisons
     if country == "United States"
-      provided = zip.to_s.gsub(/\D/, "")[0,5]
-      detected = detected_zip.gsub(/\D/, "")[0,5]
+      provided = zip.to_s.gsub(/\D/, "")[0, 5]
+      detected = detected_zip.gsub(/\D/, "")[0, 5]
 
       if provided.blank? || detected.blank? || provided != detected
         # Don’t set coords; fail validation later
-        errors.add(:zip, "zip code does not match the address (found #{detected_zip.presence || 'unknown'})")
+        errors.add(:zip, "zip code does not match the address (found #{detected_zip.presence || "unknown"})")
         return
       end
     end
