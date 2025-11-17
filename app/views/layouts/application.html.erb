@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
   <head>
     <title><%= content_for(:title) || "Accessbility Map" %></title>
     <meta name="viewport" content="width=device-width,initial-scale=1">
@@ -21,51 +21,38 @@
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin=""/>
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
     <%= stylesheet_link_tag :app, "data-turbo-track": "reload" %>
-    
+
     <%= javascript_importmap_tags %>
   </head>
 
   <body class="h-screen flex flex-col">
-    <main class="flex-1 flex flex-col">
-      <nav class="border-b border-gray-200">
-        <div class="w-full flex flex-wrap items-center justify-between px-6 py-4">
-          <a href="/" class="flex items-center space-x-3 rtl:space-x-reverse">
-            <span class="self-center text-2xl font-semibold whitespace-nowrap">Accessibility Map</span>
-          </a>
-          <button data-collapse-toggle="navbar-solid-bg" type="button" class="inline-flex items-center p-2 w-10 h-10 justify-center text-sm text-gray-500 rounded-lg sm:hidden hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-gray-200" aria-controls="navbar-solid-bg" aria-expanded="false">
-            <span class="sr-only">Open main menu</span>
-            <svg class="w-5 h-5" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 17 14">
-              <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M1 1h15M1 7h15M1 13h15"/>
-            </svg>
-          </button>
-          <div class="hidden w-full sm:block sm:w-auto" id="navbar-solid-bg">
-            <ul class="flex flex-col sm:gap-x-2 font-medium rounded-lg rtl:space-x-reverse sm:flex-row sm:border-0 sm:bg-transparent">
-              <li>
-                <%= link_to "Search Locations", root_path, class: "block text-black focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-md px-4 py-2 focus:outline-none" %>
-              </li>
-              <% if current_user %>
-                <li>
-                  <%= link_to "Add Location", new_location_path, class: "block text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-md px-4 py-2 dark:bg-blue-600 focus:outline-none" %>
-                </li>
-                <li>
-                  <%= link_to "Log Out", session_path, data: { "turbo-method": :delete }, class: "block text-black focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-md px-4 py-2 focus:outline-none" %>
-                </li>
-              <% else %>
-                <li>
-                  <%= link_to "Sign Up", new_user_path, class: "block text-white bg-blue-400 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-md px-4 py-2 focus:outline-none" %>
-                </li>
-                <li>
-                  <%= link_to "Log In", new_session_path, class: "block text-white bg-blue-400 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-md px-4 py-2 focus:outline-none" %>
-                </li>
-              <% end %>
-            </ul>
-          </div>
+    <nav class="w-full flex flex-wrap items-center justify-between gap-2 px-6 py-4 border-b border-gray-200">
+      <a href="/" class="flex items-center space-x-3 rtl:space-x-reverse">
+        <h1 class="self-center text-2xl font-semibold whitespace-nowrap">Accessibility Map</h1>
+      </a>
+      <button data-collapse-toggle="navbar-solid" type="button" class="inline-flex items-center p-2.5 text-sm border border-gray-200 justify-center rounded-lg sm:hidden hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-gray-200" aria-controls="navbar-solid" aria-expanded="false">
+        <span class="sr-only">Open main menu</span>
+        <svg class="w-4 h-4" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 17 14">
+          <path stroke="gray" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M1 1h15M1 7h15M1 13h15"/>
+        </svg>
+      </button>
+      <div class="hidden w-full sm:block sm:w-auto" id="navbar-solid">
+        <div class="flex flex-col sm:flex-row justify-center items-start sm:items-center gap-2 font-medium rounded-lg rtl:space-x-reverse sm:border-0 sm:bg-transparent">
+          <% if current_user %>
+            <%= link_to "Search Locations", root_path, class: "w-full sm:w-auto py-2 px-4 text-sm font-medium text-gray-900 focus:outline-none bg-white rounded-lg hover:bg-gray-100 focus:z-10 focus:ring-4 focus:ring-gray-100" %>
+            <%= link_to "Add Location", new_location_path, class: "w-full sm:w-auto py-2 px-4 text-sm font-medium text-gray-900 focus:outline-none bg-white rounded-lg hover:bg-gray-100 focus:z-10 focus:ring-4 focus:ring-gray-100" %>
+            <%= link_to "Logout", session_path, data: { "turbo-method": :delete }, class: "w-full sm:w-auto py-2 px-4 text-sm font-medium text-gray-900 focus:outline-none bg-white rounded-lg border border-gray-200 hover:bg-gray-100 focus:z-10 focus:ring-4 focus:ring-gray-100" %>
+          <% else %>
+            <%= link_to "Login", new_session_path, class: "w-full sm:w-auto py-2 px-4 text-sm font-medium text-gray-900 focus:outline-none bg-white rounded-lg border border-gray-200 hover:bg-gray-100 focus:z-10 focus:ring-4 focus:ring-gray-100" %>
+            <%= link_to "Sign Up", new_user_path, class: "w-full sm:w-auto py-2 px-4 text-sm font-medium text-white focus:outline-none bg-blue-600 hover:bg-blue-500 rounded-lg border border-gray-200 focus:z-10 focus:ring-4 focus:ring-gray-100" %>
+          <% end %>
         </div>
-      </nav>
+      </div>
+    </nav>
+    <main class="flex-1 flex flex-col">
       <div class="flex-1">
         <%= yield %>
       </div>
     </main>
-    <%= render "layouts/footer" %>
   </body>
 </html>

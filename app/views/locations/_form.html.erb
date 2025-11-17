@@ -1,4 +1,4 @@
-<%= form_with(model: location, class: "space-y-4", data: { controller: "location-form-validation" }) do |f| %>
+<%= form_with(model: location, class: "space-y-5 text-sm", data: { controller: "location-form-validation" }) do |f| %>
   <% if location.errors.any? %>
     <aside class="rounded-md bg-red-50 p-4 text-red-700">
       <p class="font-semibold mb-2"><%= pluralize(location.errors.count, "error") %> prohibited this location from being saved:</p>
@@ -10,17 +10,17 @@
     </aside>
   <% end %>
 
-  <section>
-    <%= f.label :name, "Location Name", class: "block text-sm font-medium mb-1" %>
+  <div class="space-y-2">
+    <%= f.label :name, "Location Name", class: "block font-medium" %>
     <%= f.text_field :name, placeholder: "ex. Moge Tee",
-          class: "w-full rounded-md border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-yellow-400",
+          class: "text-sm w-full rounded-md border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-yellow-400",
           data: { "location-form-validation-target": "nameInput", action: "input->location-form-validation#validate" } %>
     <div data-location-form-validation-target="nameFeedback"></div>
-  </section>
+  </div>
 
-  <section class="space-y-4">
-    <div>
-      <%= f.label :pictures, "Photos", class: "block text-sm font-medium mb-1" %>
+  <div class="space-y-2">
+    <div class="space-y-2">
+      <%= f.label :pictures, "Photos", class: "block font-medium" %>
       <%= f.file_field :pictures, multiple: true, accept: "image/png,image/jpeg,image/jpg" %>
     </div>
 
@@ -30,51 +30,51 @@
           <% next unless picture.persisted? %>
           <div class="relative group">
             <%= image_tag picture.variant(resize_to_limit: [nil, 200]), class: "w-full h-64 object-cover rounded-lg" %>
-            <%= link_to "Delete", 
+            <%= link_to "Delete",
                 delete_picture_location_path(location, picture_id: picture.id),
                 method: :delete,
                 data: { turbo_method: "delete", turbo_confirm: "Are you sure you want to delete this image?" },
-                class: "absolute top-2 right-2 bg-red-500 hover:bg-red-700 text-white text-xs font-bold py-1 px-2 rounded opacity-0 group-hover:opacity-100 transition-opacity" %>
+                class: "text-sm absolute top-2 right-2 bg-red-500 hover:bg-red-700 text-white text-xs font-bold py-1 px-2 rounded opacity-0 group-hover:opacity-100 transition-opacity" %>
           </div>
         <% end %>
       <% end %>
     </div>
-  </section>
+  </div>
 
-  <section>
-    <%= f.label :feature_ids, "Features", class: "block text-sm font-medium mb-1" %>
+  <div class="space-y-2">
+    <%= f.label :feature_ids, "Features", class: "block font-medium" %>
     <div class="flex flex-wrap gap-2">
       <% Feature.all.each do |feature| %>
         <label class="flex items-center space-x-2 bg-gray-100 hover:bg-yellow-100 px-3 py-1.5 rounded-md cursor-pointer">
           <%= check_box_tag "location[feature_ids][]",
             feature.id,
-            @location.features.include?(feature),   
-            class: "rounded text-yellow-500 focus:ring-yellow-400" %>
-          <span class="text-sm text-gray-800"><%= feature.feature %></span>
+            @location.features.include?(feature),
+            class: "text-sm rounded text-yellow-500 focus:ring-yellow-400" %>
+          <span class="text-gray-800"><%= feature.feature %></span>
         </label>
       <% end %>
     </div>
-  </section>
+  </div>
 
-  <section>
-    <%= f.label :address, "Address Line", class: "block text-sm font-medium mb-1" %>
+  <div class="space-y-2">
+    <%= f.label :address, "Address Line", class: "block font-medium" %>
     <%= f.text_field :address, placeholder: "ex. 1590 Sherman Ave",
-          class: "w-full rounded-md border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-yellow-400",
+          class: "text-sm w-full rounded-md border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-yellow-400",
           data: { "location-form-validation-target": "addressInput", action: "input->location-form-validation#validate" } %>
     <div data-location-form-validation-target="addressFeedback"></div>
-  </section>
+  </div>
 
-  <section class="grid grid-cols-1 md:grid-cols-2 gap-4">
-    <div>
-      <%= f.label :city, "City", class: "block text-sm font-medium mb-1" %>
+  <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+    <div class="space-y-2">
+      <%= f.label :city, "City", class: "block font-medium" %>
       <%= f.text_field :city, placeholder: "ex. Evanston",
-            class: "w-full rounded-md border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-yellow-400",
+            class: "text-sm w-full rounded-md border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-yellow-400",
             data: { "location-form-validation-target": "cityInput", action: "input->location-form-validation#validate" } %>
       <div data-location-form-validation-target="cityFeedback"></div>
     </div>
 
-    <div>
-      <%= f.label :state, "State", class: "block text-sm font-medium mb-1" %>
+    <div class="space-y-2">
+      <%= f.label :state, "State", class: "block font-medium" %>
       <%= f.select :state,
           [
             ["Select a state", ""],
@@ -92,22 +92,22 @@
             ["Vermont", "VT"], ["Virginia", "VA"], ["Washington", "WA"], ["West Virginia", "WV"],
             ["Wisconsin", "WI"], ["Wyoming", "WY"]
           ],
-          {}, class: "w-full rounded-md border border-gray-300 px-3 py-2 bg-white focus:outline-none focus:ring-2 focus:ring-yellow-400",
+          {}, class: "text-sm w-full rounded-md border border-gray-300 px-3 py-2 bg-white focus:outline-none focus:ring-2 focus:ring-yellow-400",
           data: { "location-form-validation-target": "stateInput", action: "change->location-form-validation#validate" }
       %>
       <div data-location-form-validation-target="stateFeedback"></div>
     </div>
 
-    <div>
-      <%= f.label :zip, "Zip Code", class: "block text-sm font-medium mb-1" %>
+    <div class="space-y-2">
+      <%= f.label :zip, "Zip Code", class: "block font-medium" %>
       <%= f.text_field :zip, placeholder: "ex. 60201",
-            class: "w-full rounded-md border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-yellow-400",
+            class: "text-sm w-full rounded-md border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-yellow-400",
             data: { "location-form-validation-target": "zipInput", action: "input->location-form-validation#validate" } %>
       <div data-location-form-validation-target="zipFeedback"></div>
     </div>
 
-    <div>
-      <%= f.label :country, "Country", class: "block text-sm font-medium mb-1" %>
+    <div class="space-y-2">
+      <%= f.label :country, "Country", class: "block font-medium" %>
       <%= f.select :country,
           [
             ["Select a country", ""],
@@ -124,29 +124,25 @@
             ["Brazil", "Brazil"],
             ["South Korea", "South Korea"]
           ],
-          {}, class: "w-full rounded-md border border-gray-300 px-3 py-2 bg-white focus:outline-none focus:ring-2 focus:ring-yellow-400",
+          {}, class: "text-sm w-full rounded-md border border-gray-300 px-3 py-2 bg-white focus:outline-none focus:ring-2 focus:ring-yellow-400",
           data: { "location-form-validation-target": "countryInput", action: "change->location-form-validation#validate" }
       %>
       <div data-location-form-validation-target="countryFeedback"></div>
     </div>
-  </section>
+  </div>
 
   <%= f.hidden_field :latitude %>
   <%= f.hidden_field :longitude %>
 
-  <section>
+  <div class="flex flex-row-reverse flex-wrap gap-2">
     <%= f.submit( location.persisted? ? "Save Changes" : "Add Location",
-          class: "w-full md:w-auto rounded-md bg-yellow-400 hover:bg-yellow-500 px-6 py-2 font-medium text-gray-900 transition disabled:bg-gray-400 disabled:hover:bg-gray-400 disabled:cursor-not-allowed",
+          class: "text-sm w-full sm:w-auto text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-md px-4 py-2 dark:bg-blue-600 focus:outline-none flex justify-center items-center",
           data: { "location-form-validation-target": "submitButton" }) %>
-  </section>
-
-  <% if location.persisted? %>
-  <div class="mt-4 flex justify-between items-center">
-    <%= link_to "Delete Location",
-                location_path(location),
-                data: { turbo_method: :delete, turbo_confirm: "Are you sure you want to delete this location?" },
-                class: "rounded-md bg-red-500 hover:bg-red-600 px-6 py-2 font-medium text-white transition" %>
+    <% if location.persisted? %>
+      <%= link_to "Delete Location",
+                  location_path(location),
+                  data: { turbo_method: :delete, turbo_confirm: "Are you sure you want to delete this location?" },
+                  class: "w-full sm:w-auto rounded-md bg-red-500 hover:bg-red-600 px-6 py-2 font-medium text-white transition flex justify-center items-center" %>
+    <% end %>
   </div>
-<% end %>
-
 <% end %>
