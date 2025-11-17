@@ -28,14 +28,25 @@
     </div>
   </section>
 
-  <!-- placeholder image gallery -->
   <section id="gallery" class="flex gap-4 overflow-x-auto">
-    <% if @location.pictures.any? %>
-      <% @location.pictures_as_thumbnails.each do |picture| %>
-        <%= image_tag(picture, class: "rounded-lg shadow-md") %>
+    <% if @location.pictures.attached? %>
+      <% @location.pictures.each do |picture| %>
+        <% next unless picture.persisted? %>
+        <% next unless picture.variable? %>
+        <div class="relative group flex-shrink-0">
+          <% begin %>
+            <%= image_tag(
+                  picture.variant(resize_to_limit: [nil, 200]),
+                  class: "h-64 object-cover rounded-lg"
+                ) %>
+          <% rescue => e %>
+            <% Rails.logger.error("Variant render failed for attachment #{picture.id}: #{e.class} #{e.message}") %>
+            <% next %>
+          <% end %>
+        </div>
       <% end %>
     <% else %>
-      <div class="h-[100px] flex items-center">
+      <div class="h-16 flex items-center">
         <p class="text-sm font-normal text-gray-700 italic">
           No photos yet for this location.
         </p>

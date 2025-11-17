@@ -38,7 +38,7 @@ class LocationsController < ApplicationController
 
   # POST /locations or /locations.json
   def create
-    @location = current_user.locations.build(location_params)
+    @location = current_user.locations.build(location_params_with_pictures)
 
     respond_to do |format|
       if @location.save
@@ -53,12 +53,14 @@ class LocationsController < ApplicationController
 
   # PATCH/PUT /locations/1 or /locations/1.json
   def update
-    if params[:location][:pictures].present?
-      @location.pictures.attach(params[:location][:pictures])
-    end
+    # Extract and attach new pictures separately
+    new_pictures = params[:location]&.delete(:pictures)
 
     respond_to do |format|
       if @location.update(location_params)
+        # Attach new pictures after update (this appends, not replaces)
+        @location.pictures.attach(new_pictures) if new_pictures.present?
+
         format.html { redirect_to(@location, notice: "Location was successfully updated.", status: :see_other) }
         format.json { render(:show, status: :ok, location: @location) }
       else
@@ -98,6 +100,11 @@ class LocationsController < ApplicationController
 
   # Only allow a list of trusted parameters through.
   def location_params
+    params.expect(location: [:name, :address, :city, :state, :zip, :country, :latitude, :longitude, feature_ids: []])
+  end
+
+  # For create action: include pictures
+  def location_params_with_pictures
     params.expect(location: [:name, :address, :city, :state, :zip, :country, :latitude, :longitude, feature_ids: [], pictures: []])
   end
 
