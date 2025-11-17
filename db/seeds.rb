@@ -150,24 +150,29 @@
 #   Review.create(review)
 # end
 
-features = [
-  "Quiet space",
-  "Pet-friendly",
-  "Child-friendly",
-  "Wheelchair accessible",
-  "Accessible restrooms",
-  "Elevator access",
-  "Human service",
-  "Vegetarian",
-  "Vegan",
-  "Kosher",
-  "Halal",
-  "Wide aisles",
-  "Automatic doors",
-]
+features_with_categories = {
 
-features.each do |f|
-  Feature.create(feature: f)
+  "Wheelchair accessible"  => "Physical Accessibility",
+  "Accessible restrooms"   => "Physical Accessibility",
+  "Elevator access"        => "Physical Accessibility",
+  "Wide aisles"            => "Physical Accessibility",
+  "Automatic doors"        => "Physical Accessibility",
+  "Vegetarian"             => "Food & Diet",
+  "Vegan"                  => "Food & Diet",
+  "Kosher"                 => "Food & Diet",
+  "Halal"                  => "Food & Diet",
+  "Quiet space"            => "Environment",
+  "Human service"          => "Environment",
+  "Pet-friendly"           => "Family & Pets",
+  "Child-friendly"         => "Family & Pets",
+  "High chair available" => "Family & Pets"
+}
+
+features_with_categories.each do |feature_name, category|
+  Feature.create!(
+    feature: feature_name,
+    feature_category: category
+  )
 end
 
 # location_features = [

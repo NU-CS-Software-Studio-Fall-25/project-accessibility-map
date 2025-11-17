@@ -14,7 +14,7 @@
     %>
   </div>
 
-  <div id="locations" class="sm:flex-initial flex-1 sm:basis-[450px] flex flex-col justify-start items-stretch gap-4 overflow-y-auto border-l border-b border-gray-200 p-4">
+  <div class="sm:flex-initial flex-1 sm:basis-[450px] flex flex-col justify-start items-stretch gap-4 overflow-y-auto border-l border-b border-gray-200 p-4">
     <%= form_with url: locations_path, method: :get, class: "w-full flex flex-col gap-2", role: "search" do %>
       <label for="query" class="block text-sm font-medium text-gray-700 mb-1">Search by name or keyword</label>
       <div class="flex-1 relative">
@@ -43,16 +43,14 @@
     <% end %>
 
     <div class="h-[1px] bg-gray-200"></div>
-
-    <section class="w-full flex flex-col justify-start items-stretch gap-4 overflow-y-auto">
-      <% if @locations.any? %>
-        <% @locations.each do |location| %>
-          <%= render location %>
+      <section class="w-full flex flex-col justify-start items-stretch gap-4 overflow-y-auto">
+        <% if @locations.any? %>
+          <% @locations.each do |location| %>
+            <%= render location %>
+          <% end %>
+        <% else %>
+          <p class="text-center my-10">No locations found.</p>
         <% end %>
-      <% else %>
-        <p class="text-center my-10">No locations found.</p>
-      <% end %>
-    </section>
+      </section>
   </div>
 </main>
-
