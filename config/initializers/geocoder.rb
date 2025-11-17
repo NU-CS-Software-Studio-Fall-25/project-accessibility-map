@@ -12,5 +12,5 @@ Geocoder.configure(
 
   params: {
     email: "darianliang2027@u.northwestern.edu",
-  }
+  },
 )
