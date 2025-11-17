@@ -1,4 +1,4 @@
-<div class="h-full flex flex-col justify-center items-center">
+<div class="h-full flex flex-col justify-center items-center mx-6">
   <% if alert = flash[:alert] %>
     <p class="py-2 px-3 bg-red-50 mb-5 text-red-700 font-medium rounded-lg inline-block" id="alert"><%= alert %></p>
   <% end %>
@@ -7,16 +7,16 @@
     <p class="py-2 px-3 bg-green-50 mb-5 text-green-700 font-medium rounded-lg inline-block" id="notice"><%= notice %></p>
   <% end %>
 
-  <div style="max-width: 400px;" class="w-full max-w-[400px] p-6 border border-gray-200 rounded-lg shadow-xs">
-    <h2 class="text-2xl font-semibold mb-6">Update your password</h2>
-    <%= form_with url: password_path(params[:token]), method: :put, class: "contents" do |form| %>
-      <div class="my-5 space-y-2">
+  <div class="w-full max-w-[400px] p-6 border border-gray-200 rounded-lg shadow-xs space-y-5">
+    <h2 class="text-xl font-semibold mb-5">Update your password</h2>
+    <%= form_with url: password_path(params[:token]), method: :put, class: "contents space-y-5 text-sm" do |form| %>
+      <div class="space-y-2">
         <%= form.label :password, "New password", class: "block font-medium" %>
-        <%= form.password_field :password, required: true, autocomplete: "new-password", placeholder: "Enter new password", maxlength: 72, class: "block shadow-sm rounded-md border border-gray-200 focus:outline-blue-600 px-3 py-2 w-full" %>
+        <%= form.password_field :password, required: true, autocomplete: "new-password", placeholder: "Enter new password", maxlength: 72, class: "text-sm block shadow-sm rounded-md border border-gray-200 focus:outline-blue-600 px-3 py-2 w-full" %>
       </div>
-      <div class="my-5 space-y-2">
+      <div class="space-y-2">
         <%= form.label :password_confirmation, "Confirm new password", class: "block font-medium" %>
-        <%= form.password_field :password_confirmation, required: true, autocomplete: "new-password", placeholder: "Repeat new password", maxlength: 72, class: "block shadow-sm rounded-md border border-gray-200 focus:outline-blue-600 px-3 py-2 w-full" %>
+        <%= form.password_field :password_confirmation, required: true, autocomplete: "new-password", placeholder: "Repeat new password", maxlength: 72, class: "text-sm block shadow-sm rounded-md border border-gray-200 focus:outline-blue-600 px-3 py-2 w-full" %>
       </div>
       <div class="w-full text-center space-y-4">
         <%= form.submit "Save password", class: "w-full text-center rounded-md py-2 bg-blue-600 hover:bg-blue-500 text-white inline-block font-medium" %>

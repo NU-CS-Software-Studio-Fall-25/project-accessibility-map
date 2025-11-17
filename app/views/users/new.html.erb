@@ -1,4 +1,4 @@
-<div class="h-full flex flex-col justify-center items-center">
+<div class="h-full flex flex-col justify-center items-center mx-6">
   <% if alert = flash[:alert] %>
     <p class="py-2 px-3 bg-red-50 mb-5 text-red-700 font-medium rounded-lg inline-block" id="alert"><%= alert %></p>
   <% end %>
@@ -7,9 +7,9 @@
     <p class="py-2 px-3 bg-green-50 mb-5 text-green-700 font-medium rounded-lg inline-block" id="notice"><%= notice %></p>
   <% end %>
 
-  <div style="max-width: 400px;" class="w-full max-w-[400px] p-6 border border-gray-200 rounded-lg shadow-xs">
-    <h2 class="text-2xl font-bold mb-6">Hello there!</h2>
-    <%= form_with(model: @user, url: users_path, class: "space-y-4") do |form| %>
+  <div class="w-full max-w-[400px] p-6 border border-gray-200 rounded-lg shadow-xs space-y-5">
+    <h2 class="text-xl font-bold">Hello there!</h2>
+    <%= form_with(model: @user, url: users_path, class: "space-y-5 text-sm") do |form| %>
       <% if form.object.errors.any? %>
         <div class="rounded-md bg-red-50 p-4 text-red-700">
           <p class="font-semibold mb-2"><%= pluralize(form.object.errors.count, "error") %> prohibited this user from being saved:</p>
@@ -20,17 +20,17 @@
           </ul>
         </div>
       <% end %>
-      <div class="my-5 space-y-2">
+      <div class="space-y-2">
         <%= form.label :email_address, class: "block font-medium mb-3" %>
-        <%= form.email_field :email_address, placeholder: "Enter your email address", class: "w-full rounded-md border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-300" %>
+        <%= form.email_field :email_address, placeholder: "Enter your email address", class: "text-sm w-full rounded-md border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-300" %>
       </div>
-      <div class="my-5 space-y-2">
+      <div class="space-y-2">
         <%= form.label :password, class: "block font-medium mb-3" %>
-        <%= form.password_field :password, placeholder: "Enter your password", class: "w-full rounded-md border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-300" %>
+        <%= form.password_field :password, placeholder: "Enter your password", class: "text-sm w-full rounded-md border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-300" %>
       </div>
-      <div class="my-5 space-y-2">
+      <div class="space-y-2">
         <%= form.label :password_confirmation, class: "block font-medium mb-3" %>
-        <%= form.password_field :password_confirmation, placeholder: "Confirm your password", class: "w-full rounded-md border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-300" %>
+        <%= form.password_field :password_confirmation, placeholder: "Confirm your password", class: "text-sm w-full rounded-md border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-300" %>
       </div>
       <div class="w-full text-center space-y-4">
         <%= form.submit "Sign Up", class: "w-full text-white rounded-md bg-blue-700 hover:bg-blue-800 py-2 font-medium" %>
