@@ -38,7 +38,7 @@ class LocationsController < ApplicationController
 
   # POST /locations or /locations.json
   def create
-    @location = current_user.locations.build(location_params)
+    @location = current_user.locations.build(location_params_with_pictures)
 
     respond_to do |format|
       if @location.save
@@ -101,6 +101,11 @@ class LocationsController < ApplicationController
   # Only allow a list of trusted parameters through.
   def location_params
     params.expect(location: [:name, :address, :city, :state, :zip, :country, :latitude, :longitude, feature_ids: []])
+  end
+
+  # For create action: include pictures
+  def location_params_with_pictures
+    params.expect(location: [:name, :address, :city, :state, :zip, :country, :latitude, :longitude, feature_ids: [], pictures: []])
   end
 
   def authorize_user!
