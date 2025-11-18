@@ -1,4 +1,9 @@
-<%= form_with(model: location, class: "space-y-5 text-sm", data: { controller: "location-form-validation image-preview" }) do |f| %>
+<%= form_with(model: location, class: "space-y-5 text-sm",
+      data: {
+        controller: "address-autocomplete image-preview",
+        address_autocomplete_access_token_value: ENV['MAPBOX_ACCESS_TOKEN'],
+        address_autocomplete_current_address_value: location.persisted? ? "#{location.address}, #{location.city}, #{location.state} #{location.zip}, #{location.country}" : ""
+      }) do |f| %>
   <% if location.errors.any? %>
     <aside class="rounded-md bg-red-50 p-4 text-red-700">
       <p class="font-semibold mb-2"><%= pluralize(location.errors.count, "error") %> prohibited this location from being saved:</p>
@@ -13,9 +18,7 @@
   <div class="space-y-2">
     <%= f.label :name, "Location Name", class: "block font-medium" %>
     <%= f.text_field :name, placeholder: "ex. Moge Tee",
-          class: "text-sm w-full rounded-md border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-yellow-400",
-          data: { "location-form-validation-target": "nameInput", action: "input->location-form-validation#validate" } %>
-    <div data-location-form-validation-target="nameFeedback"></div>
+          class: "text-sm w-full rounded-md border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-yellow-400" %>
   </div>
 
   <div class="space-y-2">
@@ -64,88 +67,35 @@
     </div>
   </div>
 
+  <!-- Address Autocomplete Section -->
   <div class="space-y-2">
-    <%= f.label :address, "Address Line", class: "block font-medium" %>
-    <%= f.text_field :address, placeholder: "ex. 1590 Sherman Ave",
-          class: "text-sm w-full rounded-md border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-yellow-400",
-          data: { "location-form-validation-target": "addressInput", action: "input->location-form-validation#validate" } %>
-    <div data-location-form-validation-target="addressFeedback"></div>
+    <%= f.label :address, "Address", class: "block font-medium" %>
+    <div class="relative">
+      <input id="location_address" type="text"
+             placeholder="Search for an address..."
+             data-address-autocomplete-target="searchInput"
+             class="text-sm w-full rounded-md border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-yellow-400"
+             autocomplete="off" />
+      <p class="text-xs text-gray-500 mt-1">Start typing and select an address from the suggestions</p>
+    </div>
+
+    <!-- Confirmation display -->
+    <div data-address-autocomplete-target="confirmationDisplay" class="hidden mt-2"></div>
   </div>
 
-  <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-    <div class="space-y-2">
-      <%= f.label :city, "City", class: "block font-medium" %>
-      <%= f.text_field :city, placeholder: "ex. Evanston",
-            class: "text-sm w-full rounded-md border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-yellow-400",
-            data: { "location-form-validation-target": "cityInput", action: "input->location-form-validation#validate" } %>
-      <div data-location-form-validation-target="cityFeedback"></div>
-    </div>
-
-    <div class="space-y-2">
-      <%= f.label :state, "State", class: "block font-medium" %>
-      <%= f.select :state,
-          [
-            ["Select a state", ""],
-            ["Alabama", "AL"], ["Alaska", "AK"], ["Arizona", "AZ"], ["Arkansas", "AR"],
-            ["California", "CA"], ["Colorado", "CO"], ["Connecticut", "CT"], ["Delaware", "DE"],
-            ["Florida", "FL"], ["Georgia", "GA"], ["Hawaii", "HI"], ["Idaho", "ID"],
-            ["Illinois", "IL"], ["Indiana", "IN"], ["Iowa", "IA"], ["Kansas", "KS"],
-            ["Kentucky", "KY"], ["Louisiana", "LA"], ["Maine", "ME"], ["Maryland", "MD"],
-            ["Massachusetts", "MA"], ["Michigan", "MI"], ["Minnesota", "MN"], ["Mississippi", "MS"],
-            ["Missouri", "MO"], ["Montana", "MT"], ["Nebraska", "NE"], ["Nevada", "NV"],
-            ["New Hampshire", "NH"], ["New Jersey", "NJ"], ["New Mexico", "NM"], ["New York", "NY"],
-            ["North Carolina", "NC"], ["North Dakota", "ND"], ["Ohio", "OH"], ["Oklahoma", "OK"],
-            ["Oregon", "OR"], ["Pennsylvania", "PA"], ["Rhode Island", "RI"], ["South Carolina", "SC"],
-            ["South Dakota", "SD"], ["Tennessee", "TN"], ["Texas", "TX"], ["Utah", "UT"],
-            ["Vermont", "VT"], ["Virginia", "VA"], ["Washington", "WA"], ["West Virginia", "WV"],
-            ["Wisconsin", "WI"], ["Wyoming", "WY"]
-          ],
-          {}, class: "text-sm w-full rounded-md border border-gray-300 px-3 py-2 bg-white focus:outline-none focus:ring-2 focus:ring-yellow-400",
-          data: { "location-form-validation-target": "stateInput", action: "change->location-form-validation#validate" }
-      %>
-      <div data-location-form-validation-target="stateFeedback"></div>
-    </div>
-
-    <div class="space-y-2">
-      <%= f.label :zip, "Zip Code", class: "block font-medium" %>
-      <%= f.text_field :zip, placeholder: "ex. 60201",
-            class: "text-sm w-full rounded-md border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-yellow-400",
-            data: { "location-form-validation-target": "zipInput", action: "input->location-form-validation#validate" } %>
-      <div data-location-form-validation-target="zipFeedback"></div>
-    </div>
-
-    <div class="space-y-2">
-      <%= f.label :country, "Country", class: "block font-medium" %>
-      <%= f.select :country,
-          [
-            ["Select a country", ""],
-            ["United States", "United States"],
-            ["Canada", "Canada"],
-            ["Mexico", "Mexico"],
-            ["United Kingdom", "United Kingdom"],
-            ["France", "France"],
-            ["Germany", "Germany"],
-            ["India", "India"],
-            ["China", "China"],
-            ["Japan", "Japan"],
-            ["Australia", "Australia"],
-            ["Brazil", "Brazil"],
-            ["South Korea", "South Korea"]
-          ],
-          {}, class: "text-sm w-full rounded-md border border-gray-300 px-3 py-2 bg-white focus:outline-none focus:ring-2 focus:ring-yellow-400",
-          data: { "location-form-validation-target": "countryInput", action: "change->location-form-validation#validate" }
-      %>
-      <div data-location-form-validation-target="countryFeedback"></div>
-    </div>
-  </div>
-
-  <%= f.hidden_field :latitude %>
-  <%= f.hidden_field :longitude %>
+  <!-- Hidden fields for address components -->
+  <%= f.hidden_field :address, data: { address_autocomplete_target: "addressField" } %>
+  <%= f.hidden_field :city, data: { address_autocomplete_target: "cityField" } %>
+  <%= f.hidden_field :state, data: { address_autocomplete_target: "stateField" } %>
+  <%= f.hidden_field :zip, data: { address_autocomplete_target: "zipField" } %>
+  <%= f.hidden_field :country, data: { address_autocomplete_target: "countryField" } %>
+  <%= f.hidden_field :latitude, data: { address_autocomplete_target: "latitudeField" } %>
+  <%= f.hidden_field :longitude, data: { address_autocomplete_target: "longitudeField" } %>
 
   <div class="flex flex-row-reverse flex-wrap gap-2">
     <%= f.submit( location.persisted? ? "Save Changes" : "Add Location",
-          class: "text-sm w-full sm:w-auto text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-md px-4 py-2 dark:bg-blue-600 focus:outline-none flex justify-center items-center",
-          data: { "location-form-validation-target": "submitButton" }) %>
+          class: "text-sm w-full sm:w-auto text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-md px-4 py-2 dark:bg-blue-600 focus:outline-none flex justify-center items-center disabled:opacity-50 disabled:cursor-not-allowed",
+          data: { address_autocomplete_target: "submitButton" }) %>
     <% if location.persisted? %>
       <%= link_to "Delete Location",
                   location_path(location),

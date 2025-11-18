@@ -14,15 +14,7 @@ class Location < ApplicationRecord
     }
 
   before_validation :normalize_fields
-  before_validation :clear_coords_if_address_changed
-  before_validation :geocode_safely, if: -> { address_fields_changed? || latitude.blank? || longitude.blank? }
   validate :zip_code_format_valid
-  validate :coordinates_required_if_address_changed, if: :address_fields_changed?
-
-  # Let geocoded_by handle the geocoding automatically
-  geocoded_by :full_address
-  # after_validation :geocode, if: ->(obj) { obj.address_changed? || obj.city_changed? || obj.state_changed? || obj.zip_changed? || obj.country_changed? }
-  # after_validation :geocode_safely, if: :address_fields_changed?
 
   validates :name, :address, :city, :state, :zip, :country, presence: true
   validates :address, uniqueness: {
@@ -30,8 +22,6 @@ class Location < ApplicationRecord
     case_sensitive: false,
     message: "has already been taken for this city, state, zip, and country",
   }
-
-  validate :coordinates_required_if_address_changed, if: :address_fields_changed?
 
   def full_address
     [address, city, state, zip, country].compact_blank.join(", ")
@@ -72,51 +62,6 @@ class Location < ApplicationRecord
 
     unless /\A\d{5}(-\d{4})?\z/.match?(zip)
       errors.add(:zip, "must be in the format 12345 or 12345-6789 for United States")
-    end
-  end
-
-  def require_coordinates_after_geocoding
-    if full_address.present? && (latitude.blank? || longitude.blank?)
-      errors.add(:base, "Could not geocode the provided address. Please check the address details.")
-    end
-  end
-
-  def clear_coords_if_address_changed
-    return unless address_fields_changed?
-
-    self.latitude = nil
-    self.longitude = nil
-  end
-
-  def geocode_safely
-    # Call Geocoder directly so we can inspect postal_code
-    result = Geocoder.search(full_address).first
-    return unless result
-
-    detected_zip = (result.postal_code || "").to_s
-    # Normalize to 5 digits for US comparisons
-    if country == "United States"
-      provided = zip.to_s.gsub(/\D/, "")[0, 5]
-      detected = detected_zip.gsub(/\D/, "")[0, 5]
-
-      if provided.blank? || detected.blank? || provided != detected
-        # Don’t set coords; fail validation later
-        errors.add(:zip, "zip code does not match the address (found #{detected_zip.presence || "unknown"})")
-        return
-      end
-    end
-
-    # ZIP matches (or non-US), accept the coordinates
-    self.latitude  = result.latitude
-    self.longitude = result.longitude
-  rescue OpenSSL::SSL::SSLError, Geocoder::Error => e
-    Rails.logger.warn("Geocode error, will invalidate save if coords blank: #{e.message}")
-    # leave coords nil; your validation will block save
-  end
-
-  def coordinates_required_if_address_changed
-    if latitude.blank? || longitude.blank?
-      errors.add(:base, "Address could not be located. Please enter a valid address.")
     end
   end
 end

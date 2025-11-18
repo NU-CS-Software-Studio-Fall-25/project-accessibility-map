@@ -40,8 +40,13 @@ class LocationsController < ApplicationController
   def create
     @location = current_user.locations.build(location_params_with_pictures)
 
+    # Validate coordinates are present
+    if @location.latitude.blank? || @location.longitude.blank?
+      @location.errors.add(:base, "Address could not be located. Please enter a valid address.")
+    end
+
     respond_to do |format|
-      if @location.save
+      if @location.errors.empty? && @location.save
         format.html { redirect_to(@location, notice: "Location was successfully created.", status: :see_other) }
         format.json { render(:show, status: :created, location: @location) }
       else
@@ -56,8 +61,22 @@ class LocationsController < ApplicationController
     # Extract and attach new pictures separately
     new_pictures = params[:location]&.delete(:pictures)
 
+    # Assign params to check for changes
+    @location.assign_attributes(location_params)
+
+    # Check if address fields changed and validate coordinates
+    address_changed = @location.will_save_change_to_address? ||
+      @location.will_save_change_to_city? ||
+      @location.will_save_change_to_state? ||
+      @location.will_save_change_to_zip? ||
+      @location.will_save_change_to_country?
+
+    if address_changed && (@location.latitude.blank? || @location.longitude.blank?)
+      @location.errors.add(:base, "Address could not be located. Please enter a valid address.")
+    end
+
     respond_to do |format|
-      if @location.update(location_params)
+      if @location.errors.empty? && @location.save
         # Attach new pictures after update (this appends, not replaces)
         @location.pictures.attach(new_pictures) if new_pictures.present?
 
@@ -99,6 +118,7 @@ class LocationsController < ApplicationController
   end
 
   # Only allow a list of trusted parameters through.
+  # Note: Zip is now optional since it's not required for all countries
   def location_params
     params.expect(location: [:name, :address, :city, :state, :zip, :country, :latitude, :longitude, feature_ids: []])
   end
