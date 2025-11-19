@@ -15,8 +15,22 @@ class LocationsController < ApplicationController
       @locations = @locations.merge(Location.search_locations(params[:query]))
     end
 
-    if params[:feature_id].present?
-      @locations = @locations.joins(:features).where(features: { id: params[:feature_id] })
+    if params[:feature_ids].present?
+      feature_ids = params[:feature_ids].reject(&:blank?)  # remove empty strings
+
+      @locations = @locations
+        .joins(:features)
+        .where(features: { id: feature_ids })
+        .group("locations.id")
+        .having("COUNT(DISTINCT features.id) = ?", feature_ids.count)
+    end
+
+
+    # allow for auto search, no need for search button 
+    respond_to do |format|
+      format.html
+      format.turbo_stream
+      format.json { render json: @locations }
     end
   end
 

@@ -1,0 +1,13 @@
+<section>
+    <turbo-stream action="update" target="locations_list">
+        <template>
+            <% if @locations.any? %>
+                <% @locations.each do |location| %>
+                    <%= render location %>
+                <% end %>
+            <% else %>
+                <p class="text-center my-10">No locations found.</p>
+            <% end %>
+        </template>
+    </turbo-stream>
+</section>
