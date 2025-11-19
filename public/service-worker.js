@@ -1,9 +1,9 @@
-const CACHE = "accessmap-v1";
+const CACHE = "opendoors-v1";
 const APP_SHELL = [
   "/",
   "/manifest.webmanifest",
-  "/icon-192.png",
-  "/icon-512.png",
+  "/opendoors-192.png",
+  "/opendoors-512.png",
   "/icon-maskable.png"
 ];
 
