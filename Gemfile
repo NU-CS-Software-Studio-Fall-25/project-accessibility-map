@@ -78,6 +78,7 @@ end
 
 group :development, :test do
   gem "dotenv-rails"
+  gem "rspec-rails"
 end
 
 gem "tailwindcss-ruby", "~> 4.1"
