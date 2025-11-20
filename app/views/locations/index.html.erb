@@ -68,11 +68,16 @@
     <div class="h-[1px] bg-gray-200"></div>
 
     <%# results list %>
-    <section id="locations_list" class="w-full flex flex-col justify-start items-stretch gap-4 overflow-y-auto">
+    <section id="locations_list" class="flex-1 flex flex-col justify-start items-stretch gap-4 overflow-y-auto">
       <% if @locations.any? %>
         <% @locations.each do |location| %>
           <%= render location %>
         <% end %>
+        <div class="flickr_pagination">
+          <div class="py-2">
+            <%= will_paginate @locations, :page_links => false %>
+          </div>
+        </div>
       <% else %>
         <p class="text-center my-10">No locations found.</p>
       <% end %>
