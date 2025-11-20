@@ -76,8 +76,17 @@ group :test do
   gem "selenium-webdriver"
 end
 
+group :development, :test do
+  gem "dotenv-rails"
+end
+
 gem "tailwindcss-ruby", "~> 4.1"
 gem "tailwindcss-rails", "~> 4.3"
 
 gem "rubocop", require: false
 gem "rubocop-shopify", require: false
+
+gem "omniauth"
+gem "omniauth-rails_csrf_protection"
+gem "omniauth-oauth2"
+gem "omniauth-google-oauth2"

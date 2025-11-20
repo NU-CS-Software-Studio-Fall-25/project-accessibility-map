@@ -32,13 +32,34 @@
         <%= form.label :password_confirmation, class: "block font-medium mb-3" %>
         <%= form.password_field :password_confirmation, placeholder: "Confirm your password", class: "text-sm w-full rounded-md border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-300" %>
       </div>
-      <div class="w-full text-center space-y-4">
-        <%= form.submit "Sign Up", class: "transition w-full text-white rounded-md bg-blue-700 hover:bg-blue-800 py-2 font-medium" %>
-        <div>
-          <span>Already have an account? </span>
-          <%= link_to "Login", new_session_path, class: "text-gray-600 hover:underline" %>
-        </div>
+      <div class="w-full text-center">
+        <%= form.submit "Sign Up", class: "w-full text-white rounded-md bg-blue-700 hover:bg-blue-800 hover:cursor-pointer py-2 font-medium" %>
       </div>
     <% end %>
+
+    <div class="relative my-4">
+      <div class="absolute inset-0 flex items-center" aria-hidden="true">
+        <div class="w-full border-t border-gray-300"></div>
+      </div>
+      <div class="relative flex justify-center text-sm">
+        <span class="px-2 bg-white text-gray-500">
+          Or continue with
+        </span>
+      </div>
+    </div>
+
+    <div>
+      <%= link_to "/auth/google_oauth2", class: "w-full flex items-center justify-center gap-3 py-2.5 px-4 border border-gray-300 rounded-lg hover:bg-gray-50 hover:cursor-pointer focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-400", form_class: "w-full" do %>
+        <svg class="w-5 h-5" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 488 512">
+          <path d="M488 261.8C488 403.3 381.5 512 244 512 110.3 512 0 401.7 0 265.2 0 128.8 109.3 18.5 244 18.5c71.2 0 132.8 28.4 177.9 72.9l-63.5 61.4C333.6 128.1 292.8 106 244 106c-76.3 0-138.3 62.4-138.3 139.2s62 139.2 138.3 139.2c87.3 0 119.3-67.3 123.4-102.9H244v-79.5h236.1c2.3 12.7 3.9 26.4 3.9 41.4z"/>
+        </svg>
+        <span class="text-sm font-medium text-gray-700">Sign in with Google</span>
+      <% end %>
+    </div>
+
+    <div class="text-center text-sm">
+      <span>Already have an account? </span>
+      <%= link_to "Login", new_session_path, class: "text-gray-600 hover:underline hover:cursor-pointer" %>
+    </div>
   </div>
 </div>

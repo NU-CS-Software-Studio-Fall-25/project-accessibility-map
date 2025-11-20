@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <title><%= content_for(:title) || "Accessbility Map" %></title>
+    <title><%= content_for(:title) || "OpenDoors" %></title>
     <meta name="viewport" content="width=device-width,initial-scale=1">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="mobile-web-app-capable" content="yes">
@@ -13,9 +13,11 @@
     <%# Enable PWA manifest for installable apps (make sure to enable in config/routes.rb too!) %>
     <%#= tag.link rel: "manifest", href: pwa_manifest_path(format: :json) %>
 
-    <link rel="icon" href="/icon.png" type="image/png">
-    <link rel="icon" href="/icon.svg" type="image/svg+xml">
-    <link rel="apple-touch-icon" href="/icon.png">
+    <link rel="icon" href="/opendoors-192.png" type="image/png">
+    <link rel="apple-touch-icon" href="/opendoors-192.png">
+
+    <link rel="manifest" href="/manifest.webmanifest">
+    <meta name="theme-color" content="#1d4ed8">
 
     <%# Includes all stylesheet files in app/assets/stylesheets %>
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin=""/>
@@ -28,7 +30,7 @@
   <body class="h-screen flex flex-col">
     <nav class="w-full flex flex-wrap items-center justify-between gap-2 px-6 py-4 border-b border-gray-200">
       <a href="/" class="flex items-center space-x-3 rtl:space-x-reverse">
-        <h1 class="self-center text-2xl font-semibold whitespace-nowrap">Accessibility Map</h1>
+        <h1 class="self-center text-2xl font-semibold whitespace-nowrap">OpenDoors</h1>
       </a>
       <button data-collapse-toggle="navbar-solid" type="button" class="transition inline-flex items-center p-2.5 text-sm border border-gray-200 justify-center rounded-lg sm:hidden hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-gray-200" aria-controls="navbar-solid" aria-expanded="false">
         <span class="sr-only">Open main menu</span>
