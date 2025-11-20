@@ -38,6 +38,18 @@ class LocationsController < ApplicationController
     @location = Location.find(params[:id])
     @reviews = @location.reviews.order(created_at: :desc)
     @review = @location.reviews.build
+
+
+    respond_to do |format|
+      format.html
+      format.pdf do
+        pdf = LocationPdf.new(@location, @reviews)
+        send_data pdf.render,
+          filename: "location-#{@location.id}.pdf",
+          type: "application/pdf",
+          disposition: "inline" # or "attachment" to force download
+      end
+    end
   end
 
   # GET /locations/new
@@ -146,4 +158,5 @@ class LocationsController < ApplicationController
       redirect_to(@location, alert: "You are not authorized to perform this action")
     end
   end
+
 end
