@@ -9,7 +9,7 @@ class LocationsController < ApplicationController
 
   # GET /locations or /locations.json
   def index
-    @locations = Location.all
+    @locations = Location.paginate(page: params[:page], per_page: 10)
 
     if params[:query].present?
       @locations = @locations.merge(Location.search_locations(params[:query]))
