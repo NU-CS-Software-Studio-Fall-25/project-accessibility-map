@@ -57,6 +57,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_11_20_025326) do
     t.text "feature"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.string "feature_category", null: false
   end
 
   create_table "locations", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|

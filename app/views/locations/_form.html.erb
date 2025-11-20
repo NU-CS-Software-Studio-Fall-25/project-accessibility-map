@@ -51,18 +51,27 @@
 
   <div class="space-y-2">
     <%= f.label :feature_ids, "Features", class: "block font-medium" %>
-    <div class="flex flex-wrap gap-2">
-      <% Feature.all.each do |feature| %>
-        <label class="flex items-center space-x-2 bg-gray-100 hover:bg-yellow-100 px-3 py-1.5 rounded-md cursor-pointer">
-          <%= check_box_tag "location[feature_ids][]",
-            feature.id,
-            @location.features.include?(feature),
-            class: "text-sm rounded text-yellow-500 focus:ring-yellow-400" %>
-          <span class="text-gray-800"><%= feature.feature %></span>
-        </label>
+    <% grouped = Feature.all.group_by(&:feature_category) %>
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+      <% grouped.each do |category, features| %>
+        <div>
+          <h3 class="font-semibold text-gray-800 mb-2"><%= category %></h3>
+          <div class="space-y-2">
+            <% features.each do |feature| %>
+              <label class="flex items-center space-x-2 bg-gray-100 hover:bg-yellow-100 px-3 py-1.5 rounded-md cursor-pointer">
+                <%= check_box_tag "location[feature_ids][]",
+                  feature.id,
+                  @location.features.include?(feature),
+                  class: "text-sm rounded text-yellow-500 focus:ring-yellow-400" %>
+                <span class="text-gray-800"><%= feature.feature %></span>
+              </label>
+            <% end %>
+          </div>
+        </div>
       <% end %>
     </div>
   </div>
+
 
   <div class="space-y-2">
     <%= f.label :address, "Address Line", class: "block font-medium" %>
