@@ -29,7 +29,6 @@ class LocationsController < ApplicationController
     # allow for auto search, no need for search button 
     respond_to do |format|
       format.html
-      format.turbo_stream
       format.json { render json: @locations }
     end
   end
