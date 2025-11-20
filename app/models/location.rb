@@ -20,7 +20,7 @@ class Location < ApplicationRecord
   validates :address, uniqueness: {
     scope: [:city, :state, :zip, :country],
     case_sensitive: false,
-    message: "has already been taken for this city, state, zip, and country",
+    message: "is already in use",
   }
 
   def full_address

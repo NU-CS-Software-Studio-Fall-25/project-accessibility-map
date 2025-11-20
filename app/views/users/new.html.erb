@@ -7,7 +7,7 @@
     <p class="py-2 px-3 bg-green-50 mb-5 text-green-700 font-medium rounded-lg inline-block" id="notice"><%= notice %></p>
   <% end %>
 
-  <div class="w-full max-w-[400px] p-6 border border-gray-200 rounded-lg shadow-xs space-y-5">
+  <div class="w-full max-w-[400px] p-6 border border-gray-200 rounded-lg shadow-sm space-y-5">
     <h2 class="text-xl font-bold">Hello there!</h2>
     <%= form_with(model: @user, url: users_path, class: "space-y-5 text-sm") do |form| %>
       <% if form.object.errors.any? %>
@@ -33,7 +33,7 @@
         <%= form.password_field :password_confirmation, placeholder: "Confirm your password", class: "text-sm w-full rounded-md border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-300" %>
       </div>
       <div class="w-full text-center space-y-4">
-        <%= form.submit "Sign Up", class: "w-full text-white rounded-md bg-blue-700 hover:bg-blue-800 py-2 font-medium" %>
+        <%= form.submit "Sign Up", class: "transition w-full text-white rounded-md bg-blue-700 hover:bg-blue-800 py-2 font-medium" %>
         <div>
           <span>Already have an account? </span>
           <%= link_to "Login", new_session_path, class: "text-gray-600 hover:underline" %>

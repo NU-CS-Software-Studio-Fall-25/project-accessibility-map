@@ -29,6 +29,7 @@ export default class extends Controller {
     // Initialize Mapbox Search Box Core
     this.searchBox = new SearchBoxCore({
       accessToken: this.accessTokenValue,
+      types: "address",
       options: {
         language: 'en',
         country: 'US', // Can be modified to support multiple countries
