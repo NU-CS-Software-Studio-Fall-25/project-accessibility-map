@@ -30,6 +30,12 @@
           class: "text-sm w-full sm:w-auto rounded-md bg-red-500 hover:bg-red-600 px-6 py-2 font-medium text-white transition flex justify-center items-center" %>
       <% end %>
     </div>
+    <div class="mt-4">
+      <%= link_to "Download PDF",
+          location_path(@location, format: :pdf),
+          class: "rounded-md bg-blue-600 hover:bg-blue-500 text-white px-4 py-2" %>
+    </div>
+
   </section>
 
   <section id="gallery" class="flex gap-4 overflow-x-auto">
