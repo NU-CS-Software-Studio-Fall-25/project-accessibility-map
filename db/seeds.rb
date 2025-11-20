@@ -151,7 +151,6 @@
 # end
 
 features_with_categories = {
-
   "Wheelchair accessible"  => "Physical Accessibility",
   "Accessible restrooms"   => "Physical Accessibility",
   "Elevator access"        => "Physical Accessibility",
