@@ -11,12 +11,15 @@ class LocationsController < ApplicationController
   def index
     @locations = Location.all
 
+    # text search
     if params[:query].present?
       @locations = @locations.merge(Location.search_locations(params[:query]))
+                            .reorder(nil)   # ← remove pg_search ORDER BY
     end
 
+    # feature filter
     if params[:feature_ids].present?
-      feature_ids = params[:feature_ids].reject(&:blank?)  # remove empty strings
+      feature_ids = params[:feature_ids].reject(&:blank?)
 
       @locations = @locations
         .joins(:features)
@@ -25,13 +28,12 @@ class LocationsController < ApplicationController
         .having("COUNT(DISTINCT features.id) = ?", feature_ids.count)
     end
 
-
-    # allow for auto search, no need for search button 
     respond_to do |format|
       format.html
       format.json { render json: @locations }
     end
   end
+
 
   # GET /locations/1 or /locations/1.json
   def show
