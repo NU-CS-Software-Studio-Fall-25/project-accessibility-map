@@ -1,26 +1,9 @@
-Given('that the following users exists:') do |table|
-  @passwords ||= {}
-
-  table.hashes.each do |row|
-    user = User.create!(
-      email_address: row['email_address'],
-      password: row['password'],
-      password_confirmation: row['password']
-    )
-
-    @passwords[user.email_address] = row['password']
-  end
-end
-
-
-Given('I am logged in as {string}') do |email|
+Given("I am logged in as {string}") do |email|
   visit new_session_path
 
-  user = User.find_by(email_address: email)
-  raise "User with email #{email} not found" unless user
+  fill_in "Email address", with: email
+  fill_in "Password", with: @users[email]   
 
-  fill_in "Email address", with: user.email_address
-  fill_in "Password", with: "Password#12345"
   click_button "Login"
 end
 

@@ -1,4 +1,4 @@
-Given('the following features exist:') do |table|
+Given("the following features exist:") do |table|
   table.hashes.each do |row|
     Feature.create!(
       feature: row["feature"],

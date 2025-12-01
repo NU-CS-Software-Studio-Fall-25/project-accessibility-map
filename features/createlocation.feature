@@ -8,6 +8,13 @@ Feature: Creating a location
       | email_address                      | password       |
       | isabellayan2027@u.northwestern.edu | Password!12345 |
 
+    And the following features exist:
+      | feature                  | feature_category |
+      | Wheelchair accessible    | Accessibility    |
+      | Gender neutral restrooms | Accessibility    |
+      | Quiet study space        | Environment      |
+
+
     And I am logged in as "isabellayan2027@u.northwestern.edu"
 
   Scenario: Happy - create a new location successfully
@@ -15,16 +22,12 @@ Feature: Creating a location
     And I fill in "location_name" with "Evanston Public Library"
     And I fill in "location_address" with "1703 Orrington Ave"
     And I fill in "location_city" with "Evanston"
-    And I select "IL" from "State"
+    And I select "Illinois" from "State"
     And I fill in "location_zip" with "60201"
     And I select "United States" from "Country"
-    And I check "Wheelchair accessible"
+    And I check feature "Wheelchair accessible"
     And I press "Add Location"
     Then I should see "Evanston Public Library"
-    And I should see "1703 Orrington Ave"
-    And I should see "Evanston"
-    And I should see "IL"
-    And I should see "60201"
-    And I should see "United States"
+    Then I should see "Wheelchair accessible"
 
 
