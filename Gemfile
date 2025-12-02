@@ -75,12 +75,15 @@ end
 
 group :test do
   # Use system testing [https://guides.rubyonrails.org/testing.html#system-testing]
+  gem 'cucumber-rails', require: false
+  gem 'database_cleaner-active_record'
   gem "capybara"
   gem "selenium-webdriver"
 end
 
 group :development, :test do
   gem "dotenv-rails"
+  gem "rspec-rails"
 end
 
 gem "tailwindcss-ruby", "~> 4.1"
