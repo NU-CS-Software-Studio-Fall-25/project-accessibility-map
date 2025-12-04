@@ -1,32 +1,41 @@
+require "net/http"
+require "json"
+
 class AutomaticAltTextService
-    def self.generate_for(picture)
-        return unless attachment.variable?
-        image_url = Rails.application.routes.url_helpers.rails_blob_url(
-            attachment, 
-            only_path: false 
-        )
+  HF_MODEL = "Salesforce/blip-image-captioning-base"
 
-        caption = call_openai(image_url)
+  def self.generate_for(attachment)
+    return unless attachment.variable? 
 
-        attachment.blob.metadata["alt_text"] = caption
-        attachment.blob.save
-    end
+    image_url = Rails.application.routes.url_helpers.rails_blob_url(
+      attachment,
+      only_path: false
+    )
 
-    def self.call_openai(image_url)
-        client = OpenAI::Client.new
+    caption = call_huggingface(image_url)
+    return unless caption.present?
 
-        response = client.chat(parameters: {
-            model: "gpt-4o-mini",
-            messages: [
-                {
-                    role: "user", content: [
-                        { type: "input_text", text: "Generate a short alt text for this accessibility-related photo." }
-                        { type: "input_image", image_url: image_url }
-                    ]
-                }
-            ]
-        })
+    # alt text goes into active storage
+    attachment.blob.metadata["alt_text"] = caption
+    attachment.blob.save
 
-        response.dig("choices", 0, "message", "content") || "image"
-    end
+    caption
+  end
+
+  def self.call_huggingface(image_url)
+    api_key = Rails.application.credentials.dig(:huggingface, :api_key)
+    uri = URI("https://api-inference.huggingface.co/models/#{HF_MODEL}")
+
+    headers = {
+      "Authorization" => "Bearer #{api_key}",
+      "Content-Type" => "application/json"
+    }
+
+    payload = { inputs: image_url }.to_json
+
+    response = Net::HTTP.post(uri, payload, headers)
+    json = JSON.parse(response.body)
+
+    json.first["generated_text"] rescue nil
+  end
 end
