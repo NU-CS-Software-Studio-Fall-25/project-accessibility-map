@@ -41,7 +41,21 @@ class Location < ApplicationRecord
       will_save_change_to_country?
   end
 
+  after_save :generate_alt_text_for_new_pictures
+
   private
+
+  def generate_alt_text_for_new_pictures
+    pictures.each do |picture|
+      next if picture.metadata['alt'].present?
+
+      # new service for alternate text services 
+      alt = AutomaticAltTextService.generate_for(picture)
+      picture.metadata['alt'] = alt
+      picture.save
+    end
+  end
+
 
   def normalize_fields
     [:address, :city, :state, :zip, :country].each do |attr|
