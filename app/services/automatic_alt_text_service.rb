@@ -5,7 +5,7 @@ class AutomaticAltTextService
   HF_MODEL = "Salesforce/blip-image-captioning-base"
 
   def self.generate_for(attachment)
-    return unless attachment.variable? 
+    return unless attachment.variable?
 
     image_url = Rails.application.routes.url_helpers.rails_blob_url(
       attachment,
@@ -23,7 +23,7 @@ class AutomaticAltTextService
   end
 
   def self.call_huggingface(image_url)
-    api_key = Rails.application.credentials.dig(:huggingface, :api_key)
+    api_key = ENV["HUGGINGFACE_API_KEY"] 
     uri = URI("https://api-inference.huggingface.co/models/#{HF_MODEL}")
 
     headers = {
@@ -36,6 +36,6 @@ class AutomaticAltTextService
     response = Net::HTTP.post(uri, payload, headers)
     json = JSON.parse(response.body)
 
-    json.first["generated_text"] rescue nil
+    json[0]["generated_text"] rescue nil
   end
 end
