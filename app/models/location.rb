@@ -45,14 +45,11 @@ class Location < ApplicationRecord
 
   private
 
-  def generate_alt_text_for_new_pictures
+  def generate_alt_text_for_pictures
     pictures.each do |picture|
-      next if picture.metadata['alt'].present?
-
-      # new service for alternate text services 
-      alt = AutomaticAltTextService.generate_for(picture)
-      picture.metadata['alt'] = alt
-      picture.save
+      next if picture.blob.metadata["alt_text"].present?
+      # call the service for alt text generation 
+      AutomaticAltTextService.generate_for(picture)
     end
   end
 
