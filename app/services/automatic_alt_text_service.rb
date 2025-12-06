@@ -6,13 +6,12 @@ class AutomaticAltTextService
 
   def self.generate_for(attachment)
     return unless attachment&.blob
-    file = attachment.download
-    encoded = Base64.strict_encode64(file)
 
-    caption = call_huggingface(encoded)
+    file = attachment.download
+    caption = call_huggingface(file)
     return unless caption.present?
 
-    # alt text goes into active storage 
+    # save in active record 
     attachment.blob.metadata["alt_text"] = caption
     attachment.blob.save!
     caption
@@ -22,18 +21,19 @@ class AutomaticAltTextService
     api_key = ENV["HUGGINGFACE_API_KEY"] 
     uri = URI("https://api-inference.huggingface.co/models/#{HF_MODEL}")
 
-    headers = {
-      "Authorization" => "Bearer #{api_key}",
-      "Content-Type" => "application/json"
-    }
+    request = Net::HTTP::Post.new(uri)
+    request["Authorization"] = "Bearer #{api_key}"
+    request["Content-Type"] = "image/jpeg"   # HF requires binary MIME
+    request.body = image_bytes
 
-    puts "Calling Hugging Face API for alt text generation..."
+    response = Net::HTTP.start(uri.hostname, uri.port, use_ssl: true) do |http|
+      http.request(request)
+    end
 
-    payload = { inputs: image_url }.to_json
-
-    response = Net::HTTP.post(uri, payload, headers)
     json = JSON.parse(response.body)
-
-    json[0]["generated_text"] rescue nil
+    json.first["generated_text"]
+  rescue => e
+    Rails.logger.error("HuggingFace error: #{e}")
+    nil
   end
 end
