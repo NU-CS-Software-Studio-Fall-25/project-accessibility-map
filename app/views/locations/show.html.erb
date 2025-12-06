@@ -12,6 +12,19 @@
       <%= link_to "Download PDF",
         location_path(@location, format: :pdf),
         class: "py-2 px-4 text-sm font-medium text-gray-900 focus:outline-none bg-white rounded-lg border border-gray-200 hover:bg-gray-100 focus:z-10 focus:ring-4 focus:ring-gray-100 transition" %>
+      <% if current_user %>
+        <% if @is_favorited %>
+          <%= button_to "Remove From Favorites",
+            unfavorite_location_path(@location),
+            method: :delete,
+            class: "py-2 px-4 text-sm font-medium text-gray-900 focus:outline-none bg-white rounded-lg border border-gray-200 hover:bg-gray-100 focus:z-10 focus:ring-4 focus:ring-gray-100 transition" %>
+        <% else %>
+          <%= button_to "Add To Favorites",
+            favorite_location_path(@location),
+            method: :post,
+            class: "py-2 px-4 text-sm font-medium text-white focus:outline-none bg-blue-600 hover:bg-blue-700 rounded-lg focus:z-10 focus:ring-4 focus:ring-blue-300 transition" %>
+        <% end %>
+      <% end %>
       <% if current_user == @location.user %>
       <%= link_to "Edit Location",
         edit_location_path(@location),

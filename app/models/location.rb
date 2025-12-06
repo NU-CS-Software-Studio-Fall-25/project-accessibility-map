@@ -4,6 +4,7 @@ class Location < ApplicationRecord
   belongs_to :user
   has_many :reviews, dependent: :destroy
   has_and_belongs_to_many :features, join_table: :locations_features
+  has_and_belongs_to_many :favorited_by_users, class_name: "User", join_table: "favorites"
   has_many_attached :pictures, dependent: :destroy
 
   include PgSearch::Model

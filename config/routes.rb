@@ -12,6 +12,8 @@ Rails.application.routes.draw do
     resources :reviews, only: [:create, :update, :destroy]
     member do
       delete :delete_picture
+      post :favorite
+      delete :unfavorite
     end
   end
   # Define your application routes per the DSL in https://guides.rubyonrails.org/routing.html
