@@ -5,20 +5,16 @@ class AutomaticAltTextService
   HF_MODEL = "Salesforce/blip-image-captioning-base"
 
   def self.generate_for(attachment)
-    return unless attachment.variable?
+    return unless attachment&.blob
+    file = attachment.download
+    encoded = Base64.strict_encode64(file)
 
-    image_url = Rails.application.routes.url_helpers.rails_blob_url(
-      attachment,
-      only_path: false
-    )
-
-    caption = call_huggingface(image_url)
+    caption = call_huggingface(encoded)
     return unless caption.present?
 
-    # alt text goes into active storage
+    # alt text goes into active storage 
     attachment.blob.metadata["alt_text"] = caption
-    attachment.blob.save
-
+    attachment.blob.save!
     caption
   end
 
@@ -30,6 +26,8 @@ class AutomaticAltTextService
       "Authorization" => "Bearer #{api_key}",
       "Content-Type" => "application/json"
     }
+
+    puts "Calling Hugging Face API for alt text generation..."
 
     payload = { inputs: image_url }.to_json
 

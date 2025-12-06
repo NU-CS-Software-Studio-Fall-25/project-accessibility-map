@@ -47,6 +47,7 @@
           <% begin %>
             <%= image_tag(
                   picture.variant(resize_to_limit: [nil, 200]),
+                  alt: (picture.blob.metadata["alt_text"] || "Location photo"),
                   class: "h-64 object-cover rounded-lg"
                 ) %>
           <% rescue => e %>

@@ -41,15 +41,15 @@ class Location < ApplicationRecord
       will_save_change_to_country?
   end
 
-  after_save :generate_alt_text_for_new_pictures
+  after_save_commit :generate_alt_text_for_pictures
 
   private
 
   def generate_alt_text_for_pictures
-    pictures.each do |picture|
-      next if picture.blob.metadata["alt_text"].present?
-      # call the service for alt text generation 
-      AutomaticAltTextService.generate_for(picture)
+    return unless pictures.attachments.any?(&:previously_new_record?)
+
+    pictures.each do |attachment|
+      AutomaticAltTextService.generate_for(attachment)
     end
   end
 
