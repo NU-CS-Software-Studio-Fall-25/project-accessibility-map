@@ -1,13 +1,15 @@
+# frozen_string_literal: true
+
 Given("the following features exist:") do |table|
   table.hashes.each do |row|
     Feature.create!(
       feature: row["feature"],
-      feature_category: row["feature_category"]
+      feature_category: row["feature_category"],
     )
   end
 end
 
-Given('{string} has features: {string}') do |location_name, feature_list|
+Given("{string} has features: {string}") do |location_name, feature_list|
   location = Location.find_by!(name: location_name)
   feature_names = feature_list.split(",").map(&:strip)
   features = Feature.where(feature: feature_names)
@@ -28,6 +30,6 @@ When("I check {string}") do |feature_name|
   checkbox.check
 end
 
-Then('I should see {string} if nothing matches') do |string|
-  expect(page).to have_content(string)
+Then("I should see {string} if nothing matches") do |string|
+  expect(page).to(have_content(string))
 end

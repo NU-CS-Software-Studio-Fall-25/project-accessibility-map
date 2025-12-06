@@ -4,7 +4,7 @@ class LocationsController < ApplicationController
   # Run auth check before every action except what should remain public
   allow_unauthenticated_access only: [:index, :show]
 
-  before_action :set_location, only: [:show, :edit, :update, :destroy, :delete_picture]
+  before_action :set_location, only: [:show, :edit, :update, :destroy, :delete_picture, :favorite, :unfavorite]
   before_action :authorize_user!, only: [:edit, :update, :destroy, :delete_picture]
 
   # GET /locations or /locations.json
@@ -14,7 +14,13 @@ class LocationsController < ApplicationController
     # text search
     if params[:query].present?
       @locations = @locations.merge(Location.search_locations(params[:query]))
-                            .reorder(nil)   # ← remove pg_search ORDER BY
+        .reorder(nil) # ← remove pg_search ORDER BY
+    end
+
+    # favorites filter
+    if params[:favorites_only] == "1" && current_user
+      favorite_ids = current_user.favorite_locations.pluck(:id)
+      @locations = @locations.where(id: favorite_ids)
     end
 
     # feature filter
@@ -28,28 +34,32 @@ class LocationsController < ApplicationController
         .having("COUNT(DISTINCT features.id) = ?", feature_ids.count)
     end
 
+    # Preload favorite location IDs for current user to avoid N+1 queries
+    @favorite_location_ids = current_user&.favorite_locations&.pluck(:id)&.to_set || Set.new
+
     respond_to do |format|
       format.html
-      format.json { render json: @locations }
+      format.json { render(json: @locations) }
     end
   end
-
 
   # GET /locations/1 or /locations/1.json
   def show
     @location = Location.find(params[:id])
     @reviews = @location.reviews.order(created_at: :desc)
     @review = @location.reviews.build
-
+    @is_favorited = current_user&.favorite_locations&.include?(@location) || false
 
     respond_to do |format|
       format.html
       format.pdf do
         pdf = LocationPdf.new(@location, @reviews)
-        send_data pdf.render,
+        send_data(
+          pdf.render,
           filename: "location-#{@location.id}.pdf",
           type: "application/pdf",
-          disposition: "inline" # or "attachment" to force download
+          disposition: "inline",
+        ) # or "attachment" to force download
       end
     end
   end
@@ -137,6 +147,46 @@ class LocationsController < ApplicationController
     end
   end
 
+  # POST /locations/1/favorite
+  def favorite
+    unless current_user
+      redirect_to(new_session_path, alert: "You must be logged in to favorite locations.")
+      return
+    end
+
+    if current_user.favorite_locations.include?(@location)
+      notice_message = "Location is already in your favorites."
+    else
+      current_user.favorite_locations << @location
+      notice_message = "Location added to favorites."
+    end
+
+    respond_to do |format|
+      format.html { redirect_back(fallback_location: @location, notice: notice_message) }
+      format.json { head(:ok) }
+    end
+  end
+
+  # DELETE /locations/1/unfavorite
+  def unfavorite
+    unless current_user
+      redirect_to(new_session_path, alert: "You must be logged in to unfavorite locations.")
+      return
+    end
+
+    if current_user.favorite_locations.include?(@location)
+      current_user.favorite_locations.delete(@location)
+      notice_message = "Location removed from favorites."
+    else
+      notice_message = "Location is not in your favorites."
+    end
+
+    respond_to do |format|
+      format.html { redirect_back(fallback_location: @location, notice: notice_message) }
+      format.json { head(:ok) }
+    end
+  end
+
   private
 
   # Use callbacks to share common setup or constraints between actions.
@@ -160,5 +210,4 @@ class LocationsController < ApplicationController
       redirect_to(@location, alert: "You are not authorized to perform this action")
     end
   end
-
 end

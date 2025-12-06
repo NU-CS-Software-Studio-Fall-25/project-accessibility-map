@@ -13,6 +13,7 @@ class User < ApplicationRecord
   has_many :locations
   has_many :reviews
   has_many_attached :pictures
+  has_and_belongs_to_many :favorite_locations, class_name: "Location", join_table: "favorites"
 
   normalizes :email_address, with: ->(e) { e.strip.downcase }
 end

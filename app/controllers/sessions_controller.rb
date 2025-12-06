@@ -8,14 +8,14 @@ class SessionsController < ApplicationController
   end
 
   def create
-    if auth_hash = request.env["omniauth.auth"]
+    if (auth_hash = request.env["omniauth.auth"])
 
       def generate_compliant_password
-        lowercase = ('a'..'z').to_a.sample
-        uppercase = ('A'..'Z').to_a.sample
-        digit     = ('0'..'9').to_a.sample
-        special   = %w[! @ # $ % ^ & *].sample
-        filler    = SecureRandom.alphanumeric(20)  # fills the rest
+        lowercase = ("a".."z").to_a.sample
+        uppercase = ("A".."Z").to_a.sample
+        digit     = ("0".."9").to_a.sample
+        special   = ["!", "@", "#", "$", "%", "^", "&", "*"].sample
+        filler    = SecureRandom.alphanumeric(20) # fills the rest
         # Shuffle so required characters aren't predictable
         (lowercase + uppercase + digit + special + filler).chars.shuffle.join
       end
@@ -27,19 +27,17 @@ class SessionsController < ApplicationController
       user.email_address = auth_hash.info.email
       user.password ||= generate_compliant_password # only assign if password missing
 
-      user.save!  # raises validation errors if something is wrong
+      user.save! # raises validation errors if something is wrong
 
       start_new_session_for(user)
       redirect_to(after_authentication_url, notice: "Signed in successfully!")
-    else
+    elsif (user = User.authenticate_by(params.permit(:email_address, :password)))
       # Existing password/email login
-      if (user = User.authenticate_by(params.permit(:email_address, :password)))
-        start_new_session_for(user)
-        redirect_to(after_authentication_url)
-      else
-        flash.now[:alert] = "Incorrect email or password."
-        render(:new, status: :unprocessable_entity)
-      end
+      start_new_session_for(user)
+      redirect_to(after_authentication_url)
+    else
+      flash.now[:alert] = "Incorrect email or password."
+      render(:new, status: :unprocessable_entity)
     end
   end
 

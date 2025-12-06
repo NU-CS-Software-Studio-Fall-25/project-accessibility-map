@@ -1,4 +1,4 @@
-<div id="<%= dom_id location %>" class="w-full flex flex-col justify-center items-start gap-2 border border-gray-200 rounded-xl p-4">
+<%= link_to location_path(location), id: dom_id(location), class: "w-full flex flex-col justify-center items-start gap-2 border border-gray-200 rounded-xl p-4 transition hover:shadow-md cursor-pointer" do %>
   <div>
     <h3 class="font-bold text-md">
       <%= location.name %>
@@ -10,5 +10,20 @@
       <%= location.zip %>
     </span>
   </div>
-  <%= link_to "See More", location_path(location), class: "transition text-sm bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium px-4 py-1.5 rounded-full text-nowrap" %>
-</div>
+  <div class="flex gap-2 flex-wrap" onclick="event.stopPropagation()">
+    <% if current_user %>
+      <% is_favorited = @favorite_location_ids&.include?(location.id) || false %>
+      <% if is_favorited %>
+        <%= button_to "Remove From Favorites",
+          unfavorite_location_path(location),
+          method: :delete,
+          class: "transition text-sm bg-gray-200 hover:bg-gray-300 text-gray-800 text-sm font-medium px-4 py-1.5 rounded-full text-nowrap" %>
+      <% else %>
+        <%= button_to "Add To Favorites",
+          favorite_location_path(location),
+          method: :post,
+          class: "transition text-sm bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium px-4 py-1.5 rounded-full text-nowrap" %>
+      <% end %>
+    <% end %>
+  </div>
+<% end %>

@@ -1,41 +1,41 @@
 <% content_for :title, @location.name %>
 
-<% if notice.present? %>
-  <p class="py-2 px-3 bg-green-50 mb-5 text-green-700 font-medium rounded-md inline-block" id="notice"><%= notice %></p>
-<% end %>
-
-<div class="w-full lg:px-[144px] md:px-[96px] px-4 flex flex-col gap-4">
-
-  <!-- What is this for? -->
-  <% if @location.latitude && @location.longitude %>
-    <div id="ofm-map"
-     data-lat="<%= @location.latitude %>"
-     data-lng="<%= @location.longitude %>"
-     class="mt-4 h-0 w-full opacity-0 rounded-md border">
-    </div>
+<div class="w-full lg:px-[144px] md:px-[96px] px-4 py-6 flex flex-col gap-4">
+  <% if notice.present? %>
+    <p class="py-2 px-3 bg-green-50 text-green-700 font-medium rounded-md inline-block" id="notice"><%= notice %></p>
   <% end %>
 
-  <section class="flex md:flex-row flex-col justify-between md:items-center items-start gap-2">
+  <section class="flex sm:flex-row flex-col justify-between md:items-center items-start gap-2">
     <h2 class="text-3xl font-bold"><%= @location.name %></h2>
     <!-- buttons for editing location and add image -->
-    <div class="flex gap-2 grow-0">
-      <% if current_user == @location.user %>
-        <%= link_to "Edit Location",
-          edit_location_path(@location),
-          class: "py-2 px-4 text-sm font-medium text-gray-900 focus:outline-none bg-white rounded-lg border border-gray-200 hover:bg-gray-100 focus:z-10 focus:ring-4 focus:ring-gray-100 transition"
-        %>
-        <%= link_to "Delete Location",
-          location_path(@location),
-          data: { turbo_method: :delete, turbo_confirm: "Are you sure you want to delete this location?" },
-          class: "text-sm w-full sm:w-auto rounded-md bg-red-500 hover:bg-red-600 px-6 py-2 font-medium text-white transition flex justify-center items-center" %>
-      <% end %>
-    </div>
-    <div class="mt-4">
+    <div class="flex gap-2 flex-wrap grow-0">
       <%= link_to "Download PDF",
-          location_path(@location, format: :pdf),
-          class: "rounded-md bg-blue-600 hover:bg-blue-500 text-white px-4 py-2" %>
+        location_path(@location, format: :pdf),
+        class: "py-2 px-4 text-sm font-medium text-gray-900 focus:outline-none bg-white rounded-lg border border-gray-200 hover:bg-gray-100 focus:z-10 focus:ring-4 focus:ring-gray-100 transition" %>
+      <% if current_user %>
+        <% if @is_favorited %>
+          <%= button_to "Remove From Favorites",
+            unfavorite_location_path(@location),
+            method: :delete,
+            class: "py-2 px-4 text-sm font-medium text-gray-900 focus:outline-none bg-white rounded-lg border border-gray-200 hover:bg-gray-100 focus:z-10 focus:ring-4 focus:ring-gray-100 transition" %>
+        <% else %>
+          <%= button_to "Add To Favorites",
+            favorite_location_path(@location),
+            method: :post,
+            class: "py-2 px-4 text-sm font-medium text-white focus:outline-none bg-blue-600 hover:bg-blue-700 rounded-lg focus:z-10 focus:ring-4 focus:ring-blue-300 transition" %>
+        <% end %>
+      <% end %>
+      <% if current_user == @location.user %>
+      <%= link_to "Edit Location",
+        edit_location_path(@location),
+        class: "py-2 px-4 text-sm font-medium text-gray-900 focus:outline-none bg-white rounded-lg border border-gray-200 hover:bg-gray-100 focus:z-10 focus:ring-4 focus:ring-gray-100 transition"
+      %>
+      <%= link_to "Delete Location",
+        location_path(@location),
+        data: { turbo_method: :delete, turbo_confirm: "Are you sure you want to delete this location?" },
+        class: "text-sm rounded-md bg-red-500 hover:bg-red-600 px-4 py-2 font-medium text-white transition flex justify-center items-center" %>
+          <% end %>
     </div>
-
   </section>
 
   <section id="gallery" class="flex gap-4 overflow-x-auto">
@@ -57,7 +57,7 @@
       <% end %>
     <% else %>
       <div class="h-16 flex items-center">
-        <p class="text-sm font-normal text-gray-700 italic">
+        <p class="text-sm font-normal text-gray-700">
           No photos yet for this location.
         </p>
       </div>
@@ -74,6 +74,20 @@
       <span class="bg-blue-600 text-white text-sm font-medium px-4 py-1.5 rounded-full text-nowrap">No features available</span>
     <% end %>
   </section>
+
+  <!-- divider line -->
+  <hr class="h-px bg-gray-200 border-0">
+
+  <!-- Map preview -->
+  <% if @location.latitude && @location.longitude %>
+    <div class="w-full rounded-md border overflow-hidden border-none" style="height: 400px; pointer-events: none;">
+      <%= js_map [{latitude: @location.latitude, longitude: @location.longitude, label: @location.name}],
+          controls: false,
+          width: "100%",
+          height: "100%"
+      %>
+    </div>
+  <% end %>
 
   <!-- divider line -->
   <hr class="h-px bg-gray-200 border-0">

@@ -3,7 +3,7 @@
 Rails.application.routes.draw do
   resource :session
   match "/auth/:provider/callback", to: "sessions#create", via: [:get, :post]
-  
+
   resources :passwords, param: :token
   resources :users, only: [:new, :create]
   # resources :reviews
@@ -12,6 +12,8 @@ Rails.application.routes.draw do
     resources :reviews, only: [:create, :update, :destroy]
     member do
       delete :delete_picture
+      post :favorite
+      delete :unfavorite
     end
   end
   # Define your application routes per the DSL in https://guides.rubyonrails.org/routing.html
