@@ -14,7 +14,7 @@ class LocationsController < ApplicationController
     # text search
     if params[:query].present?
       @locations = @locations.merge(Location.search_locations(params[:query]))
-                            .reorder(nil)   # ← remove pg_search ORDER BY
+        .reorder(nil) # ← remove pg_search ORDER BY
     end
 
     # feature filter
@@ -30,10 +30,9 @@ class LocationsController < ApplicationController
 
     respond_to do |format|
       format.html
-      format.json { render json: @locations }
+      format.json { render(json: @locations) }
     end
   end
-
 
   # GET /locations/1 or /locations/1.json
   def show
@@ -41,15 +40,16 @@ class LocationsController < ApplicationController
     @reviews = @location.reviews.order(created_at: :desc)
     @review = @location.reviews.build
 
-
     respond_to do |format|
       format.html
       format.pdf do
         pdf = LocationPdf.new(@location, @reviews)
-        send_data pdf.render,
+        send_data(
+          pdf.render,
           filename: "location-#{@location.id}.pdf",
           type: "application/pdf",
-          disposition: "inline" # or "attachment" to force download
+          disposition: "inline",
+        ) # or "attachment" to force download
       end
     end
   end
@@ -160,5 +160,4 @@ class LocationsController < ApplicationController
       redirect_to(@location, alert: "You are not authorized to perform this action")
     end
   end
-
 end

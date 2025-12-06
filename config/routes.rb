@@ -3,7 +3,7 @@
 Rails.application.routes.draw do
   resource :session
   match "/auth/:provider/callback", to: "sessions#create", via: [:get, :post]
-  
+
   resources :passwords, param: :token
   resources :users, only: [:new, :create]
   # resources :reviews

@@ -19,21 +19,19 @@
     <h2 class="text-3xl font-bold"><%= @location.name %></h2>
     <!-- buttons for editing location and add image -->
     <div class="flex gap-2 grow-0">
-      <% if current_user == @location.user %>
-        <%= link_to "Edit Location",
-          edit_location_path(@location),
-          class: "py-2 px-4 text-sm font-medium text-gray-900 focus:outline-none bg-white rounded-lg border border-gray-200 hover:bg-gray-100 focus:z-10 focus:ring-4 focus:ring-gray-100 transition"
-        %>
-        <%= link_to "Delete Location",
-          location_path(@location),
-          data: { turbo_method: :delete, turbo_confirm: "Are you sure you want to delete this location?" },
-          class: "text-sm w-full sm:w-auto rounded-md bg-red-500 hover:bg-red-600 px-6 py-2 font-medium text-white transition flex justify-center items-center" %>
-      <% end %>
-    </div>
-    <div class="mt-4">
+    <% if current_user == @location.user %>
+    <%= link_to "Edit Location",
+      edit_location_path(@location),
+      class: "py-2 px-4 text-sm font-medium text-gray-900 focus:outline-none bg-white rounded-lg border border-gray-200 hover:bg-gray-100 focus:z-10 focus:ring-4 focus:ring-gray-100 transition"
+      %>
+      <%= link_to "Delete Location",
+      location_path(@location),
+      data: { turbo_method: :delete, turbo_confirm: "Are you sure you want to delete this location?" },
+      class: "text-sm w-full sm:w-auto rounded-md bg-red-500 hover:bg-red-600 px-4 py-2 font-medium text-white transition flex justify-center items-center" %>
+        <% end %>
       <%= link_to "Download PDF",
           location_path(@location, format: :pdf),
-          class: "rounded-md bg-blue-600 hover:bg-blue-500 text-white px-4 py-2" %>
+          class: "py-2 px-4 text-sm font-medium text-gray-900 focus:outline-none bg-white rounded-lg border border-gray-200 hover:bg-gray-100 focus:z-10 focus:ring-4 focus:ring-gray-100 transition" %>
     </div>
 
   </section>
