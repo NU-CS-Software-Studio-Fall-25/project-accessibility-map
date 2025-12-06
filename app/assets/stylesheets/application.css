@@ -38,3 +38,8 @@
 .flickr_pagination .previous_page, .flickr_pagination .next_page {
   padding: 8px 16px;
 }
+
+/* Mapbox popup rounded border styling */
+.mapboxgl-popup-content {
+  border-radius: 8px !important;
+}
