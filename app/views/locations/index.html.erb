@@ -13,52 +13,13 @@
   </div>
 
   <div id="locations" class="sm:flex-initial flex-1 sm:basis-[450px] flex flex-col justify-start items-stretch gap-4 overflow-y-auto border-l border-b border-gray-200">
-
-    <%= form_with url: locations_path, method: :get, class: "w-full flex flex-col gap-2 px-4 pt-4" do %>
-
-      <div class="flex-1 relative">
-        <div class="absolute inset-y-0 start-0 flex items-center ps-3 pointer-events-none">
-          <svg class="w-4 h-4 text-gray-600" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 20 20">
-            <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-              d="m19 19-4-4m0-7A7 7 0 1 1 1 8a7 7 0 0 1 14 0Z"/>
-          </svg>
-        </div>
-
-        <%= text_field_tag :query,
-          params[:query],
-          class: "w-full text-sm py-2 ps-10 rounded-lg border border-gray-200 focus:ring-blue-500 focus:border-blue-500 truncate",
-          placeholder: "Search locations" %>
-      </div>
-
-      <details class="relative w-full">
-        <summary class="cursor-pointer flex items-center justify-between w-full px-3 py-2 bg-white border border-gray-300 rounded-lg text-sm">
-          <span class="text-gray-700">Filter by features</span>
-          <svg class="w-4 h-4 text-gray-500" fill="none" stroke="currentColor" stroke-width="2"
-              viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M6 9l6 6 6-6" />
-          </svg>
-        </summary>
-
-        <div class="absolute left-0 right-0 mt-1 bg-white border border-gray-200 rounded-lg shadow-lg max-h-64 overflow-y-auto p-3 z-20">
-          <% Feature.order(:feature_category, :feature).each do |feature| %>
-            <label class="flex items-center gap-2 px-2 py-1 text-sm hover:bg-gray-50 rounded">
-              <%= check_box_tag "feature_ids[]",
-                    feature.id,
-                    params[:feature_ids]&.include?(feature.id.to_s),
-                    class: "h-4 w-4" %>
-              <span><%= feature.feature %></span>
-            </label>
-          <% end %>
-        </div>
-      </details>
-
-      <%= submit_tag "Search",
-        class: "text-white text-sm bg-blue-600 hover:bg-blue-700 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg px-4 py-2"
-      %>
-
-    <% end %>
-
+    <div class="flex flex-col gap-2">
+      <%= render "locations/search_form" %>
+      <%= render "locations/filters_button" %>
+    </div>
     <div class="h-[1px] bg-gray-200 mx-4"></div>
+
+    <%= render "locations/filters_modal" %>
 
     <section id="locations_list" class="flex-1 flex flex-col justify-start items-stretch gap-4 overflow-y-auto px-4 pb-4">
       <% if @locations.any? %>
@@ -71,9 +32,10 @@
           </div>
         </div>
       <% else %>
-        <p class="text-center my-10">No locations found.</p>
+        <p class="text-sm font-normal text-gray-700 text-center my-10">No locations found.</p>
       <% end %>
     </section>
 
   </div>
 </div>
+

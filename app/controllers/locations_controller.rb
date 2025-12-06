@@ -17,6 +17,12 @@ class LocationsController < ApplicationController
         .reorder(nil) # ← remove pg_search ORDER BY
     end
 
+    # favorites filter
+    if params[:favorites_only] == "1" && current_user
+      favorite_ids = current_user.favorite_locations.pluck(:id)
+      @locations = @locations.where(id: favorite_ids)
+    end
+
     # feature filter
     if params[:feature_ids].present?
       feature_ids = params[:feature_ids].reject(&:blank?)
