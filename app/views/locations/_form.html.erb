@@ -5,7 +5,7 @@
         address_autocomplete_current_address_value: location.persisted? ? "#{location.address}, #{location.city}, #{location.state} #{location.zip}, #{location.country}" : ""
       }) do |f| %>
   <% if location.errors.any? %>
-    <aside class="rounded-md bg-red-50 p-4 text-red-700">
+    <aside class="rounded-md bg-red-50 p-4 text-red-700" role="alert" aria-live="polite">
       <p class="font-semibold mb-2"><%= pluralize(location.errors.count, "error") %> prohibited this location from being saved:</p>
       <ul class="list-disc pl-5">
         <% location.errors.full_messages.each do |msg| %>
@@ -37,18 +37,21 @@
               <%= image_tag picture.variant(resize_to_limit: [nil, 200]), alt: picture.blob.metadata["alt_text"], class: "h-64 object-cover rounded-lg" %>
               <!-- Add alt text -->
               <div class="mt-2 pt-2 pb-2">
-                <%= f.label :"alt_text_#{picture.blob.id}", "Alt text for this image", class: "block text-xs font-medium" %>
+                <% alt_text_id = "alt_text_#{picture.blob.id}" %>
+                <%= label_tag alt_text_id, "Alt text for this image", class: "block text-xs font-medium" %>
 
                 <%= text_field_tag "location[alt_texts][#{picture.blob.id}]",
                       picture.blob.metadata["alt_text"],
+                      id: alt_text_id,
                       class: "shadow-sm text-sm w-full rounded-md border border-gray-300 px-2 py-1" %>
               </div>
               <!-- Hover to have option to delete loation photo -->
-              <%= link_to "Delete",
-                  delete_picture_location_path(location, picture_id: picture.id),
-                  method: :delete,
-                  data: { turbo_method: "delete", turbo_confirm: "Are you sure you want to delete this image?" },
-                  class: "text-sm absolute top-2 right-2 bg-red-500 hover:bg-red-700 text-white text-xs font-bold py-1 px-2 rounded opacity-0 group-hover:opacity-100 transition-opacity" %>
+                  <%= link_to "Delete",
+                      delete_picture_location_path(location, picture_id: picture.id),
+                      method: :delete,
+                      data: { turbo_method: "delete", turbo_confirm: "Are you sure you want to delete this image?" },
+                      "aria-label": "Delete image",
+                      class: "text-sm absolute top-2 right-2 bg-red-500 hover:bg-red-700 focus:opacity-100 text-white text-xs font-bold py-1 px-2 rounded opacity-0 group-hover:opacity-100 focus-within:opacity-100 transition-opacity focus:outline-none focus:ring-2 focus:ring-red-300" %>
             <% rescue => e %>
               <% Rails.logger.error("Variant render failed for attachment #{picture.id}: #{e.class} #{e.message}") %>
               <% next %>
@@ -67,7 +70,7 @@
     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
       <% grouped.each do |category, features| %>
         <div>
-          <h3 class="font-semibold text-gray-800 mb-2"><%= category %></h3>
+          <h4 class="font-semibold text-gray-800 mb-2"><%= category %></h4>
           <div class="space-y-2">
             <% features.each do |feature| %>
               <label class="flex items-center space-x-2 bg-gray-100 hover:bg-yellow-100 px-3 py-1.5 rounded-md cursor-pointer">
@@ -90,13 +93,20 @@
       <input id="location_address" type="text"
              placeholder="Search for an address..."
              data-address-autocomplete-target="searchInput"
+             aria-label="Address search"
+             aria-describedby="address-help address-confirmation"
+             aria-autocomplete="list"
+             aria-expanded="false"
+             aria-controls="address-suggestions"
              class="shadow-sm text-sm w-full rounded-md border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-yellow-400"
              autocomplete="off" />
-      <p class="text-xs text-gray-500 mt-1">Start typing and select an address from the suggestions</p>
+      <p id="address-help" class="text-xs text-gray-600 mt-1">Start typing and select an address from the suggestions</p>
     </div>
 
     <!-- Confirmation display -->
-    <div data-address-autocomplete-target="confirmationDisplay" class="hidden mt-2"></div>
+    <div id="address-confirmation" data-address-autocomplete-target="confirmationDisplay" class="hidden mt-2" role="status" aria-live="polite"></div>
+    <!-- Suggestions dropdown -->
+    <div id="address-suggestions" role="listbox" aria-label="Address suggestions" class="hidden"></div>
   </div>
 
   <!-- Hidden fields for address components -->

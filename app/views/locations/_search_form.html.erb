@@ -1,5 +1,6 @@
 <%= form_with url: locations_path, method: :get, class: "w-full flex flex-col gap-2 px-4 pt-4" do %>
   <div class="flex-1 relative">
+    <label for="search_query" class="sr-only">Search locations</label>
     <div class="absolute inset-y-0 start-0 flex items-center ps-3 pointer-events-none">
       <svg class="w-4 h-4 text-gray-600" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 20 20">
         <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -9,8 +10,10 @@
 
     <%= text_field_tag :query,
       params[:query],
+      id: "search_query",
       class: "w-full text-sm py-2 ps-10 rounded-lg border border-gray-200 focus:ring-blue-500 focus:border-blue-500 truncate",
-      placeholder: "Search locations" %>
+      placeholder: "Search locations",
+      "aria-label": "Search locations" %>
   </div>
 
   <%= submit_tag "Search",

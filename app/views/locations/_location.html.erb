@@ -10,7 +10,7 @@
       <%= location.zip %>
     </span>
   </div>
-  <div class="flex gap-2 flex-wrap" onclick="event.stopPropagation()">
+  <div class="flex gap-2 flex-wrap" onclick="event.stopPropagation()" onkeydown="if(event.key === 'Enter' || event.key === ' ') { event.stopPropagation(); }">
     <% if current_user %>
       <% is_favorited = @favorite_location_ids&.include?(location.id) || false %>
       <% if is_favorited %>

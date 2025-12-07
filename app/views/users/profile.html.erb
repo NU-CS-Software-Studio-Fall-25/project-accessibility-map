@@ -33,11 +33,11 @@
 
       <!-- Edit Profile Form -->
       <div class="space-y-4">
-        <h3 class="text-lg font-semibold text-gray-900">Edit Profile</h3>
+        <h2 class="text-lg font-semibold text-gray-900">Edit Profile</h2>
 
         <%= form_with model: @user, url: update_profile_users_path, method: :patch, local: true, class: "space-y-4" do |f| %>
           <% if @user.errors.any? %>
-            <div class="rounded-md bg-red-50 p-4 text-red-700">
+            <div class="rounded-md bg-red-50 p-4 text-red-700" role="alert" aria-live="polite">
               <p class="font-semibold mb-2"><%= pluralize(@user.errors.count, "error") %> prevented this profile from being saved:</p>
               <ul class="list-disc pl-5">
                 <% @user.errors.each do |error| %>
@@ -58,7 +58,7 @@
             <p class="text-xs text-gray-500">Upload a new profile picture to replace the current one</p>
           </div>
 
-          <div>
+          <div class="flex flex-row-reverse">
             <%= f.submit "Update Profile", class: "text-sm px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 font-medium transition-colors cursor-pointer" %>
           </div>
         <% end %>
@@ -69,27 +69,27 @@
 
       <!-- Account Information -->
       <div class="space-y-4">
-        <h3 class="text-lg font-semibold text-gray-900">Account Information</h3>
+        <h2 class="text-lg font-semibold text-gray-900">Account Information</h2>
 
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div class="space-y-1">
-            <p class="text-sm font-medium text-gray-500">Username</p>
+            <p class="text-sm font-medium text-gray-600">Username</p>
             <p class="text-sm text-gray-900"><%= @user.username %></p>
           </div>
 
           <div class="space-y-1">
-            <p class="text-sm font-medium text-gray-500">Email</p>
+            <p class="text-sm font-medium text-gray-600">Email</p>
             <p class="text-sm text-gray-900"><%= @user.email_address %></p>
           </div>
 
           <div class="space-y-1">
-            <p class="text-sm font-medium text-gray-500">Member Since</p>
+            <p class="text-sm font-medium text-gray-600">Member Since</p>
             <p class="text-sm text-gray-900"><%= @user.created_at.strftime("%B %d, %Y") %></p>
           </div>
 
           <% if @user.provider.present? %>
             <div class="space-y-1">
-              <p class="text-sm font-medium text-gray-500">Sign-in Method</p>
+              <p class="text-sm font-medium text-gray-600">Sign-in Method</p>
               <p class="text-sm text-gray-900 capitalize"><%= @user.provider %></p>
             </div>
           <% end %>
@@ -101,7 +101,7 @@
 
       <!-- Activity Stats -->
       <div class="space-y-4">
-        <h3 class="text-lg font-semibold text-gray-900">Activity</h3>
+        <h2 class="text-lg font-semibold text-gray-900">Activity</h2>
 
         <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
           <div class="bg-blue-50 rounded-lg p-4 text-center">
@@ -122,8 +122,8 @@
       </div>
 
       <!-- Actions -->
-      <div class="flex gap-3 pt-4">
-        <%= link_to "Back", :back, class: "text-sm px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 font-medium transition-colors" %>
+      <div class="flex flex-row-reverse gap-2 pt-4">
+        <%= link_to "Back", :back, class: "text-sm py-2 px-4 font-medium text-gray-900 focus:outline-none bg-white rounded-lg border border-gray-200 hover:bg-gray-100 focus:z-10 focus:ring-4 focus:ring-gray-100 transition-colors" %>
       </div>
     </div>
   </div>

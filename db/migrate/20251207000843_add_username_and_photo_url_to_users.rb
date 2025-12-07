@@ -1,8 +1,10 @@
+# frozen_string_literal: true
+
 class AddUsernameAndPhotoUrlToUsers < ActiveRecord::Migration[8.0]
   def change
-    add_column :users, :username, :string
-    add_column :users, :photo_url, :string
-    
+    add_column(:users, :username, :string)
+    add_column(:users, :photo_url, :string)
+
     # Set existing users' username to their email for now
     reversible do |dir|
       dir.up do
@@ -12,8 +14,8 @@ class AddUsernameAndPhotoUrlToUsers < ActiveRecord::Migration[8.0]
         end
       end
     end
-    
+
     # Make username required
-    change_column_null :users, :username, false
+    change_column_null(:users, :username, false)
   end
 end
