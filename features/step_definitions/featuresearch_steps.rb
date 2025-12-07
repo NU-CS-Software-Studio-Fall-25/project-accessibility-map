@@ -1,5 +1,3 @@
-# frozen_string_literal: true
-
 Given("the following features exist:") do |table|
   table.hashes.each do |row|
     Feature.create!(
@@ -16,20 +14,11 @@ Given("{string} has features: {string}") do |location_name, feature_list|
   location.features << features
 end
 
-When("I open the feature filter") do
-  find("summary", text: "Filter by features").click
-end
-
 When("I check {string}") do |feature_name|
-  details = find("details", match: :first)
-  unless details[:open]
-    details.find("summary").click
-  end
-  label = details.find("label", text: feature_name, match: :first)
-  checkbox = label.find("input[type='checkbox']", visible: :all)
-  checkbox.check
+  label = find("label", text: feature_name, match: :first)
+  label.click
 end
 
-Then("I should see {string} if nothing matches") do |string|
-  expect(page).to(have_content(string))
+Then("I should see {string}") do |text|
+  expect(page).to have_content(text)
 end

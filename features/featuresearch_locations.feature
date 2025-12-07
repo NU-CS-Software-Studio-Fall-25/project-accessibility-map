@@ -4,7 +4,7 @@ Feature: Searching for locations by features
   So that I can find places that meet my needs
 
   Background:
-    Given that the following users exists:
+    Given that the following users exist:
       | email_address                      | password       | username |
       | isabellayan2027@u.northwestern.edu | Password!12345 | i1234    |
 
@@ -47,4 +47,4 @@ Feature: Searching for locations by features
     When I visit the search page
     And I check "Vegetarian"
     And I press "Search"
-    Then I should see "No locations found." if nothing matches
+    Then I should see "No locations found." 
