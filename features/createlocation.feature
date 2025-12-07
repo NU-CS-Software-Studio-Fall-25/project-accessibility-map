@@ -5,8 +5,8 @@ Feature: Creating a location
 
   Background:
     Given that the following users exists:
-      | email_address                      | password       |
-      | isabellayan2027@u.northwestern.edu | Password!12345 |
+      | email_address                      | password       | username |
+      | isabellayan2027@u.northwestern.edu | Password!12345 | i1234    |
 
     And the following features exist:
       | feature                  | feature_category |

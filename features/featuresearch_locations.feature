@@ -5,8 +5,9 @@ Feature: Searching for locations by features
 
   Background:
     Given that the following users exists:
-      | email_address                      | password       |
-      | isabellayan2027@u.northwestern.edu | Password!12345 |
+      | email_address                      | password       | username |
+      | isabellayan2027@u.northwestern.edu | Password!12345 | i1234    |
+
 
     And I am logged in as "isabellayan2027@u.northwestern.edu"
 

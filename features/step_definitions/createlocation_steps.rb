@@ -7,10 +7,12 @@ Given("that the following users exists:") do |table|
       email_address: row["email_address"],
       password: row["password"],
       password_confirmation: row["password"],
+      username: row["username"] || row["email_address"].split("@").first # fallback to @ before email if username not in table 
     )
     @users[row["email_address"]] = row["password"]
   end
 end
+
 
 When("I visit the new location page") do
   visit new_location_path
