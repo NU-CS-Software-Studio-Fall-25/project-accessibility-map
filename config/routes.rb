@@ -5,7 +5,12 @@ Rails.application.routes.draw do
   match "/auth/:provider/callback", to: "sessions#create", via: [:get, :post]
 
   resources :passwords, param: :token
-  resources :users, only: [:new, :create]
+  resources :users, only: [:new, :create] do
+    collection do
+      get :profile
+      patch :update_profile
+    end
+  end
   # resources :reviews
   #
   resources :locations do

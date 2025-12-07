@@ -21,6 +21,10 @@
         </div>
       <% end %>
       <div class="space-y-2">
+        <%= form.label :username, class: "block font-medium mb-3" %>
+        <%= form.text_field :username, placeholder: "Choose a username", required: true, class: "text-sm w-full rounded-md border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-300" %>
+      </div>
+      <div class="space-y-2">
         <%= form.label :email_address, class: "block font-medium mb-3" %>
         <%= form.email_field :email_address, placeholder: "Enter your email address", class: "text-sm w-full rounded-md border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-300" %>
       </div>
@@ -31,6 +35,11 @@
       <div class="space-y-2">
         <%= form.label :password_confirmation, class: "block font-medium mb-3" %>
         <%= form.password_field :password_confirmation, placeholder: "Confirm your password", class: "text-sm w-full rounded-md border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-300" %>
+      </div>
+      <div class="space-y-2">
+        <%= form.label :profile_photo, "Profile Photo (optional)", class: "block font-medium mb-3" %>
+        <%= form.file_field :profile_photo, accept: "image/*", class: "text-xs text-gray-600 w-full rounded-md border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-300 file:mr-4 file:py-1 file:px-3 file:rounded file:border-0 file:text-sm file:font-medium file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100" %>
+        <p class="text-xs text-gray-500">Upload a profile picture (JPG, PNG, etc.)</p>
       </div>
       <div class="w-full text-center">
         <%= form.submit "Sign Up", class: "w-full text-white rounded-md bg-blue-700 hover:bg-blue-800 hover:cursor-pointer py-2 font-medium" %>
