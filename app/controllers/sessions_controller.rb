@@ -23,11 +23,11 @@ class SessionsController < ApplicationController
       # OmniAuth login
       # First, try to find user by provider/uid (existing OAuth user)
       user = User.find_by(provider: auth_hash.provider, uid: auth_hash.uid)
-      
+
       # If not found, check if a user exists with this email (account merging)
       if user.nil?
         user = User.find_by(email_address: auth_hash.info.email)
-        
+
         # If user exists with this email, link the OAuth credentials
         if user
           user.provider = auth_hash.provider
@@ -43,7 +43,7 @@ class SessionsController < ApplicationController
             email_address: auth_hash.info.email,
             password: generate_compliant_password,
             username: auth_hash.info.name || auth_hash.info.email.split("@").first,
-            photo_url: auth_hash.info.image
+            photo_url: auth_hash.info.image,
           )
           user.save!
         end
