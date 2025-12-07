@@ -39,7 +39,7 @@ class LocationsController < ApplicationController
 
     respond_to do |format|
       format.html
-      format.json { render(json: @locations) }
+      format.json # This will automatically use index.json.jbuilder
     end
   end
 

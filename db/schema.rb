@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_12_06_215450) do
+ActiveRecord::Schema[8.0].define(version: 2025_12_07_000843) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
   enable_extension "pgcrypto"
@@ -85,14 +85,6 @@ ActiveRecord::Schema[8.0].define(version: 2025_12_06_215450) do
   create_table "locations_features", id: false, force: :cascade do |t|
     t.uuid "location_id", null: false
     t.uuid "feature_id", null: false
-  end
-
-  create_table "photos", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
-    t.uuid "location_id", null: false
-    t.text "alt_text"
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
-    t.index ["location_id"], name: "index_photos_on_location_id"
   end
 
   create_table "reviews", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
@@ -239,6 +231,8 @@ ActiveRecord::Schema[8.0].define(version: 2025_12_06_215450) do
     t.datetime "updated_at", null: false
     t.string "provider"
     t.string "uid"
+    t.string "username", null: false
+    t.string "photo_url"
     t.index ["email_address"], name: "index_users_on_email_address", unique: true
   end
 
