@@ -23,6 +23,7 @@ class Location < ApplicationRecord
     case_sensitive: false,
     message: "is already in use",
   }
+  validates :name, length: { maximum: 60 }
 
   validate :alt_texts_are_clean
 
