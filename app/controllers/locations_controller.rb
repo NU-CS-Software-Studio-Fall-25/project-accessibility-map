@@ -204,7 +204,7 @@ class LocationsController < ApplicationController
 
   # For create action: include pictures
   def location_params_with_pictures
-    params.expect(location: [:name, :address, :city, :state, :zip, :country, :latitude, :longitude, feature_ids: [], pictures: [], alt_texts: {}])
+    params.expect(location: [:name, :address, :city, :state, :zip, :country, :latitude, :longitude, feature_ids: [], pictures: []])
   end
 
   def authorize_user!
@@ -212,14 +212,15 @@ class LocationsController < ApplicationController
       redirect_to(@location, alert: "You are not authorized to perform this action")
     end
   end
-end
 
   def save_alt_texts
     return unless params[:location] && params[:location][:alt_texts]
 
     params[:location][:alt_texts].each do |blob_id, alt_text|
-      blob = ActiveStorage::Blob.find(blob_id)
+      blob = ActiveStorage::Blob.find_by(id: blob_id)
+      next unless blob.present?
       blob.metadata["alt_text"] = alt_text
       blob.save
     end
+  end
 end

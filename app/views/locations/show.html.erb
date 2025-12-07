@@ -45,11 +45,13 @@
         <% next unless picture.variable? %>
         <div class="relative group flex-shrink-0">
           <% begin %>
+            <% alt_text = picture.metadata["alt_text"].presence || "Location image" %>
             <%= image_tag(
                   picture.variant(resize_to_limit: [nil, 200]),
+                  alt: alt_text,
                   class: "h-64 object-cover rounded-lg"
                 ) %>
-          <% rescue => e %>
+            <% rescue => e %>
             <% Rails.logger.error("Variant render failed for attachment #{picture.id}: #{e.class} #{e.message}") %>
             <% next %>
           <% end %>
