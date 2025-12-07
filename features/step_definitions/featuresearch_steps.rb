@@ -18,7 +18,3 @@ When("I check {string}") do |feature_name|
   label = find("label", text: feature_name, match: :first)
   label.click
 end
-
-Then("I should see {string}") do |text|
-  expect(page).to have_content(text)
-end
