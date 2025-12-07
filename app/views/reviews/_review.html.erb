@@ -1,6 +1,6 @@
 <article class="p-4 bg-white border border-gray-200 rounded-lg shadow-sm space-y-2">
   <div class="flex justify-between items-start gap-4">
-    <div class="flex items-center gap-3">
+    <%= link_to profile_users_path, class: "flex items-center gap-3 hover:opacity-90 hover:underline underline-offset-4 transition-opacity group" do %>
       <!-- Profile Photo -->
       <div class="flex-shrink-0">
         <% if review.user.photo_url.present? %>
@@ -14,8 +14,8 @@
         <% end %>
       </div>
       <!-- Username -->
-      <p class="text-xl text-gray-900 font-medium"><%= review.user.username %></p>
-    </div>
+      <span class="text-xl text-gray-900 font-medium transition-colors"><%= review.user.username %></span>
+    <% end %>
     <div class="flex gap-3 flex-wrap">
       <% if current_user == review.user %>
         <button data-modal-target="edit-review-modal-<%= review.id %>" data-modal-toggle="edit-review-modal-<%= review.id %>" type="button" class="text-gray-700 text-sm text-nowrap hover:underline underline-offset-4">Edit Review</button>
