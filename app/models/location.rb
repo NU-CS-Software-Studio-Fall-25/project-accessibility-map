@@ -25,6 +25,8 @@ class Location < ApplicationRecord
   }
   validates :name, length: { maximum: 60 }
 
+  validate :name_is_clean
+  validate :address_fields_are_clean
   validate :alt_texts_are_clean
 
   def full_address
@@ -69,6 +71,25 @@ class Location < ApplicationRecord
     end
   end
 
+  def name_is_clean
+    return if name.blank?
+
+    if Obscenity.profane?(name)
+      errors.add(:name, "contains inappropriate language")
+    end
+  end
+
+  def address_fields_are_clean
+    [:address, :city, :state, :country].each do |field|
+      value = self[field]
+      next if value.blank?
+
+      if Obscenity.profane?(value)
+        errors.add(field, "contains inappropriate language")
+      end
+    end
+  end
+
   def alt_texts_are_clean
     return unless pictures.attached?
 
@@ -76,7 +97,7 @@ class Location < ApplicationRecord
       alt = pic.blob.metadata["alt_text"]
 
       next if alt.blank?
-      
+
       # character limit
       if alt.length > 120
         errors.add(:base, "Alt text for an image is too long (maximum is 120 characters).")
