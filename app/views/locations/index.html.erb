@@ -3,61 +3,60 @@
 <h2 class="sr-only">Search Locations</h2>
 
 <div class="flex h-full">
-  <div class="sm:block hidden flex-1 min-w-1/2">
-    <%= js_map locations_path(format: :json, query: params[:query]),
-        controls: true,
-        tooltips: { hover: false, html: true},
-        width: "100%",
-        height: "100%"
-    %>
-  </div>
+  <% current_lat = params[:latitude].to_f || 42.057853 %>
+  <% current_lng = params[:longitude].to_f || -87.676143 %>
+  <div class="sm:block hidden flex-1 min-w-1/2"
+       data-controller="geolocation map"
+       data-geolocation-locations-url-value="<%= locations_path(format: :json, query: params[:query]) %>"
+       data-geolocation-initial-lat-value="<%= current_lat %>"
+       data-geolocation-initial-lng-value="<%= current_lng %>">
+    <%
+      # Build map URL - no radius filtering, just show all locations
+      map_params = { format: :json }
+      map_params[:query] = params[:query] if params[:query].present?
 
-  <script>
-    (function () {
-      if (!('geolocation' in navigator)) return;
+      map_url = locations_path(map_params)
 
-      // avoid re-requesting permission every time
-      const seenKey = 'pam_geo_requested';
-      if (sessionStorage.getItem(seenKey)) return;
+      map_options = {
+        controls: true,
+        tooltips: { hover: false, html: true},
+        width: "100%",
+        height: "100%",
+        id: "locations-map",
+        library: {
+          center: [current_lng, current_lat],
+          zoom: 13
+        }
+      }
+    %>
+    <%= js_map map_url, **map_options %>
+  </div>
 
-      navigator.geolocation.getCurrentPosition(function (pos) {
-        sessionStorage.setItem(seenKey, '1');
-        const url = new URL(window.location.href);
-        url.searchParams.set('user_lat', pos.coords.latitude.toFixed(6));
-        url.searchParams.set('user_lng', pos.coords.longitude.toFixed(6));
-        // keep any existing filters in the query string
-        window.location.replace(url.toString());
-      }, function () {
-        // user denied or timed out → server will include fallback point
-        sessionStorage.setItem(seenKey, '1');
-      }, { enableHighAccuracy: true, maximumAge: 60000, timeout: 8000 });
-    })();
-  </script>
+  <div id="locations" class="sm:flex-initial flex-1 sm:basis-[450px] flex flex-col justify-start items-stretch gap-4 overflow-y-auto border-l border-b border-gray-200">
+    <div class="flex flex-col gap-2">
+      <%= render "locations/search_form" %>
+      <%= render "locations/filters_button" %>
+    </div>
+    <div class="h-[1px] bg-gray-200 mx-4"></div>
 
-  <div id="locations" class="sm:flex-initial flex-1 sm:basis-[450px] flex flex-col justify-start items-stretch gap-4 overflow-y-auto border-l border-b border-gray-200">
-    <div class="flex flex-col gap-2">
-      <%= render "locations/search_form" %>
-      <%= render "locations/filters_button" %>
-    </div>
-    <div class="h-[1px] bg-gray-200 mx-4"></div>
+    <%= render "locations/filters_modal" %>
 
-    <%= render "locations/filters_modal" %>
+    <section id="locations_list" class="flex-1 flex flex-col justify-start items-stretch gap-4 overflow-y-auto px-4 pb-4">
+      <% if @locations.any? %>
+        <% @locations.each do |location| %>
+          <%= render location %>
+        <% end %>
+        <div class="flickr_pagination">
+          <div class="py-2">
+            <%= will_paginate @locations, :page_links => false %>
+          </div>
+        </div>
+      <% else %>
+        <p class="text-sm font-normal text-gray-700 text-center my-10">No locations found.</p>
+      <% end %>
+    </section>
 
-    <section id="locations_list" class="flex-1 flex flex-col justify-start items-stretch gap-4 overflow-y-auto px-4 pb-4">
-      <% if @locations.any? %>
-        <% @locations.each do |location| %>
-          <%= render location %>
-        <% end %>
-        <div class="flickr_pagination">
-          <div class="py-2">
-            <%= will_paginate @locations, :page_links => false %>
-          </div>
-        </div>
-      <% else %>
-        <p class="text-sm font-normal text-gray-700 text-center my-10">No locations found.</p>
-      <% end %>
-    </section>
-
-  </div>
+  </div>
 </div>
+
 
