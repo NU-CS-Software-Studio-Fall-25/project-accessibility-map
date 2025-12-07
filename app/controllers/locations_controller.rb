@@ -9,6 +9,29 @@ class LocationsController < ApplicationController
 
   # GET /locations or /locations.json
   def index
+    # Ensure location params are always present for map centering
+    # Redirect to same page with default location if not provided (HTML only)
+    # For JSON requests, use defaults without redirecting
+    unless params[:latitude].present? && params[:longitude].present?
+      default_lat = 42.057853
+      default_lng = -87.676143
+
+      if request.format.html?
+        # Redirect HTML requests to ensure map is centered from the start
+        redirect_params = params.to_unsafe_h.merge(
+          latitude: default_lat,
+          longitude: default_lng
+        ).except(:controller, :action, :format)
+
+        redirect_to locations_path(redirect_params), allow_other_host: false
+        return
+      else
+        # For JSON requests, set defaults without redirecting
+        params[:latitude] = default_lat
+        params[:longitude] = default_lng
+      end
+    end
+
     @locations = Location.paginate(page: params[:page], per_page: 10)
 
     # text search
@@ -118,7 +141,7 @@ class LocationsController < ApplicationController
     respond_to do |format|
       if @location.errors.empty? && @location.save
         # Attach new pictures after update (this appends, not replaces)
-        @location.pictures.attach(new_pictures) if new_pictures.present?    
+        @location.pictures.attach(new_pictures) if new_pictures.present?
 
         format.html { redirect_to(@location, notice: "Location was successfully updated.", status: :see_other) }
         format.json { render(:show, status: :ok, location: @location) }
