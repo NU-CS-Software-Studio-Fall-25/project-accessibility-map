@@ -75,7 +75,13 @@ class Location < ApplicationRecord
       alt = pic.blob.metadata["alt_text"]
 
       next if alt.blank?
+      
+      # character limit
+      if alt.length > 120
+        errors.add(:base, "Alt text for an image is too long (maximum is 120 characters).")
+      end
 
+      # profanity check
       if Obscenity.profane?(alt)
         errors.add(:base, "Alt text contains inappropriate language: '#{alt}'")
       end
