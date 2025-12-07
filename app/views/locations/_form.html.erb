@@ -34,7 +34,16 @@
           <% next unless picture.variable? %>
           <div class="relative group flex-shrink-0">
             <% begin %>
-              <%= image_tag picture.variant(resize_to_limit: [nil, 200]), class: "h-64 object-cover rounded-lg" %>
+              <%= image_tag picture.variant(resize_to_limit: [nil, 200]), alt: picture.blob.metadata["alt_text"], class: "h-64 object-cover rounded-lg" %>
+              <!-- Add alt text -->
+              <div class="mt-2 pt-2 pb-2">
+                <%= f.label :"alt_text_#{picture.blob.id}", "Alt text for this image", class: "block text-xs font-medium" %>
+
+                <%= text_field_tag "location[alt_texts][#{picture.blob.id}]",
+                      picture.blob.metadata["alt_text"],
+                      class: "shadow-sm text-sm w-full rounded-md border border-gray-300 px-2 py-1" %>
+              </div>
+              <!-- Hover to have option to delete loation photo -->
               <%= link_to "Delete",
                   delete_picture_location_path(location, picture_id: picture.id),
                   method: :delete,

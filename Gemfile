@@ -96,3 +96,5 @@ gem "omniauth"
 gem "omniauth-rails_csrf_protection"
 gem "omniauth-oauth2"
 gem "omniauth-google-oauth2"
+
+gem "obscenity"

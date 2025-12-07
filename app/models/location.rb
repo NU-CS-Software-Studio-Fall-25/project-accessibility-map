@@ -23,6 +23,9 @@ class Location < ApplicationRecord
     case_sensitive: false,
     message: "is already in use",
   }
+  validates :name, length: { maximum: 60 }
+
+  validate :alt_texts_are_clean
 
   def full_address
     [address, city, state, zip, country].compact_blank.join(", ")
@@ -63,6 +66,26 @@ class Location < ApplicationRecord
 
     unless /\A\d{5}(-\d{4})?\z/.match?(zip)
       errors.add(:zip, "must be in the format 12345 or 12345-6789 for United States")
+    end
+  end
+
+  def alt_texts_are_clean
+    return unless pictures.attached?
+
+    pictures.each do |pic|
+      alt = pic.blob.metadata["alt_text"]
+
+      next if alt.blank?
+      
+      # character limit
+      if alt.length > 120
+        errors.add(:base, "Alt text for an image is too long (maximum is 120 characters).")
+      end
+
+      # profanity check
+      if Obscenity.profane?(alt)
+        errors.add(:base, "Alt text contains inappropriate language: '#{alt}'")
+      end
     end
   end
 end

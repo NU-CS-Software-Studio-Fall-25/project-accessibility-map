@@ -83,6 +83,7 @@ class LocationsController < ApplicationController
     end
 
     respond_to do |format|
+      save_alt_texts
       if @location.errors.empty? && @location.save
         format.html { redirect_to(@location, notice: "Location was successfully created.", status: :see_other) }
         format.json { render(:show, status: :created, location: @location) }
@@ -112,10 +113,12 @@ class LocationsController < ApplicationController
       @location.errors.add(:base, "Address could not be located. Please enter a valid address.")
     end
 
+    save_alt_texts
+
     respond_to do |format|
       if @location.errors.empty? && @location.save
         # Attach new pictures after update (this appends, not replaces)
-        @location.pictures.attach(new_pictures) if new_pictures.present?
+        @location.pictures.attach(new_pictures) if new_pictures.present?    
 
         format.html { redirect_to(@location, notice: "Location was successfully updated.", status: :see_other) }
         format.json { render(:show, status: :ok, location: @location) }
@@ -208,6 +211,17 @@ class LocationsController < ApplicationController
   def authorize_user!
     unless @location.user == current_user
       redirect_to(@location, alert: "You are not authorized to perform this action")
+    end
+  end
+
+  def save_alt_texts
+    return unless params[:location] && params[:location][:alt_texts]
+
+    params[:location][:alt_texts].each do |blob_id, alt_text|
+      blob = ActiveStorage::Blob.find_by(id: blob_id)
+      next unless blob.present?
+      blob.metadata["alt_text"] = alt_text
+      blob.save
     end
   end
 end
