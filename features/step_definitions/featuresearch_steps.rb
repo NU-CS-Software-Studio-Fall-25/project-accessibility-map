@@ -14,7 +14,13 @@ Given("{string} has features: {string}") do |location_name, feature_list|
   location.features << features
 end
 
+When("I open the feature filter modal") do
+  click_on "Filters"   # adjust to your button text
+end
+
 When("I check {string}") do |feature_name|
-  label = find("label", text: feature_name, match: :first)
-  label.click
+  within("div[role='dialog']") do   
+    label = find("label", text: feature_name, match: :first)
+    label.click
+  end
 end

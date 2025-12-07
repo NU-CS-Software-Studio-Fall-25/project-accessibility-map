@@ -28,6 +28,7 @@ Feature: Searching for locations by features
 
   Scenario: Happy - filter by one feature
     When I visit the search page
+    I open the feature filter modal
     And I check "Wheelchair accessible"
     And I press "Search"
     Then I should see "Evanston Public Library"
@@ -36,6 +37,7 @@ Feature: Searching for locations by features
 
   Scenario: Happy - filter by two features
     When I visit the search page
+    I open the feature filter modal
     And I check "Automatic doors"
     And I check "Wheelchair accessible"
     And I press "Search"
@@ -45,6 +47,7 @@ Feature: Searching for locations by features
 
   Scenario: Sad - no locations match the selected features
     When I visit the search page
+    I open the feature filter modal
     And I check "Vegetarian"
     And I press "Search"
     Then I should see "No locations found." 
