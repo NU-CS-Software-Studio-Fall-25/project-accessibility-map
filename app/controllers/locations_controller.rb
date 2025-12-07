@@ -83,8 +83,8 @@ class LocationsController < ApplicationController
     end
 
     respond_to do |format|
+      save_alt_texts
       if @location.errors.empty? && @location.save
-        save_alt_texts
         format.html { redirect_to(@location, notice: "Location was successfully created.", status: :see_other) }
         format.json { render(:show, status: :created, location: @location) }
       else
@@ -113,11 +113,12 @@ class LocationsController < ApplicationController
       @location.errors.add(:base, "Address could not be located. Please enter a valid address.")
     end
 
+    save_alt_texts
+
     respond_to do |format|
       if @location.errors.empty? && @location.save
         # Attach new pictures after update (this appends, not replaces)
-        @location.pictures.attach(new_pictures) if new_pictures.present?
-        save_alt_texts
+        @location.pictures.attach(new_pictures) if new_pictures.present?    
 
         format.html { redirect_to(@location, notice: "Location was successfully updated.", status: :see_other) }
         format.json { render(:show, status: :ok, location: @location) }
