@@ -4,7 +4,7 @@ Feature: Searching for locations by features
   So that I can find places that meet my needs
 
   Background:
-    Given that the following users exist:
+    Given that the following users exists:
       | email_address                      | password       | username |
       | isabellayan2027@u.northwestern.edu | Password!12345 | i1234    |
 

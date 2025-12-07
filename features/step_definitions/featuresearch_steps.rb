@@ -1,17 +1,3 @@
-Given("that the following users exists:") do |table|
-  @users = {}
-  table.hashes.each do |row|
-    User.create!(
-      email_address: row["email_address"],
-      password: row["password"],
-      password_confirmation: row["password"],
-      username: row["username"] || row["email_address"].split("@").first # fallback in case no username provided
-    )
-    @users[row["email_address"]] = row["password"]
-  end
-end
-
-
 Given("the following features exist:") do |table|
   table.hashes.each do |row|
     Feature.create!(
