@@ -1,5 +1,15 @@
 import { Controller } from "@hotwired/stimulus"
 
+connect() {
+  console.log("[geolocate] connect")
+  // ensure we actually call getCurrentPosition()
+  navigator.geolocation.getCurrentPosition(
+    (pos)=>{ /* ... */ },
+    (err)=>{ console.warn("geo error", err) },
+    { enableHighAccuracy: true, timeout: 10000, maximumAge: 300000 }
+  )
+}
+
 // Prompts for geolocation (only once), saves coords to localStorage,
 // and dispatches "user:geolocated" with { lat, lng, accuracy }.
 export default class extends Controller {

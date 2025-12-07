@@ -12,6 +12,28 @@
     %>
   </div>
 
+  <script>
+    (function () {
+      if (!('geolocation' in navigator)) return;
+
+      // avoid re-requesting permission every time
+      const seenKey = 'pam_geo_requested';
+      if (sessionStorage.getItem(seenKey)) return;
+
+      navigator.geolocation.getCurrentPosition(function (pos) {
+        sessionStorage.setItem(seenKey, '1');
+        const url = new URL(window.location.href);
+        url.searchParams.set('user_lat', pos.coords.latitude.toFixed(6));
+        url.searchParams.set('user_lng', pos.coords.longitude.toFixed(6));
+        // keep any existing filters in the query string
+        window.location.replace(url.toString());
+      }, function () {
+        // user denied or timed out → server will include fallback point
+        sessionStorage.setItem(seenKey, '1');
+      }, { enableHighAccuracy: true, maximumAge: 60000, timeout: 8000 });
+    })();
+  </script>
+
   <div id="locations" class="sm:flex-initial flex-1 sm:basis-[450px] flex flex-col justify-start items-stretch gap-4 overflow-y-auto border-l border-b border-gray-200">
     <div class="flex flex-col gap-2">
       <%= render "locations/search_form" %>
