@@ -243,7 +243,6 @@ ActiveRecord::Schema[8.0].define(version: 2025_12_07_000843) do
   add_foreign_key "locations", "users"
   add_foreign_key "locations_features", "features"
   add_foreign_key "locations_features", "locations"
-  add_foreign_key "photos", "locations"
   add_foreign_key "reviews", "locations", on_delete: :cascade
   add_foreign_key "reviews", "users"
   add_foreign_key "sessions", "users"
