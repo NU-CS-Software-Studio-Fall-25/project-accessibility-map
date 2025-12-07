@@ -84,6 +84,7 @@ class LocationsController < ApplicationController
 
     respond_to do |format|
       if @location.errors.empty? && @location.save
+        save_alt_texts
         format.html { redirect_to(@location, notice: "Location was successfully created.", status: :see_other) }
         format.json { render(:show, status: :created, location: @location) }
       else
@@ -116,6 +117,7 @@ class LocationsController < ApplicationController
       if @location.errors.empty? && @location.save
         # Attach new pictures after update (this appends, not replaces)
         @location.pictures.attach(new_pictures) if new_pictures.present?
+        save_alt_texts
 
         format.html { redirect_to(@location, notice: "Location was successfully updated.", status: :see_other) }
         format.json { render(:show, status: :ok, location: @location) }
@@ -202,7 +204,7 @@ class LocationsController < ApplicationController
 
   # For create action: include pictures
   def location_params_with_pictures
-    params.expect(location: [:name, :address, :city, :state, :zip, :country, :latitude, :longitude, feature_ids: [], pictures: []])
+    params.expect(location: [:name, :address, :city, :state, :zip, :country, :latitude, :longitude, feature_ids: [], pictures: [], alt_texts: {}])
   end
 
   def authorize_user!
@@ -210,4 +212,14 @@ class LocationsController < ApplicationController
       redirect_to(@location, alert: "You are not authorized to perform this action")
     end
   end
+end
+
+  def save_alt_texts
+    return unless params[:location] && params[:location][:alt_texts]
+
+    params[:location][:alt_texts].each do |blob_id, alt_text|
+      blob = ActiveStorage::Blob.find(blob_id)
+      blob.metadata["alt_text"] = alt_text
+      blob.save
+    end
 end
