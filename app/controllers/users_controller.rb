@@ -12,7 +12,7 @@ class UsersController < ApplicationController
   end
 
   def profile
-    @user = current_user
+    redirect_to(user_path(current_user))
   end
 
   def update_profile
@@ -26,9 +26,9 @@ class UsersController < ApplicationController
     end
 
     if @user.update(profile_params)
-      redirect_to(profile_users_path, notice: "Profile updated successfully!")
+      redirect_to(user_path(current_user), notice: "Profile updated successfully!")
     else
-      render(:profile, status: :unprocessable_entity)
+      render(:show, status: :unprocessable_entity)
     end
   end
 
