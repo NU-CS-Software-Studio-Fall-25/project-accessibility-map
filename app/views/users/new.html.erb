@@ -21,19 +21,19 @@
         </div>
       <% end %>
       <div class="space-y-2">
-        <%= form.label :username, class: "block font-medium mb-3" %>
-        <%= form.text_field :username, placeholder: "Choose a username", required: true, class: "text-sm w-full rounded-md border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-300" %>
+        <%= form.label :username, "Username *", class: "block font-medium mb-3" %>
+        <%= form.text_field :username, placeholder: "Choose a username", class: "text-sm w-full rounded-md border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-300" %>
       </div>
       <div class="space-y-2">
-        <%= form.label :email_address, class: "block font-medium mb-3" %>
+        <%= form.label :email_address, "Email address *", class: "block font-medium mb-3" %>
         <%= form.email_field :email_address, placeholder: "Enter your email address", class: "text-sm w-full rounded-md border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-300" %>
       </div>
       <div class="space-y-2">
-        <%= form.label :password, class: "block font-medium mb-3" %>
+        <%= form.label :password, "Password *", class: "block font-medium mb-3" %>
         <%= form.password_field :password, placeholder: "Enter your password", class: "text-sm w-full rounded-md border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-300" %>
       </div>
       <div class="space-y-2">
-        <%= form.label :password_confirmation, class: "block font-medium mb-3" %>
+        <%= form.label :password_confirmation, "Password confirmation *", class: "block font-medium mb-3" %>
         <%= form.password_field :password_confirmation, placeholder: "Confirm your password", class: "text-sm w-full rounded-md border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-300" %>
       </div>
       <div class="space-y-2">

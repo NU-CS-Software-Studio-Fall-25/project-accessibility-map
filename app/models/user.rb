@@ -2,7 +2,7 @@
 
 class User < ApplicationRecord
   has_secure_password
-  validates :email_address, uniqueness: true
+  validates :email_address, presence: true, uniqueness: true
   validates :username, presence: true
   validates :password,
     length: { minimum: 12, message: "must be at least 12 characters long" },

@@ -11,12 +11,12 @@
     <h2 class="text-xl font-semibold text-heading">Welcome back!</h2>
     <%= form_with url: session_url, class: "contents space-y-5 text-sm" do |form| %>
       <div class="space-y-2">
-        <%= form.label :email_address, "Email address", class: "block font-medium" %>
+        <%= form.label :email_address, "Email address *", class: "block font-medium" %>
         <%= form.email_field :email_address, required: true, autofocus: true, autocomplete: "username", placeholder: "Enter your email address", value: params[:email_address], class: "text-sm block shadow-sm rounded-md border border-gray-200 focus:outline-blue-600 px-3 py-2 w-full" %>
       </div>
       <div class="space-y-2">
         <div class="flex justify-between items-center">
-          <%= form.label :password, "Password", class: "block font-medium" %>
+          <%= form.label :password, "Password *", class: "block font-medium" %>
           <%= link_to "Forgot password?", new_password_path, class: "text-gray-600 hover:underline underline-offset-4 hover:cursor-pointer" %>
           </div>
         <%= form.password_field :password, required: true, autocomplete: "current-password", placeholder: "Enter your password", maxlength: 72, class: "text-sm block shadow-sm rounded-md border border-gray-200 focus:outline-blue-600 px-3 py-2 w-full" %>
