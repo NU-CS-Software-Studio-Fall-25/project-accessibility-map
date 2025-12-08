@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-# ----------------- helpers -----------------
+# ---------- small helpers ----------
 
 def find_location_by_name!(name)
   Location.find_by!(name: name)
@@ -10,59 +10,53 @@ def current_test_user
   @current_user ||= User.find_by(email_address: "test@example.com") || User.first
 end
 
-def open_new_review_ui_on_show!
-  clicked = false
-  ["Write a Review", "New Review", "Add Review"].each do |label|
-    if page.has_button?(label, wait: 0)
-      click_button(label)
-      clicked = true
-      break
-    elsif page.has_link?(label, wait: 0)
-      click_link(label)
-      clicked = true
-      break
-    end
-  end
-
-  # Optional data-test hook
-  if !clicked && page.has_css?("[data-test=new-review]", wait: 0)
-    find("[data-test=new-review]").click
-    clicked = true
-  end
-
-  # Important: DO NOT raise here. Some UIs render the form only for logged-in users;
-  # the "not authenticated" scenario should continue to the redirect assertion.
-  # For happy-path scenarios, the next step will fail clearly if the textarea isn't present.
+def has_modal_toggle?
+  page.has_css?('[data-modal-toggle="add-review-modal"]', wait: 0)
 end
 
-def open_edit_review_ui_on_show!
-  # Click an edit control if present; some UIs use inline edit toggles
-  if page.has_button?("Edit Review", wait: 0)
-    click_button("Edit Review")
-  elsif page.has_link?("Edit Review", wait: 0)
-    click_link("Edit Review")
-  elsif page.has_button?("Edit", wait: 0)
-    click_button("Edit")
-  elsif page.has_link?("Edit", wait: 0)
-    click_link("Edit")
+def click_modal_toggle
+  find('[data-modal-toggle="add-review-modal"]', match: :first).click
+end
+
+def within_modal(&block)
+  within("#add-review-modal", &block)
+end
+
+def first_modal_form
+  within_modal do
+    form = first("form", minimum: 1)
+    raise "No form found in #add-review-modal" unless form
+
+    form
+  end
+end
+
+def modal_has_body_field?(form)
+  form.has_field?("review_body", wait: 0, visible: :all) ||
+    form.has_field?("review[body]", wait: 0, visible: :all)
+end
+
+def set_modal_body(form, value)
+  if form.has_field?("review_body", wait: 0, visible: :all)
+    form.fill_in("review_body", with: value)
+  elsif form.has_field?("review[body]", wait: 0, visible: :all)
+    form.fill_in("review[body]", with: value)
   else
-    # If no edit control is visible, treat it as "cannot edit" (authorization hides it)
-    # Let the scenario's subsequent expectations verify we remain on the show page.
-    # Do nothing.
+    raise "Textarea not found (id='review_body' or name='review[body]')"
   end
 end
 
-def fill_review_body_with(text)
-  if page.has_field?("review_body", wait: 0)
-    fill_in("review_body", with: text)
-  elsif page.has_field?("review[body]", wait: 0)
-    fill_in("review[body]", with: text)
+def submit_modal_form(form)
+  if form.has_button?("Add Review", wait: 0, visible: :all)
+    form.click_button("Add Review")
+  elsif form.has_css?("button[type='submit'], input[type='submit']", wait: 0, visible: :all)
+    form.find(:css, "button[type='submit'], input[type='submit']").click
   else
-    raise "Could not find a review body field (looked for id 'review_body' or name 'review[body]')"
+    page.execute_script("arguments[0].submit()", form.native)
   end
 end
 
-# ----------------- navigation -----------------
+# ---------- navigation ----------
 
 Given("I am on the location show page for {string}") do |name|
   @location = find_location_by_name!(name)
@@ -71,19 +65,22 @@ end
 
 When("I visit the new review page for {string}") do |name|
   @location = find_location_by_name!(name)
-  visit location_path(@location) # all review actions happen on show page
-  open_new_review_ui_on_show!
+  visit location_path(@location)
+  click_modal_toggle if has_modal_toggle?
 end
 
 Then("I should be on the new review page for {string}") do |name|
-  loc = Location.find_by!(name: name)
+  loc = find_location_by_name!(name)
   expect(page).to(have_current_path(location_path(loc), ignore_query: true))
 
-  has_field =
-    page.has_field?("review_body", wait: 0) ||
-    page.has_field?("review[body]", wait: 0)
-
-  expect(has_field).to(be(true), "Expected a review textarea (id='review_body' or name='review[body]') on the page")
+  within_modal do
+    form = first("form", minimum: 1)
+    expect(form).to(be_present)
+    expect(
+      form.has_field?("review_body", wait: 0, visible: :all) ||
+      form.has_field?("review[body]", wait: 0, visible: :all),
+    ).to(be(true), "Expected a review textarea inside the modal")
+  end
 end
 
 Given("I have a review on {string} with body {string}") do |name, body|
@@ -95,50 +92,35 @@ end
 Given("I am on the edit page for my review on {string}") do |name|
   @location = find_location_by_name!(name)
   visit location_path(@location)
-  open_edit_review_ui_on_show!
+  click_modal_toggle if has_modal_toggle?
 end
 
 When("I try to visit the edit page for that user's review") do
-  # For other users, edit controls should be hidden/disabled.
-  # Navigate to the show page and attempt to open the edit UI; if it's hidden, we simply remain on show.
   visit location_path(@location)
-  open_edit_review_ui_on_show!
+  expect(page).not_to(have_link("Edit", wait: 0))
+  expect(page).not_to(have_button("Edit", wait: 0))
 end
 
-# ----------------- form actions -----------------
+# ---------- form actions ----------
 
 When("I fill in the review body with {string}") do |text|
-  fill_review_body_with(text)
+  form = first_modal_form
+  set_modal_body(form, text)
+  @current_review_form = form
 end
 
 When("I clear the review body field") do
-  fill_review_body_with("")
+  form = first_modal_form
+  set_modal_body(form, "")
+  @current_review_form = form
 end
 
-# Submit the review form no matter what the submit button is called
 When("I submit the review form") do
-  # Find the form that contains the review body field
-  form =
-    if page.has_field?("review_body", wait: 0)
-      find(:field, "review_body").first(:xpath, ".//ancestor::form")
-    elsif page.has_field?("review[body]", wait: 0)
-      find(:field, "review[body]").first(:xpath, ".//ancestor::form")
-    else
-      raise "Could not find a review body field to locate the form"
-    end
-
-  # Prefer a submit button inside the same form
-  if form.has_button?(nil, type: "submit", wait: 0)
-    form.click_button(nil, type: "submit")
-  elsif form.has_css?("button[type='submit'], input[type='submit']", wait: 0)
-    form.find(:css, "button[type='submit'], input[type='submit']").click
-  else
-    # Last resort: submit via JS
-    page.execute_script("arguments[0].submit()", form.native)
-  end
+  form = @current_review_form || first_modal_form
+  submit_modal_form(form)
 end
 
-# ----------------- assertions -----------------
+# ---------- assertions ----------
 
 Then("I should be on the location show page for {string}") do |name|
   loc = find_location_by_name!(name)
@@ -146,56 +128,30 @@ Then("I should be on the location show page for {string}") do |name|
 end
 
 Then("I should be redirected to the login page from review") do
-  on_login = page.has_current_path?(new_session_path, ignore_query: true)
-  form_visible =
-    page.has_field?("review_body", wait: 0) ||
-    page.has_field?("review[body]", wait: 0)
+  # When logged out, the toggle isn’t rendered; the modal DOM is present.
+  # Force-submit to trigger auth redirect.
+  visit current_path
+  within_modal do
+    form = first("form", minimum: 1)
+    raise "No form present in modal for logged-out submit" unless form
 
-  expect(on_login || !form_visible).to(
-    be(true),
-    "Expected to be redirected to #{new_session_path} OR not see a review form when logged out",
-  )
+    page.execute_script("arguments[0].submit()", form.native)
+  end
+  expect(page).to(have_current_path(new_session_path, ignore_query: false))
 end
 
 Then("I should see a validation error for the review body") do
-  # Find the review textarea
-  field = page.first(:fillable_field, "review_body", wait: 0) ||
-    page.first(:fillable_field, "review[body]", wait: 0)
+  within_modal do
+    form = first_modal_form
+    field = form.first(:fillable_field, "review_body", wait: 0) ||
+      form.first(:fillable_field, "review[body]", wait: 0)
+    expect(field).to(be_present)
 
-  # If the form is a modal or inline, the field should be present after a failed submit
-  expect(field).to(be_present)
+    error_present =
+      form.has_css?("#error_explanation", wait: 0) ||
+      field["aria-invalid"].to_s == "true" ||
+      page.has_text?(/blank|required|too short|invalid/i)
 
-  error_found = false
-
-  # a) ARIA invalid flag
-  error_found ||= field["aria-invalid"].to_s == "true"
-
-  # b) ARIA describedby pointing to an error element
-  if (desc = field["aria-describedby"]).present?
-    desc.split.each do |err_id|
-      error_found ||= page.has_css?("##{err_id}", text: /blank|required|too short|invalid/i, wait: 0)
-    end
+    expect(error_present).to(be(true), "Expected a validation error for the review textarea")
   end
-
-  # c) Common error classes near the field
-  if (fid = field[:id]).present?
-    error_found ||= page.has_css?("##{fid} ~ .error, ##{fid} ~ .error-message, ##{fid} ~ .invalid-feedback", wait: 0)
-    error_found ||= page.has_xpath?("//textarea[@id='#{fid}']/following::*[contains(@class,'error') or contains(@class,'invalid')][1]", wait: 0)
-  end
-
-  # d) Fallback: generic error text anywhere on the page
-  error_found ||= page.has_text?(/can't be blank|required|too short|invalid/i)
-
-  expect(error_found).to(be(true), "Expected a validation error near the review field or a generic error message")
-end
-
-# ----------------- other-user setup -----------------
-
-Given("that user has a review on {string} with body {string}") do |name, body|
-  @other_user ||= User.find_or_create_by!(email_address: "other@example.com") do |u|
-    u.username = "other"
-    u.password = "OtherPassword123!"
-  end
-  @location = find_location_by_name!(name)
-  Review.find_or_create_by!(user: @other_user, location: @location) { |r| r.body = body }
 end
