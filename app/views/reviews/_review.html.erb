@@ -30,7 +30,7 @@
   </p>
 </article>
 
-<div id="edit-review-modal-<%= review.id %>" tabindex="-1" aria-hidden="true" aria-labelledby="edit-review-modal-title-<%= review.id %>" class="hidden overflow-y-auto overflow-x-hidden fixed top-0 right-0 left-0 z-50 justify-center items-center w-full md:inset-0 h-[calc(100%-1rem)] max-h-full">
+<div id="edit-review-modal-<%= review.id %>" tabindex="-1" aria-hidden="<%= (@review&.id == review.id && @review&.errors&.any?) ? 'false' : 'true' %>" aria-labelledby="edit-review-modal-title-<%= review.id %>" class="<%= (@review&.id == review.id && @review&.errors&.any?) ? '' : 'hidden' %> overflow-y-auto overflow-x-hidden fixed top-0 right-0 left-0 z-50 justify-center items-center w-full md:inset-0 h-[calc(100%-1rem)] max-h-full">
   <div class="relative p-4 w-full max-w-[800px] max-h-full">
     <div class="relative bg-white rounded-lg shadow-sm">
       <div class="flex items-center justify-between p-4 rounded-t">
@@ -60,6 +60,13 @@
     if (!modal) return;
 
     let previouslyFocusedElement = null;
+
+    // Open modal if there are validation errors for this review
+    const hasReviewErrors = <%= ((@review&.id == review.id && @review&.errors&.any?) ? true : false).to_json %>;
+    if (hasReviewErrors && modal.classList.contains('hidden')) {
+      modal.classList.remove('hidden');
+      modal.setAttribute('aria-hidden', 'false');
+    }
 
     function openModal() {
       previouslyFocusedElement = document.activeElement;

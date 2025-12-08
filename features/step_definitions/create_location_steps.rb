@@ -133,12 +133,24 @@ end
 
 When("I enable the submit button manually") do
   # Enable the submit button for testing validation errors
+  # Try location form submit button first
   page.execute_script(%{
-    const submitButton = document.querySelector('[data-address-autocomplete-target="submitButton"]');
-    if (submitButton) {
-      submitButton.disabled = false;
-      submitButton.removeAttribute('disabled');
+    const locationSubmitButton = document.querySelector('[data-address-autocomplete-target="submitButton"]');
+    if (locationSubmitButton) {
+      locationSubmitButton.disabled = false;
+      locationSubmitButton.removeAttribute('disabled');
     }
+    // Also try review form submit buttons
+    const reviewSubmitButton = document.querySelector('#add-review-modal button[type="submit"], #add-review-modal input[type="submit"]');
+    if (reviewSubmitButton) {
+      reviewSubmitButton.disabled = false;
+      reviewSubmitButton.removeAttribute('disabled');
+    }
+    // Also try to find submit buttons in edit modals
+    document.querySelectorAll('[id^="edit-review-modal-"] button[type="submit"], [id^="edit-review-modal-"] input[type="submit"]').forEach(function(btn) {
+      btn.disabled = false;
+      btn.removeAttribute('disabled');
+    });
   })
 end
 
