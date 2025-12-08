@@ -5,7 +5,7 @@
 <div class="flex h-screen overflow-hidden">
   <% current_lat = params[:latitude].to_f || 42.057853 %>
   <% current_lng = params[:longitude].to_f || -87.676143 %>
-  <div class="sm:block hidden flex-1 min-w-1/2 min-h-0"
+  <div class="sm:block hidden flex-1 min-w-1/2"
        data-controller="geolocation map"
        data-geolocation-locations-url-value="<%= locations_path(format: :json, query: params[:query]) %>"
        data-geolocation-initial-lat-value="<%= current_lat %>"
@@ -35,11 +35,12 @@
     <%= js_map map_url, **map_options %>
   </div>
 
-  <section id="locations_list" class="flex-1 min-h-0 flex flex-col justify-start items-stretch gap-4 overflow-y-auto px-4 pb-4">
+  <section id="locations_list" class="sm:flex-initial flex-1 min-h-0 flex flex-col justify-start items-stretch gap-4 overflow-y-auto">
     <div class="flex flex-col gap-2">
       <%= render "locations/search_form" %>
       <%= render "locations/filters_button" %>
     </div>
+
     <div class="h-[1px] bg-gray-200 mx-4"></div>
 
     <%= render "locations/filters_modal" %>
