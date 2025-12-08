@@ -71,10 +71,10 @@ class LocationsController < ApplicationController
         # This ensures the map shows all locations, including newly added ones
         @locations = base_locations
         # Prevent caching of JSON responses to ensure newly added locations appear on the map
-        response.headers['Cache-Control'] = 'no-cache, no-store, must-revalidate'
-        response.headers['Pragma'] = 'no-cache'
-        response.headers['Expires'] = '0'
-        render :index # This will automatically use index.json.jbuilder
+        response.headers["Cache-Control"] = "no-cache, no-store, must-revalidate"
+        response.headers["Pragma"] = "no-cache"
+        response.headers["Expires"] = "0"
+        render(:index) # This will automatically use index.json.jbuilder
       end
     end
   end
