@@ -138,6 +138,151 @@ The application is deployed on Heroku and can be accessed at:
 
 The application can also be containerized using Docker (see `Dockerfile`) and deployed with Kamal.
 
+### Deploying to Heroku
+
+#### Initial Setup (First Time Only)
+
+1. **Install Heroku CLI** (if not already installed)
+   ```bash
+   # macOS
+   brew tap heroku/brew && brew install heroku
+
+   # Or download from https://devcenter.heroku.com/articles/heroku-cli
+   ```
+
+2. **Login to Heroku**
+   ```bash
+   heroku login
+   ```
+
+3. **Create a Heroku app** (if not already created)
+   ```bash
+   heroku create project-accessibility-map
+   # Or use existing app
+   heroku git:remote -a project-accessibility-map-50cd81ed0a73
+   ```
+
+4. **Set up PostgreSQL addon**
+   ```bash
+   heroku addons:create heroku-postgresql:mini
+   ```
+
+5. **Configure environment variables**
+   ```bash
+   heroku config:set RAILS_MASTER_KEY=$(cat config/master.key)
+   heroku config:set GOOGLE_OAUTH_CLIENT_ID=your_client_id
+   heroku config:set GOOGLE_OAUTH_CLIENT_SECRET=your_client_secret
+   # Add other required environment variables
+   ```
+
+#### Deploying with Database Schema Updates
+
+Your `Procfile` includes a `release` task that automatically runs migrations on each deploy:
+
+```procfile
+release: bundle exec rails db:migrate
+web: bundle exec puma -C config/puma.rb
+```
+
+**To deploy and update the database schema:**
+
+1. **Commit your changes** (including new migrations)
+   ```bash
+   git add .
+   git commit -m "Add database migrations"
+   ```
+
+2. **Push to Heroku**
+   ```bash
+   git push heroku main
+   # Or if your branch is different:
+   git push heroku your-branch-name:main
+   ```
+
+   Heroku will automatically:
+   - Build your application
+   - Run the `release` task (which executes `rails db:migrate`)
+   - Restart the web dyno
+
+3. **Verify the deployment**
+   ```bash
+   heroku logs --tail
+   ```
+
+#### Manual Migration (If Needed)
+
+If you need to run migrations manually (e.g., if the release task failed):
+
+```bash
+# Run pending migrations
+heroku run rails db:migrate
+
+# Check migration status
+heroku run rails db:migrate:status
+
+# Rollback last migration (if needed)
+heroku run rails db:rollback
+```
+
+#### Troubleshooting
+
+**If migrations fail during deploy:**
+
+1. **Check the logs**
+   ```bash
+   heroku logs --tail
+   ```
+
+2. **Run migrations manually**
+   ```bash
+   heroku run rails db:migrate
+   ```
+
+3. **Check database connection**
+   ```bash
+   heroku pg:info
+   heroku pg:psql
+   ```
+
+4. **Verify migration files are committed**
+   ```bash
+   git log --oneline db/migrate/
+   ```
+
+**Common Issues:**
+
+- **Migration errors**: Check that all migrations are compatible with your production database state
+- **Missing environment variables**: Ensure all required config vars are set with `heroku config`
+- **Database connection issues**: Verify PostgreSQL addon is provisioned and active
+
+#### Useful Heroku Commands
+
+```bash
+# View app info
+heroku info
+
+# Open app in browser
+heroku open
+
+# Run Rails console
+heroku run rails console
+
+# View environment variables
+heroku config
+
+# View database info
+heroku pg:info
+
+# Access PostgreSQL console
+heroku pg:psql
+
+# Restart the app
+heroku restart
+
+# Scale dynos
+heroku ps:scale web=1
+```
+
 ## 👥 Team Members
 
 - Brandon Do
