@@ -1,16 +1,16 @@
-<%= link_to location_path(location), id: dom_id(location), class: "w-full flex flex-col justify-center items-start gap-2 border border-gray-200 rounded-xl p-4 transition hover:shadow-md cursor-pointer", data: { turbo_frame: "_top" } do %>
-  <div>
-    <h3 class="font-bold text-md">
+<%= link_to location_path(location), id: dom_id(location), class: "w-full min-w-0 max-w-full overflow-hidden flex flex-col justify-center items-start gap-2 border border-gray-200 rounded-xl p-4 transition hover:shadow-md cursor-pointer", data: { turbo_frame: "_top" } do %>
+  <div class="min-w-0 w-full overflow-hidden">
+    <h3 class="font-bold text-md break-words">
       <%= location.name %>
     </h3>
-    <span class="text-sm">
+    <span class="text-sm break-words">
       <%= location.address %>,
       <%= location.city %>,
       <%= location.state %>
       <%= location.zip %>
     </span>
   </div>
-  <div class="flex gap-2 flex-wrap" onclick="event.stopPropagation()" onkeydown="if(event.key === 'Enter' || event.key === ' ') { event.stopPropagation(); }">
+  <div class="flex gap-2 flex-wrap min-w-0 w-full" onclick="event.stopPropagation()" onkeydown="if(event.key === 'Enter' || event.key === ' ') { event.stopPropagation(); }">
     <% if current_user %>
       <% is_favorited = @favorite_location_ids&.include?(location.id) || false %>
       <% if is_favorited %>

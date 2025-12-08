@@ -2,10 +2,10 @@
 
 <h2 class="sr-only">Search Locations</h2>
 
-<div class="flex h-screen overflow-hidden">
+<div class="absolute inset-0 flex overflow-hidden">
   <% current_lat = params[:latitude].to_f || 42.057853 %>
   <% current_lng = params[:longitude].to_f || -87.676143 %>
-  <div class="sm:block hidden flex-1 min-w-1/2"
+  <div class="sm:block hidden flex-1 lg:flex-2 min-w-1/2 min-h-0"
        data-controller="geolocation map"
        data-geolocation-locations-url-value="<%= locations_path(format: :json, query: params[:query]) %>"
        data-geolocation-initial-lat-value="<%= current_lat %>"
@@ -35,19 +35,18 @@
     <%= js_map map_url, **map_options %>
   </div>
 
-  <section id="locations_list" class="sm:flex-initial flex-1 min-h-0 flex flex-col justify-start items-stretch gap-4 overflow-y-auto">
-    <div class="flex flex-col gap-2">
+  <section id="locations_list" class="flex-1 max-w-full min-h-0 flex flex-col space-y-4 justify-start items-stretch overflow-hidden">
+    <div class="flex flex-col gap-2 flex-shrink-0">
       <%= render "locations/search_form" %>
       <%= render "locations/filters_button" %>
     </div>
-
-    <div class="h-[1px] bg-gray-200 mx-4"></div>
+    <div class="h-[1px] bg-gray-200 mx-4 flex-shrink-0"></div>
 
     <%= render "locations/filters_modal" %>
 
-    <%= turbo_frame_tag "locations_list" do %>
+    <%= turbo_frame_tag "locations_list", class: "flex-1 min-h-0 min-w-0 max-w-full overflow-x-hidden overflow-y-auto" do %>
       <%= render "locations_list" %>
     <% end %>
 
-  </div>
+  </section>
 </div>
