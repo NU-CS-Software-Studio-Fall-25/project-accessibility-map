@@ -1,6 +1,8 @@
 <%= form_with url: locations_path, method: :get, id: "filters-form", class: "space-y-4", data: { turbo_frame: "locations_list" } do %>
-  <!-- Hidden query field to preserve search -->
-  <%= hidden_field_tag :query, params[:query] %>
+  <!-- Hidden fields to preserve search and location params -->
+  <%= hidden_field_tag :query, params[:query] if params[:query].present? %>
+  <%= hidden_field_tag :latitude, params[:latitude] if params[:latitude].present? %>
+  <%= hidden_field_tag :longitude, params[:longitude] if params[:longitude].present? %>
 
   <!-- Favorites filter -->
   <% if current_user %>

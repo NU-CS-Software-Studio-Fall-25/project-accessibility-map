@@ -1,14 +1,15 @@
-<div id="filters-modal" tabindex="-1" aria-hidden="true" class="hidden overflow-y-auto overflow-x-hidden fixed top-0 right-0 left-0 z-50 justify-center items-center w-full md:inset-0 h-[calc(100%-1rem)] max-h-full">
+<!-- Modal -->
+<div id="filters-modal" tabindex="-1" aria-hidden="true" aria-labelledby="filters-modal-title" class="hidden overflow-y-auto overflow-x-hidden fixed top-0 right-0 left-0 z-50 justify-center items-center w-full md:inset-0 h-[calc(100%-1rem)] max-h-full">
   <div class="relative p-4 w-full max-w-2xl max-h-full">
     <div class="relative bg-white rounded-lg shadow-sm">
       <!-- Modal header -->
       <div class="flex items-center justify-between p-4 rounded-t border-b border-gray-200">
-        <h2 class="text-lg font-semibold text-gray-900">
+        <h2 id="filters-modal-title" class="text-lg font-semibold text-gray-900">
           Filter Locations
         </h2>
         <button type="button"
-                class="transition bg-transparent hover:bg-gray-100 rounded-lg text-sm w-8 h-8 ms-auto inline-flex justify-center items-center"
-                data-modal-toggle="filters-modal">
+                class="text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm w-8 h-8 ms-auto inline-flex justify-center items-center"
+                data-modal-hide="filters-modal">
           <svg class="w-3 h-3" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 14 14">
             <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m1 1 6 6m0 0 6 6M7 7l6-6M7 7l-6 6" />
           </svg>
@@ -23,15 +24,15 @@
 
       <!-- Modal footer -->
       <div class="flex flex-row-reverse gap-2 p-4 border-t border-gray-200 rounded-b">
-        <button type="submit"
-                form="filters-form"
+        <button type="button"
+                id="apply-filters-btn"
                 class="text-white inline-flex items-center bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-4 py-2 text-center">
           Apply Filters
         </button>
         <button type="button"
                 data-modal-hide="filters-modal"
                 class="text-sm py-2 px-4 font-medium text-gray-900 focus:outline-none bg-white rounded-lg border border-gray-200 hover:bg-gray-100 focus:z-10 focus:ring-4 focus:ring-gray-100">
-          Cancel
+          Close
         </button>
       </div>
     </div>
@@ -40,81 +41,65 @@
 
 <script>
   document.addEventListener('DOMContentLoaded', function() {
-    const modal = document.getElementById('filters-modal');
-    if (!modal) return;
+    const form = document.getElementById('filters-form');
+    if (!form) return;
 
-    let previouslyFocusedElement = null;
+    // Function to submit form to Turbo Frame
+    function submitFilters() {
+      const url = new URL(form.action, window.location.origin);
 
-    // Function to open modal
-    function openModal() {
-      previouslyFocusedElement = document.activeElement;
-      modal.classList.remove('hidden');
-      modal.setAttribute('aria-hidden', 'false');
-      // Focus first focusable element in modal
-      const firstFocusable = modal.querySelector('button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])');
-      if (firstFocusable) {
-        firstFocusable.focus();
+      // Clear existing params
+      url.search = '';
+
+      // Get all checked checkboxes
+      const checkedFeatureIds = [];
+      form.querySelectorAll('input[name="feature_ids[]"]:checked').forEach(checkbox => {
+        checkedFeatureIds.push(checkbox.value);
+      });
+
+      // Add feature_ids if any are checked
+      checkedFeatureIds.forEach(id => {
+        url.searchParams.append('feature_ids[]', id);
+      });
+
+      // Add favorites_only if checked
+      const favoritesOnly = form.querySelector('input[name="favorites_only"]:checked');
+      if (favoritesOnly) {
+        url.searchParams.set('favorites_only', '1');
+      }
+
+      // Preserve query and location params from current URL
+      const currentParams = new URLSearchParams(window.location.search);
+      if (currentParams.has('query')) {
+        url.searchParams.set('query', currentParams.get('query'));
+      }
+      if (currentParams.has('latitude')) {
+        url.searchParams.set('latitude', currentParams.get('latitude'));
+      }
+      if (currentParams.has('longitude')) {
+        url.searchParams.set('longitude', currentParams.get('longitude'));
+      }
+
+      // Update the Turbo Frame
+      const frame = document.querySelector('turbo-frame#locations_list');
+      if (frame) {
+        frame.src = url.toString();
       }
     }
 
-    // Function to close modal
-    function closeModal() {
-      modal.classList.add('hidden');
-      modal.setAttribute('aria-hidden', 'true');
-      // Restore focus to previously focused element
-      if (previouslyFocusedElement) {
-        previouslyFocusedElement.focus();
-      }
-    }
-
-    // Close modal when clicking outside (on backdrop)
-    modal.addEventListener('click', function(e) {
-      if (e.target === modal) {
-        closeModal();
-      }
-    });
-
-    // Close modal on Escape key
-    modal.addEventListener('keydown', function(e) {
-      if (e.key === 'Escape' && !modal.classList.contains('hidden')) {
-        closeModal();
-      }
-    });
-
-    // Trap focus within modal
-    const focusableElements = modal.querySelectorAll('button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])');
-    const firstFocusable = focusableElements[0];
-    const lastFocusable = focusableElements[focusableElements.length - 1];
-
-    modal.addEventListener('keydown', function(e) {
-      if (e.key !== 'Tab' || modal.classList.contains('hidden')) return;
-
-      if (e.shiftKey) {
-        if (document.activeElement === firstFocusable) {
-          e.preventDefault();
-          lastFocusable.focus();
-        }
-      } else {
-        if (document.activeElement === lastFocusable) {
-          e.preventDefault();
-          firstFocusable.focus();
-        }
-      }
-    });
-
-    // Handle modal toggle buttons
-    document.querySelectorAll('[data-modal-toggle="filters-modal"]').forEach(button => {
-      button.addEventListener('click', function() {
-        if (modal.classList.contains('hidden')) {
-          openModal();
-        } else {
-          closeModal();
+    // Handle submit button click
+    const applyButton = document.getElementById('apply-filters-btn');
+    if (applyButton) {
+      applyButton.addEventListener('click', function(e) {
+        e.preventDefault();
+        submitFilters();
+        // Close modal after applying filters
+        // Trigger click on close button to use Flowbite's native close
+        const closeButton = document.querySelector('[data-modal-hide="filters-modal"]');
+        if (closeButton) {
+          closeButton.click();
         }
       });
-    });
-
-    document.querySelectorAll('[data-modal-hide="filters-modal"]').forEach(button => {
-      button.addEventListener('click', closeModal);
-    });
+    }
   });
 </script>

@@ -9,6 +9,9 @@ class LocationsController < ApplicationController
 
   # GET /locations or /locations.json
   def index
+    # Remove blank query parameter to avoid issues
+    params.delete(:query) if params[:query].blank?
+
     # Ensure location params are always present for map centering
     # Don't redirect for Turbo Frame requests (they break frames)
     # For JSON requests, use defaults without redirecting
@@ -42,52 +45,23 @@ class LocationsController < ApplicationController
         .reorder(nil) # ← remove pg_search ORDER BY
     end
 
-    # favorites filter
-    if params[:favorites_only] == "1" && current_user
-      favorite_ids = current_user.favorite_locations.pluck(:id)
-      base_locations = base_locations.where(id: favorite_ids)
-    end
-
-    # feature filter
+    # feature filter - OR logic (locations matching ANY selected feature)
     if params[:feature_ids].present?
       feature_ids = params[:feature_ids].reject(&:blank?)
 
-      base_locations = base_locations
-        .joins(:features)
-        .where(features: { id: feature_ids })
-        .group("locations.id")
-        .having("COUNT(DISTINCT features.id) = ?", feature_ids.count)
+      # Only apply filter if there are valid feature IDs
+      if feature_ids.any?
+        base_locations = base_locations
+          .joins(:features)
+          .where(features: { id: feature_ids })
+          .distinct
+      end
     end
 
-    # Sort by distance from coordinates if provided
-    if params[:latitude].present? && params[:longitude].present?
-      lat = params[:latitude].to_f
-      lng = params[:longitude].to_f
-
-      # Only sort if coordinates are valid (between -90/90 for lat, -180/180 for lng)
-      if lat.between?(-90, 90) && lng.between?(-180, 180)
-        # Use Haversine formula to calculate distance in kilometers
-        # 6371 is Earth's radius in kilometers
-        # Safely escape the numeric values
-        lat_escaped = ActiveRecord::Base.connection.quote(lat)
-        lng_escaped = ActiveRecord::Base.connection.quote(lng)
-
-        distance_sql = <<-SQL.squish
-          (
-            6371 * acos(
-              cos(radians(#{lat_escaped})) *
-              cos(radians(locations.latitude)) *
-              cos(radians(locations.longitude) - radians(#{lng_escaped})) +
-              sin(radians(#{lat_escaped})) *
-              sin(radians(locations.latitude))
-            )
-          ) AS distance
-        SQL
-
-        base_locations = base_locations
-          .select("locations.*, #{distance_sql}")
-          .order("distance ASC")
-      end
+    # favorites filter - AND logic (must be favorites AND match feature filters if any)
+    if params[:favorites_only] == "1" && current_user
+      favorite_ids = current_user.favorite_locations.pluck(:id)
+      base_locations = base_locations.where(id: favorite_ids)
     end
 
     # Preload favorite location IDs for current user to avoid N+1 queries
@@ -100,7 +74,7 @@ class LocationsController < ApplicationController
 
         # If this is a Turbo Frame request, render just the partial
         if request.headers["Turbo-Frame"].present?
-          render partial: "locations_list"
+          render(partial: "locations_list")
         end
       end
       format.json do

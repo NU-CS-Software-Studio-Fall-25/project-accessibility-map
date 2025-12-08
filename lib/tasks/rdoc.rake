@@ -11,4 +11,3 @@ RDoc::Task.new do |rdoc|
   rdoc.rdoc_files.exclude("app/models/concerns/**")
   rdoc.rdoc_files.exclude("app/controllers/concerns/**")
 end
-
