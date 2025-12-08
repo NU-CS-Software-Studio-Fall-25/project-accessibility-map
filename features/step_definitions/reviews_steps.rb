@@ -46,7 +46,27 @@ def set_modal_body(form, value)
   end
 end
 
+def strip_html5_validation(form)
+  # Remove required/minlength to bypass browser validation in headless CI
+  el = form.first(:css, 'textarea#review_body, textarea[name="review[body]"]', minimum: 1, visible: :all)
+  return unless el
+
+  page.execute_script(<<~JS, el.native)
+    (function(el){
+      try {
+        el.removeAttribute('required');
+        el.removeAttribute('minlength');
+        el.required = false;
+        el.setCustomValidity && el.setCustomValidity('');
+      } catch(_) {}
+    })(arguments[0]);
+  JS
+end
+
 def submit_modal_form(form)
+  # Always strip client-side constraints first so empty/short bodies submit to server
+  strip_html5_validation(form)
+
   if form.has_button?("Add Review", wait: 0, visible: :all)
     form.click_button("Add Review")
   elsif form.has_css?("button[type='submit'], input[type='submit']", wait: 0, visible: :all)
@@ -54,6 +74,19 @@ def submit_modal_form(form)
   else
     page.execute_script("arguments[0].submit()", form.native)
   end
+end
+
+def try_open_review_edit_ui
+  # Click a visible Edit control if present (works for link or button, any case)
+  if page.has_link?("Edit", wait: 0, exact: false)
+    first(:link, "Edit", exact: false).click
+    return true
+  end
+  if page.has_button?("Edit", wait: 0, exact: false)
+    first(:button, "Edit", exact: false).click
+    return true
+  end
+  false
 end
 
 # ---------- navigation ----------
@@ -92,13 +125,25 @@ end
 Given("I am on the edit page for my review on {string}") do |name|
   @location = find_location_by_name!(name)
   visit location_path(@location)
-  click_modal_toggle if has_modal_toggle?
+
+  # Prefer a real Edit control; fall back to opening the modal if not present
+  opened = try_open_review_edit_ui
+  click_modal_toggle if !opened && has_modal_toggle?
 end
 
 When("I try to visit the edit page for that user's review") do
+  # For the other user, you should not see Edit controls; just stay on show page
   visit location_path(@location)
-  expect(page).not_to(have_link("Edit", wait: 0))
-  expect(page).not_to(have_button("Edit", wait: 0))
+  expect(page).not_to(have_link("Edit", wait: 0, exact: false))
+  expect(page).not_to(have_button("Edit", wait: 0, exact: false))
+end
+
+# This step was missing in CI -> re-add to define the scenario
+Given("that user has a review on {string} with body {string}") do |name, body|
+  @location = find_location_by_name!(name)
+  @other_user ||= User.find_by(email_address: "other@example.com") ||
+    User.create!(email_address: "other@example.com", username: "other", password: "OtherPassword123!")
+  Review.find_or_create_by!(user: @other_user, location: @location) { |r| r.body = body }
 end
 
 # ---------- form actions ----------
@@ -135,6 +180,7 @@ Then("I should be redirected to the login page from review") do
     form = first("form", minimum: 1)
     raise "No form present in modal for logged-out submit" unless form
 
+    strip_html5_validation(form)
     page.execute_script("arguments[0].submit()", form.native)
   end
   expect(page).to(have_current_path(new_session_path, ignore_query: false))
