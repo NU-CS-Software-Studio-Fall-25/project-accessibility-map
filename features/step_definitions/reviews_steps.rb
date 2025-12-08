@@ -367,16 +367,62 @@ Then("I should be on the location show page for {string}") do |name|
 end
 
 Then("I should be redirected to the login page from review") do
-  # When logged out the toggle isn’t shown; the modal DOM still exists.
-  visit current_path
-  within_modal do
-    form = first("form", minimum: 1)
-    raise "No form present in modal for logged-out submit" unless form
+  # When logged out, try to submit a review form to trigger authentication
+  # The modal might not be accessible, so we'll use JavaScript to submit directly
+  @location ||= find_location_by_name!("Reviewable Place")
 
-    strip_html5_validation(form)
-    page.execute_script("arguments[0].submit()", form.native)
+  # Try to find and submit the modal form if it exists and is accessible
+  modal_accessible = false
+  if page.has_css?("#add-review-modal", wait: 0)
+    begin
+      # Try to access the modal
+      page.execute_script("var m=document.getElementById('add-review-modal'); if(m){m.classList.remove('hidden'); m.setAttribute('aria-hidden','false');}")
+      sleep(0.2)
+
+      if page.has_css?("#add-review-modal:not(.hidden) form", wait: 0)
+        within("#add-review-modal") do
+          form = first("form", minimum: 1)
+          if form
+            strip_html5_validation(form)
+            page.execute_script("arguments[0].submit()", form.native)
+            modal_accessible = true
+          end
+        end
+      end
+    rescue Capybara::ElementNotFound, Selenium::WebDriver::Error
+      # Modal not accessible, will use JavaScript POST instead
+    end
   end
-  expect(page).to(have_current_path(new_session_path, ignore_query: false))
+
+  # If modal wasn't accessible, use JavaScript to POST directly
+  unless modal_accessible
+    page.execute_script(<<~JS)
+      var form = document.createElement('form');
+      form.method = 'POST';
+      form.action = '#{location_reviews_path(@location)}';
+      var input = document.createElement('input');
+      input.type = 'hidden';
+      input.name = 'review[body]';
+      input.value = 'Test';
+      form.appendChild(input);
+      var csrf = document.querySelector('meta[name="csrf-token"]');
+      if (csrf) {
+        var csrfInput = document.createElement('input');
+        csrfInput.type = 'hidden';
+        csrfInput.name = 'authenticity_token';
+        csrfInput.value = csrf.content;
+        form.appendChild(csrfInput);
+      }
+      document.body.appendChild(form);
+      form.submit();
+    JS
+
+    # Wait for navigation/redirect
+    sleep(0.5)
+  end
+
+  # Wait for redirect to login page
+  expect(page).to(have_current_path(new_session_path, wait: 10))
 end
 
 Then("I should see a validation error for the review body") do

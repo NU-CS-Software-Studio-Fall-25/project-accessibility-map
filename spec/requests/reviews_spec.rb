@@ -19,6 +19,8 @@ RSpec.describe("Reviews", type: :request) do
       state: "IL",
       zip: "60201",
       country: "USA",
+      latitude: 42.057853,
+      longitude: -87.676143,
       user_id: user.id,
     )
   end
