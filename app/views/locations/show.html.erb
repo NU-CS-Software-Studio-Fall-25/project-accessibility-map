@@ -6,7 +6,7 @@
   <% end %>
 
   <section class="flex sm:flex-row flex-col justify-between md:items-center items-start gap-2">
-    <h1 class="text-3xl font-bold"><%= @location.name %></h1>
+    <h1 class="text-3xl font-bold text-nowrap"><%= @location.name %></h1>
     <!-- buttons for editing location and add image -->
     <div class="flex gap-2 flex-wrap grow-0">
       <%= link_to "Download PDF",
@@ -114,6 +114,9 @@
   </section>
 </div>
 
+<!-- Modal backdrop -->
+<div id="add-review-modal-backdrop" class="hidden fixed inset-0 z-40 bg-gray-900/20 dark:bg-gray-900/30"></div>
+
 <div id="add-review-modal" tabindex="-1" aria-hidden="true" aria-labelledby="add-review-modal-title" class="hidden overflow-y-auto overflow-x-hidden fixed top-0 right-0 left-0 z-50 justify-center items-center w-full md:inset-0 h-[calc(100%-1rem)] max-h-full">
   <div class="relative p-4 w-full max-w-[800px] max-h-full">
     <div class="relative bg-white rounded-lg shadow-sm">
@@ -142,8 +145,11 @@
 
     let previouslyFocusedElement = null;
 
+    const backdrop = document.getElementById('add-review-modal-backdrop');
+
     function openModal() {
       previouslyFocusedElement = document.activeElement;
+      if (backdrop) backdrop.classList.remove('hidden');
       modal.classList.remove('hidden');
       modal.setAttribute('aria-hidden', 'false');
       const firstFocusable = modal.querySelector('button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])');
@@ -153,6 +159,7 @@
     }
 
     function closeModal() {
+      if (backdrop) backdrop.classList.add('hidden');
       modal.classList.add('hidden');
       modal.setAttribute('aria-hidden', 'true');
       if (previouslyFocusedElement) {
@@ -165,6 +172,12 @@
         closeModal();
       }
     });
+
+    if (backdrop) {
+      backdrop.addEventListener('click', function() {
+        closeModal();
+      });
+    }
 
     modal.addEventListener('keydown', function(e) {
       if (e.key === 'Escape' && !modal.classList.contains('hidden')) {

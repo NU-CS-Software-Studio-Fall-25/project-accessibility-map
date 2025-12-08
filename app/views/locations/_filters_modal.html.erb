@@ -1,3 +1,6 @@
+<!-- Modal backdrop -->
+<div id="filters-modal-backdrop" class="hidden fixed inset-0 z-40 bg-gray-900/20 dark:bg-gray-900/30"></div>
+
 <!-- Modal -->
 <div id="filters-modal" tabindex="-1" aria-hidden="true" aria-labelledby="filters-modal-title" class="hidden overflow-y-auto overflow-x-hidden fixed top-0 right-0 left-0 z-50 justify-center items-center w-full md:inset-0 h-[calc(100%-1rem)] max-h-full">
   <div class="relative p-4 w-full max-w-2xl max-h-full">
@@ -117,4 +120,40 @@
   // Run on initial load and on every Turbo navigation
   document.addEventListener('DOMContentLoaded', setupFiltersForm);
   document.addEventListener('turbo:load', setupFiltersForm);
+
+  // Handle backdrop visibility for filters modal
+  function setupFiltersModalBackdrop() {
+    const modal = document.getElementById('filters-modal');
+    const backdrop = document.getElementById('filters-modal-backdrop');
+    if (!modal || !backdrop) return;
+
+    // Use MutationObserver to watch for class changes on the modal
+    const observer = new MutationObserver(function(mutations) {
+      mutations.forEach(function(mutation) {
+        if (mutation.type === 'attributes' && mutation.attributeName === 'class') {
+          if (modal.classList.contains('hidden')) {
+            backdrop.classList.add('hidden');
+          } else {
+            backdrop.classList.remove('hidden');
+          }
+        }
+      });
+    });
+
+    observer.observe(modal, {
+      attributes: true,
+      attributeFilter: ['class']
+    });
+
+    // Also handle backdrop click to close modal
+    backdrop.addEventListener('click', function() {
+      const closeButton = document.querySelector('[data-modal-hide="filters-modal"]');
+      if (closeButton) {
+        closeButton.click();
+      }
+    });
+  }
+
+  document.addEventListener('DOMContentLoaded', setupFiltersModalBackdrop);
+  document.addEventListener('turbo:load', setupFiltersModalBackdrop);
 </script>
