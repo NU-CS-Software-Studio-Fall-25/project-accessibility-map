@@ -23,6 +23,9 @@ class Location < ApplicationRecord
     case_sensitive: false,
     message: "is already in use",
   }
+
+  # Ensure coordinates are present when address fields are set
+  validate :coordinates_present_if_address_changed, on: :update
   validates :name, length: { maximum: 60 }
 
   validate :name_is_clean
@@ -107,6 +110,20 @@ class Location < ApplicationRecord
       if Obscenity.profane?(alt)
         errors.add(:base, "Alt text contains inappropriate language: '#{alt}'")
       end
+    end
+  end
+
+  def coordinates_present_if_address_changed
+    return unless persisted? # Only for updates
+
+    address_changed = will_save_change_to_address? ||
+      will_save_change_to_city? ||
+      will_save_change_to_state? ||
+      will_save_change_to_zip? ||
+      will_save_change_to_country?
+
+    if address_changed && (latitude.blank? || longitude.blank?)
+      errors.add(:base, "Address could not be located. Please enter a valid address.")
     end
   end
 end

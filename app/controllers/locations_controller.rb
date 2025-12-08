@@ -135,19 +135,8 @@ class LocationsController < ApplicationController
     # Extract and attach new pictures separately
     new_pictures = params[:location]&.delete(:pictures)
 
-    # Assign params to check for changes
+    # Assign params - validation will check coordinates if address changed
     @location.assign_attributes(location_params)
-
-    # Check if address fields changed and validate coordinates
-    address_changed = @location.will_save_change_to_address? ||
-      @location.will_save_change_to_city? ||
-      @location.will_save_change_to_state? ||
-      @location.will_save_change_to_zip? ||
-      @location.will_save_change_to_country?
-
-    if address_changed && (@location.latitude.blank? || @location.longitude.blank?)
-      @location.errors.add(:base, "Address could not be located. Please enter a valid address.")
-    end
 
     save_alt_texts
 
@@ -159,6 +148,8 @@ class LocationsController < ApplicationController
         format.html { redirect_to(@location, notice: "Location was successfully updated.", status: :see_other) }
         format.json { render(:show, status: :ok, location: @location) }
       else
+        # Log errors for debugging
+        Rails.logger.debug("Location update failed. Errors: #{@location.errors.full_messages.inspect}")
         format.html { render(:edit, status: :unprocessable_entity) }
         format.json { render(json: @location.errors, status: :unprocessable_entity) }
       end
