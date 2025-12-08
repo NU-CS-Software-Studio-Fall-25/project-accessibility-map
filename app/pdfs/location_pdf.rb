@@ -92,7 +92,7 @@ class LocationPdf
 
     @reviews.first(5).each do |r|
       @doc.text("by #{r.user&.email_address || "Anonymous"} — #{r.created_at.strftime("%b %d, %Y")}", size: 10, color: "555555")
-      @doc.text(r.content.to_s, size: 11)
+      @doc.text(r.body.to_s, size: 11)
       @doc.move_down(8)
       @doc.stroke_horizontal_rule
       @doc.move_down(8)

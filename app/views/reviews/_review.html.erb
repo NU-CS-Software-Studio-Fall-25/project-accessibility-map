@@ -57,82 +57,72 @@
 </div>
 
 <script>
-  document.addEventListener('DOMContentLoaded', function() {
+  function setupEditReviewModal() {
     const modalId = <%= "edit-review-modal-#{review.id}".to_json %>;
     const modal = document.getElementById(modalId);
     if (!modal) return;
 
     const backdropId = <%= "edit-review-modal-#{review.id}-backdrop".to_json %>;
     const backdrop = document.getElementById(backdropId);
+    if (!backdrop) return;
 
-    let previouslyFocusedElement = null;
+    let lastState = modal.classList.contains('hidden');
 
-    function openModal() {
-      previouslyFocusedElement = document.activeElement;
-      if (backdrop) backdrop.classList.remove('hidden');
-      modal.classList.remove('hidden');
-      modal.setAttribute('aria-hidden', 'false');
-      const firstFocusable = modal.querySelector('button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])');
-      if (firstFocusable) {
-        firstFocusable.focus();
-      }
-    }
-
-    function closeModal() {
-      if (backdrop) backdrop.classList.add('hidden');
-      modal.classList.add('hidden');
-      modal.setAttribute('aria-hidden', 'true');
-      if (previouslyFocusedElement) {
-        previouslyFocusedElement.focus();
-      }
-    }
-
-    modal.addEventListener('click', function(e) {
-      if (e.target === modal) {
-        closeModal();
-      }
-    });
-
-    if (backdrop) {
-      backdrop.addEventListener('click', function() {
-        closeModal();
-      });
-    }
-
-    modal.addEventListener('keydown', function(e) {
-      if (e.key === 'Escape' && !modal.classList.contains('hidden')) {
-        closeModal();
-      }
-    });
-
-    const focusableElements = modal.querySelectorAll('button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])');
-    const firstFocusable = focusableElements[0];
-    const lastFocusable = focusableElements[focusableElements.length - 1];
-
-    modal.addEventListener('keydown', function(e) {
-      if (e.key !== 'Tab' || modal.classList.contains('hidden')) return;
-
-      if (e.shiftKey) {
-        if (document.activeElement === firstFocusable) {
-          e.preventDefault();
-          lastFocusable.focus();
-        }
-      } else {
-        if (document.activeElement === lastFocusable) {
-          e.preventDefault();
-          firstFocusable.focus();
-        }
-      }
-    });
-
-    document.querySelectorAll('[data-modal-toggle="' + modalId + '"]').forEach(button => {
-      button.addEventListener('click', function() {
-        if (modal.classList.contains('hidden')) {
-          openModal();
+    // Function to sync backdrop with modal state
+    function syncBackdrop() {
+      const isHidden = modal.classList.contains('hidden');
+      if (isHidden !== lastState) {
+        lastState = isHidden;
+        if (isHidden) {
+          backdrop.classList.add('hidden');
         } else {
-          closeModal();
+          backdrop.classList.remove('hidden');
         }
+      }
+    }
+
+    // Use requestAnimationFrame for smooth polling
+    function checkModalState() {
+      syncBackdrop();
+      requestAnimationFrame(checkModalState);
+    }
+    checkModalState();
+
+    // Also sync immediately when toggle buttons are clicked
+    document.querySelectorAll('[data-modal-toggle="' + modalId + '"], [data-modal-hide="' + modalId + '"]').forEach(button => {
+      button.addEventListener('click', function() {
+        // Check multiple times to catch Flowbite's changes
+        setTimeout(syncBackdrop, 0);
+        setTimeout(syncBackdrop, 10);
+        setTimeout(syncBackdrop, 50);
+        setTimeout(syncBackdrop, 100);
       });
     });
-  });
+
+    // Handle backdrop click to close modal via Flowbite
+    backdrop.addEventListener('click', function() {
+      const closeButton = document.querySelector('[data-modal-hide="' + modalId + '"]');
+      if (closeButton) {
+        closeButton.click();
+      }
+    });
+
+    // Handle escape key
+    function handleEscape(e) {
+      if (e.key === 'Escape' && !modal.classList.contains('hidden')) {
+        const closeButton = document.querySelector('[data-modal-hide="' + modalId + '"]');
+        if (closeButton) {
+          closeButton.click();
+        }
+      }
+    }
+
+    document.addEventListener('keydown', handleEscape);
+
+    // Initial sync
+    syncBackdrop();
+  }
+
+  document.addEventListener('DOMContentLoaded', setupEditReviewModal);
+  document.addEventListener('turbo:load', setupEditReviewModal);
 </script>
