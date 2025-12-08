@@ -40,9 +40,21 @@
 </div>
 
 <script>
-  document.addEventListener('DOMContentLoaded', function() {
+  // Use turbo:load instead of DOMContentLoaded to work with Turbo Drive
+  // This ensures the event listeners are attached on every page navigation
+  function setupFiltersForm() {
     const form = document.getElementById('filters-form');
     if (!form) return;
+
+    // Get the apply button
+    let applyButton = document.getElementById('apply-filters-btn');
+    if (applyButton) {
+      // Clone and replace to remove old listeners (prevents duplicate event handlers)
+      const newButton = applyButton.cloneNode(true);
+      applyButton.parentNode.replaceChild(newButton, applyButton);
+      // Get reference to the new button
+      applyButton = document.getElementById('apply-filters-btn');
+    }
 
     // Function to submit form to Turbo Frame
     function submitFilters() {
@@ -88,7 +100,6 @@
     }
 
     // Handle submit button click
-    const applyButton = document.getElementById('apply-filters-btn');
     if (applyButton) {
       applyButton.addEventListener('click', function(e) {
         e.preventDefault();
@@ -101,5 +112,9 @@
         }
       });
     }
-  });
+  }
+
+  // Run on initial load and on every Turbo navigation
+  document.addEventListener('DOMContentLoaded', setupFiltersForm);
+  document.addEventListener('turbo:load', setupFiltersForm);
 </script>
