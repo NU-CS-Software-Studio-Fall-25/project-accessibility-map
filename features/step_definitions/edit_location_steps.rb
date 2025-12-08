@@ -5,14 +5,14 @@ Given("I have a location named {string} at {string}") do |name, address|
   raise "User not found!" unless user
 
   # Parse address components
-  parts = address.split(',').map(&:strip)
+  parts = address.split(",").map(&:strip)
   street = parts[0]
   city = parts[1]
-  state_zip = parts[2] || 'IL 60601'
+  state_zip = parts[2] || "IL 60601"
   state_parts = state_zip.split
   state = state_parts[0]
-  zip = state_parts[1] || '60601'
-  country = parts[3] || 'United States'
+  zip = state_parts[1] || "60601"
+  country = parts[3] || "United States"
 
   @location = Location.create!(
     user: user,
@@ -23,7 +23,7 @@ Given("I have a location named {string} at {string}") do |name, address|
     zip: zip,
     country: country,
     latitude: 41.8781,
-    longitude: -87.6298
+    longitude: -87.6298,
   )
 end
 
@@ -32,18 +32,18 @@ Given("a location exists named {string} at {string}") do |name, address|
   user = User.first || User.create!(
     email_address: "default@example.com",
     username: "defaultuser",
-    password: "DefaultPassword123!"
+    password: "DefaultPassword123!",
   )
 
   # Parse address components
-  parts = address.split(',').map(&:strip)
+  parts = address.split(",").map(&:strip)
   street = parts[0]
   city = parts[1]
-  state_zip = parts[2] || 'IL 60601'
+  state_zip = parts[2] || "IL 60601"
   state_parts = state_zip.split
   state = state_parts[0]
-  zip = state_parts[1] || '60601'
-  country = parts[3] || 'United States'
+  zip = state_parts[1] || "60601"
+  country = parts[3] || "United States"
 
   Location.create!(
     user: user,
@@ -54,7 +54,7 @@ Given("a location exists named {string} at {string}") do |name, address|
     zip: zip,
     country: country,
     latitude: 41.8781,
-    longitude: -87.6298
+    longitude: -87.6298,
   )
 end
 
@@ -62,7 +62,7 @@ Given("another user exists with email {string} and password {string}") do |email
   User.create!(
     email_address: email,
     username: email.split("@").first,
-    password: password
+    password: password,
   )
 end
 
@@ -71,14 +71,14 @@ Given("that user has a location named {string} at {string}") do |name, address|
   raise "Other user not found!" unless user
 
   # Parse address components
-  parts = address.split(',').map(&:strip)
+  parts = address.split(",").map(&:strip)
   street = parts[0]
   city = parts[1]
-  state_zip = parts[2] || 'IL 60601'
+  state_zip = parts[2] || "IL 60601"
   state_parts = state_zip.split
   state = state_parts[0]
-  zip = state_parts[1] || '60601'
-  country = parts[3] || 'United States'
+  zip = state_parts[1] || "60601"
+  country = parts[3] || "United States"
 
   Location.create!(
     user: user,
@@ -89,13 +89,14 @@ Given("that user has a location named {string} at {string}") do |name, address|
     zip: zip,
     country: country,
     latitude: 41.8781,
-    longitude: -87.6298
+    longitude: -87.6298,
   )
 end
 
 Given("I am on the edit page for the location {string}") do |location_name|
   location = Location.find_by(name: location_name)
   raise "Location '#{location_name}' not found!" unless location
+
   visit edit_location_path(location)
 
   # Wait for the page to load and ensure address fields are populated
@@ -128,6 +129,7 @@ end
 When("I try to visit the edit page for {string}") do |location_name|
   location = Location.find_by(name: location_name)
   raise "Location '#{location_name}' not found!" unless location
+
   visit edit_location_path(location)
 end
 
@@ -181,11 +183,10 @@ When("I set invalid address coordinates") do
 end
 
 Then("I should still be on the edit location page") do
-  expect(page.current_path).to match(/\A\/locations\/[^\/]+\/edit\z/)
+  expect(page.current_path).to(match(%r{\A/locations/[^/]+/edit\z}))
 end
 
 Then("I should see an alert message with {string}") do |text|
   # Check for flash alert messages (displayed in #alert element)
-  expect(page).to have_css("#alert", text: text, wait: 5)
+  expect(page).to(have_css("#alert", text: text, wait: 5))
 end
-

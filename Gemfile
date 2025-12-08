@@ -65,6 +65,12 @@ group :development, :test do
 
   # Omakase Ruby styling [https://github.com/rails/rubocop-rails-omakase/]
   gem "rubocop-rails-omakase", require: false
+
+  # Lint ERB and HTML files [https://github.com/Shopify/erb_lint]
+  gem "erb_lint", require: false
+
+  gem "dotenv-rails"
+  gem "rspec-rails"
 end
 
 group :development do
@@ -79,11 +85,6 @@ group :test do
   gem "database_cleaner-active_record"
   gem "capybara"
   gem "selenium-webdriver"
-end
-
-group :development, :test do
-  gem "dotenv-rails"
-  gem "rspec-rails"
 end
 
 gem "tailwindcss-ruby", "~> 4.1"

@@ -10,7 +10,7 @@ class SessionsController < ApplicationController
   def create
     if (auth_hash = request.env["omniauth.auth"])
 
-      def generate_compliant_password
+      generate_compliant_password = lambda do
         lowercase = ("a".."z").to_a.sample
         uppercase = ("A".."Z").to_a.sample
         digit     = ("0".."9").to_a.sample
@@ -41,9 +41,9 @@ class SessionsController < ApplicationController
             provider: auth_hash.provider,
             uid: auth_hash.uid,
             email_address: auth_hash.info.email,
-            password: generate_compliant_password,
+            password: generate_compliant_password.call,
             username: auth_hash.info.name || auth_hash.info.email.split("@").first,
-            photo_url: auth_hash.info.image
+            photo_url: auth_hash.info.image,
           )
           user.save!
         end

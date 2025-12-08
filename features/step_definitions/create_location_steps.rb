@@ -4,10 +4,10 @@ Given("I am logged in as a user with email {string} and password {string}") do |
   # Create user if it doesn't exist
   user = User.find_by(email_address: email)
   unless user
-    user = User.create!(
+    User.create!(
       email_address: email,
       username: email.split("@").first,
-      password: password
+      password: password,
     )
   end
 
@@ -18,7 +18,7 @@ Given("I am logged in as a user with email {string} and password {string}") do |
   click_button "Login"
 
   # Verify we're logged in
-  expect(page).not_to have_current_path(new_session_path, wait: 10)
+  expect(page).not_to(have_current_path(new_session_path, wait: 10))
 end
 
 Given("I am logged out") do
@@ -67,14 +67,14 @@ When("I wait for address autocomplete to populate fields") do
   address_text = address_input.value
 
   # Parse address components (format: "123 Main St, Chicago, IL 60601, United States")
-  parts = address_text.split(',').map(&:strip)
-  street = parts[0] || '123 Main St'
-  city = parts[1] || 'Chicago'
-  state_zip = parts[2] || 'IL 60601'
+  parts = address_text.split(",").map(&:strip)
+  street = parts[0] || "123 Main St"
+  city = parts[1] || "Chicago"
+  state_zip = parts[2] || "IL 60601"
   state_parts = state_zip.split
-  state = state_parts[0] || 'IL'
-  zip = state_parts[1] || '60601'
-  country = parts[3] || 'United States'
+  state = state_parts[0] || "IL"
+  zip = state_parts[1] || "60601"
+  country = parts[3] || "United States"
 
   page.execute_script(%{
     const address = '#{street.gsub("'", "\\'")}';
@@ -126,10 +126,9 @@ When("I select at least one feature") do
   if page.has_css?("input[type='checkbox'][name='location[feature_ids][]']", wait: 2)
     first_feature_checkbox = first("input[type='checkbox'][name='location[feature_ids][]']")
     first_feature_checkbox.check
-  else
-    # Features might not exist in test database, which is okay - they're optional
-    # Just skip this step silently
   end
+  # Features might not exist in test database, which is okay - they're optional
+  # Just skip this step silently
 end
 
 When("I enable the submit button manually") do
@@ -145,22 +144,21 @@ end
 
 Then("I should be redirected to the location show page") do
   # Should be redirected to /locations/:id
-  expect(page.current_path).to match(/\A\/locations\/[^\/]+\z/)
-  expect(page).not_to have_current_path(new_location_path, wait: 10)
+  expect(page.current_path).to(match(%r{\A/locations/[^/]+\z}))
+  expect(page).not_to(have_current_path(new_location_path, wait: 10))
 end
 
 Then("I should still be on the new location page") do
-  expect(page).to have_current_path(new_location_path)
+  expect(page).to(have_current_path(new_location_path))
 end
 
 Then("I should see an error message for location") do
   # Check for Rails validation errors
   has_red_box = page.has_css?(".bg-red-50", wait: 5)
   has_red_text = page.has_css?(".text-red-700", wait: 5)
-  expect(has_red_box || has_red_text).to be_truthy
+  expect(has_red_box || has_red_text).to(be_truthy)
 end
 
 Then("I should be redirected to the login page from location") do
-  expect(page).to have_current_path(new_session_path, wait: 10)
+  expect(page).to(have_current_path(new_session_path, wait: 10))
 end
-

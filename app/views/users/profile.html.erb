@@ -34,7 +34,7 @@
       <!-- Edit Profile Form -->
       <div class="space-y-4">
         <h3 class="text-lg font-semibold text-gray-900">Edit Profile</h3>
-        
+
         <%= form_with model: @user, url: update_profile_users_path, method: :patch, local: true, class: "space-y-4" do |f| %>
           <% if @user.errors.any? %>
             <div class="rounded-md bg-red-50 p-4 text-red-700">
@@ -70,7 +70,7 @@
       <!-- Account Information -->
       <div class="space-y-4">
         <h3 class="text-lg font-semibold text-gray-900">Account Information</h3>
-        
+
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div class="space-y-1">
             <p class="text-sm font-medium text-gray-500">Username</p>
@@ -102,7 +102,7 @@
       <!-- Activity Stats -->
       <div class="space-y-4">
         <h3 class="text-lg font-semibold text-gray-900">Activity</h3>
-        
+
         <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
           <div class="bg-blue-50 rounded-lg p-4 text-center">
             <p class="text-3xl font-bold text-blue-600"><%= @user.locations.count %></p>

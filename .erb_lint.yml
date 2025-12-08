@@ -1,0 +1,34 @@
+---
+# Enable all linters by default
+EnableDefaultLinters: true
+
+# Linter configuration
+linters:
+  # Enforce consistent ERB tag spacing
+  ErbSafety:
+    enabled: true
+
+  # Enforce consistent indentation in ERB tags
+  ClosingErbTagIndent:
+    enabled: true
+
+  # Enforce consistent indentation in ERB tags
+  RightToLeft:
+    enabled: true
+
+  # Enforce consistent spacing in ERB tags
+  SpaceAroundErbTag:
+    enabled: true
+
+  # Enforce consistent spacing in HTML tags
+  SpaceInHtmlTag:
+    enabled: true
+
+  # Enforce no trailing whitespace
+  TrailingWhitespace:
+    enabled: true
+
+  # Enforce consistent newlines at end of file
+  NoUnusedDisable:
+    enabled: true
+

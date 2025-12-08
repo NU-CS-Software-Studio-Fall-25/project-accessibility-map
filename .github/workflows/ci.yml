@@ -6,9 +6,29 @@ on:
     branches: [ main ]
 
 jobs:
+  lint:
+    runs-on: ubuntu-latest
+    name: Run RuboCop and ERB Lint
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Ruby
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: .ruby-version
+          bundler-cache: true
+
+      - name: Run RuboCop
+        run: bundle exec rubocop
+
+      - name: Run ERB Lint
+        run: bundle exec erb_lint --lint-all
+
   test:
     runs-on: ubuntu-latest
-    name: Run Rspec and Cucumber tests 
+    name: Run Rspec and Cucumber tests
 
     services:
       postgres:

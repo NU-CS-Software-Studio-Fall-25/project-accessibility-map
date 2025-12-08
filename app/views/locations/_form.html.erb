@@ -41,7 +41,8 @@
 
                 <%= text_field_tag "location[alt_texts][#{picture.blob.id}]",
                       picture.blob.metadata["alt_text"],
-                      class: "shadow-sm text-sm w-full rounded-md border border-gray-300 px-2 py-1" %>
+                      class: "shadow-sm text-sm w-full rounded-md border border-gray-300 px-2 py-1",
+                      autocomplete: "off" %>
               </div>
               <!-- Hover to have option to delete loation photo -->
               <%= link_to "Delete",
@@ -91,7 +92,7 @@
              placeholder="Search for an address..."
              data-address-autocomplete-target="searchInput"
              class="shadow-sm text-sm w-full rounded-md border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-yellow-400"
-             autocomplete="off" />
+             autocomplete="off">
       <p class="text-xs text-gray-500 mt-1">Start typing and select an address from the suggestions</p>
     </div>
 

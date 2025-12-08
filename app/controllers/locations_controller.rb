@@ -20,10 +20,10 @@ class LocationsController < ApplicationController
         # Redirect HTML requests to ensure map is centered from the start
         redirect_params = params.to_unsafe_h.merge(
           latitude: default_lat,
-          longitude: default_lng
+          longitude: default_lng,
         ).except(:controller, :action, :format)
 
-        redirect_to locations_path(redirect_params), allow_other_host: false
+        redirect_to(locations_path(redirect_params), allow_other_host: false)
         return
       else
         # For JSON requests, set defaults without redirecting
@@ -243,6 +243,7 @@ class LocationsController < ApplicationController
     params[:location][:alt_texts].each do |blob_id, alt_text|
       blob = ActiveStorage::Blob.find_by(id: blob_id)
       next unless blob.present?
+
       blob.metadata["alt_text"] = alt_text
       blob.save
     end
