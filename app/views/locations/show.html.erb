@@ -5,10 +5,16 @@
     <p class="py-2 px-3 bg-green-50 text-green-700 font-medium rounded-md inline-block" id="notice" role="status" aria-live="polite"><%= notice %></p>
   <% end %>
 
-  <section class="flex sm:flex-row flex-col justify-between md:items-center items-start gap-2">
-    <h1 class="text-3xl font-bold text-nowrap"><%= @location.name %></h1>
+  <section class="flex flex-col justify-between gap-2">
+    <h1 class="text-3xl font-bold"><%= @location.name %></h1>
+    <span class="text-gray-900 text-sm break-words">
+      <%= @location.address %>,
+      <%= @location.city %>,
+      <%= @location.state %>
+      <%= @location.zip %>
+    </span>
     <!-- buttons for editing location and add image -->
-    <div class="flex gap-2 flex-wrap grow-0">
+    <div class="flex gap-2 flex-wrap text-nowrap grow-0">
       <%= link_to "Download PDF",
         location_path(@location, format: :pdf),
         class: "py-2 px-4 text-sm font-medium text-gray-900 focus:outline-none bg-white rounded-lg border border-gray-200 hover:bg-gray-100 focus:z-10 focus:ring-4 focus:ring-gray-100 transition" %>
