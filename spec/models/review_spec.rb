@@ -2,7 +2,7 @@
 
 require "rails_helper"
 
-RSpec.describe("Review", type: :model) do
+RSpec.describe(Review, type: :model) do
   let(:user) do
     User.create!(
       email_address: "test@example.com",
