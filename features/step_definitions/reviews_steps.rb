@@ -16,74 +16,94 @@ end
 
 def open_review_modal!
   # Try normal toggle
-  if has_modal_toggle?
-    find('[data-modal-toggle="add-review-modal"]', match: :first).click
-  end
+  find('[data-modal-toggle="add-review-modal"]', match: :first).click if has_modal_toggle?
+
   # If still hidden, force-open in CI by removing the "hidden" class
-  unless page.has_css?("#add-review-modal:not(.hidden)", wait: 0)
-    page.execute_script("var m=document.getElementById('add-review-modal'); if(m){m.classList.remove('hidden'); m.setAttribute('aria-hidden','false');}")
-  end
+  return if page.has_css?("#add-review-modal:not(.hidden)", wait: 0)
+
+  page.execute_script(<<~JS)
+    (function () {
+      var m = document.getElementById('add-review-modal');
+      if (!m) return;
+      m.classList.remove('hidden');
+      m.setAttribute('aria-hidden', 'false');
+    })();
+  JS
 end
 
 def within_modal(&block)
-  # Try add-review-modal first, then try edit-review-modal
-  # Use page scope to ensure we're searching the whole page
+  # Try add-review-modal first, then any edit-review modal
   if page.has_css?("#add-review-modal", wait: 0)
-    # Ensure modal is visible - open it if it's hidden
     unless page.has_css?("#add-review-modal:not(.hidden)", wait: 0)
-      page.execute_script("var m=document.getElementById('add-review-modal'); if(m){m.classList.remove('hidden'); m.setAttribute('aria-hidden','false');}")
-      # Wait a bit for the modal to become visible
+      page.execute_script(<<~JS)
+        (function () {
+          var m = document.getElementById('add-review-modal');
+          if (!m) return;
+          m.classList.remove('hidden');
+          m.setAttribute('aria-hidden', 'false');
+        })();
+      JS
       sleep(0.2)
     end
     expect(page).to(have_css("#add-review-modal:not(.hidden)", wait: 2))
     page.within("#add-review-modal", &block)
-  elsif page.has_css?("[id^='edit-review-modal-']", wait: 0)
-    # Find the first edit modal (visible or not) - use page scope
+    return
+  end
+
+  if page.has_css?("[id^='edit-review-modal-']", wait: 0)
     modal_element = page.first("[id^='edit-review-modal-']", wait: 2)
     modal_id = modal_element["id"]
-    # Open it if hidden (check if class contains 'hidden')
     if modal_element[:class].to_s.include?("hidden")
-      page.execute_script("var m=document.getElementById('#{modal_id}'); if(m){m.classList.remove('hidden'); m.setAttribute('aria-hidden','false');}")
+      page.execute_script(<<~JS)
+        (function () {
+          var m = document.getElementById('#{modal_id}');
+          if (!m) return;
+          m.classList.remove('hidden');
+          m.setAttribute('aria-hidden', 'false');
+        })();
+      JS
       sleep(0.2)
     end
     expect(page).to(have_css("##{modal_id}:not(.hidden)", wait: 2))
     page.within("##{modal_id}", &block)
-  else
-    # Fallback: try to find any review modal and open it - use page scope
-    modal_element = page.first("#add-review-modal, [id^='edit-review-modal-']", wait: 2)
-    modal_id = modal_element["id"]
-    # Open it if hidden
-    if modal_element[:class].to_s.include?("hidden")
-      page.execute_script("var m=document.getElementById('#{modal_id}'); if(m){m.classList.remove('hidden'); m.setAttribute('aria-hidden','false');}")
-      sleep(0.2)
-    end
-    expect(page).to(have_css("##{modal_id}:not(.hidden)", wait: 2))
-    page.within("##{modal_id}", &block)
+    return
   end
+
+  # Fallback: open whatever review modal exists
+  modal_element = page.first('#add-review-modal, [id^="edit-review-modal-"]', wait: 2)
+  modal_id = modal_element["id"]
+  if modal_element[:class].to_s.include?("hidden")
+    page.execute_script(<<~JS)
+      (function () {
+        var m = document.getElementById('#{modal_id}');
+        if (!m) return;
+        m.classList.remove('hidden');
+        m.setAttribute('aria-hidden', 'false');
+      })();
+    JS
+    sleep(0.2)
+  end
+  expect(page).to(have_css("##{modal_id}:not(.hidden)", wait: 2))
+  page.within("##{modal_id}", &block)
 end
 
 def first_modal_form
-  # Don't nest within_modal - just find the form directly
-  # First ensure modal is open
-  modal_id = nil
-  if page.has_css?("#add-review-modal:not(.hidden)", wait: 0)
-    modal_id = "#add-review-modal"
-  elsif page.has_css?("[id^='edit-review-modal-']:not(.hidden)", wait: 0)
-    modal_element = page.first("[id^='edit-review-modal-']:not(.hidden)", wait: 2)
-    modal_id = "##{modal_element["id"]}"
-  else
-    # Try to open the modal
-    within_modal do
-      # This will open the modal, then we can find the form
-    end
-    # Now try again
+  # Ensure the modal is open, then return the first form within it
+  modal_id =
     if page.has_css?("#add-review-modal:not(.hidden)", wait: 0)
-      modal_id = "#add-review-modal"
+      "#add-review-modal"
     elsif page.has_css?("[id^='edit-review-modal-']:not(.hidden)", wait: 0)
       modal_element = page.first("[id^='edit-review-modal-']:not(.hidden)", wait: 2)
-      modal_id = "##{modal_element["id"]}"
+      "##{modal_element["id"]}"
+    else
+      within_modal { nil } # opens a modal
+      if page.has_css?("#add-review-modal:not(.hidden)", wait: 0)
+        "#add-review-modal"
+      else
+        modal_element = page.first("[id^='edit-review-modal-']:not(.hidden)", wait: 2)
+        "##{modal_element["id"]}"
+      end
     end
-  end
 
   raise "No modal found" unless modal_id
 
@@ -96,7 +116,6 @@ def first_modal_form
 end
 
 def set_modal_body(form, value)
-  # Your partial uses form.textarea :body -> id=review_body, name=review[body]
   if form.has_field?("review_body", wait: 0, visible: :all)
     form.fill_in("review_body", with: value)
   elsif form.has_field?("review[body]", wait: 0, visible: :all)
@@ -116,22 +135,20 @@ def strip_html5_validation(form)
   return unless el
 
   page.execute_script(<<~JS, el.native)
-    (function(el){
+    (function (el) {
       try {
         el.removeAttribute('required');
         el.removeAttribute('minlength');
         el.required = false;
         if (el.setCustomValidity) el.setCustomValidity('');
-      } catch(_) {}
+      } catch (e) {}
     })(arguments[0]);
   JS
 end
 
 def submit_modal_form(form)
-  # Remove browser-side blockers so server validations run in CI
   strip_html5_validation(form)
 
-  # Your submit is labeled "Add Review" in new form; "Save Changes" in edit form
   if form.has_button?("Add Review", wait: 0, visible: :all)
     form.click_button("Add Review")
   elsif form.has_button?("Save Changes", wait: 0, visible: :all)
@@ -146,39 +163,26 @@ end
 def review_container_by_text(text)
   return if text.to_s.strip.empty?
 
-  # Escape single quotes in text for XPath
-  escaped_text = text.to_s.gsub("'", "''")
+  esc = text.to_s.gsub("'", "''")
 
-  # First try to find the article element that contains the review text
-  # Reviews are rendered as <article> elements
-  container = first(
-    :xpath,
-    "//article[contains(normalize-space(.), '#{escaped_text}')]",
-    wait: 0,
-  )
-
+  # Prefer the <article> that contains the review text
+  container = first(:xpath, "//article[contains(normalize-space(.), '#{esc}')]", wait: 0)
   return container if container
 
-  # Fallback: try to find any element containing the text, then get its article ancestor
   container = first(
     :xpath,
-    "//*[contains(normalize-space(.), '#{escaped_text}')]/ancestor::article[1]",
+    "//*[contains(normalize-space(.), '#{esc}')]/ancestor::article[1]",
     wait: 0,
   )
-
   return container if container
 
   # Final fallback: nearest block (div/section/article)
-  first(
-    :xpath,
-    "//*[contains(normalize-space(.), '#{escaped_text}')]" \
-      "/ancestor::*[self::div or self::section or self::article][1]",
-    wait: 0,
-  )
+  xpath = "//*[contains(normalize-space(.), '#{esc}')]" \
+    "/ancestor::*[self::div or self::section or self::article][1]"
+  first(:xpath, xpath, wait: 0)
 end
 
 def click_edit_inside!(container)
-  # Try visible link/button label variants
   ["Edit", "Edit Review"].each do |label|
     if container.has_link?(label, wait: 0, exact: false)
       container.first(:link, label, exact: false).click
@@ -190,7 +194,6 @@ def click_edit_inside!(container)
     end
   end
 
-  # Try common icon/aria roles
   candidates = container.all(
     :xpath,
     ".//*[self::a or self::button][@title or @aria-label]",
@@ -225,16 +228,22 @@ Then("I should be on the new review page for {string}") do |name|
   loc = find_location_by_name!(name)
   expect(page).to(have_current_path(location_path(loc), ignore_query: true))
 
-  # Ensure modal is visible (it might be hidden after form submission with errors)
-  # Force it open if needed
   unless page.has_css?("#add-review-modal:not(.hidden)", wait: 0)
-    page.execute_script("var m=document.getElementById('add-review-modal'); if(m){m.classList.remove('hidden'); m.setAttribute('aria-hidden','false');}")
+    page.execute_script(<<~JS)
+      (function () {
+        var m = document.getElementById('add-review-modal');
+        if (!m) return;
+        m.classList.remove('hidden');
+        m.setAttribute('aria-hidden', 'false');
+      })();
+    JS
   end
 
   within_modal do
     form = first("form", minimum: 1)
     expect(form).to(be_present)
-    has_textarea = form.has_field?("review_body", wait: 0, visible: :all) ||
+    has_textarea =
+      form.has_field?("review_body", wait: 0, visible: :all) ||
       form.has_field?("review[body]", wait: 0, visible: :all)
     expect(has_textarea).to(be(true), "Expected a review textarea inside the modal")
   end
@@ -250,41 +259,29 @@ Given("I am on the edit page for my review on {string}") do |name|
   @location = find_location_by_name!(name)
   visit location_path(@location)
 
-  # Wait for page to load
   expect(page).to(have_current_path(location_path(@location), wait: 5))
-
-  # Wait for reviews to load
   expect(page).to(have_content(@review&.body.to_s, wait: 5))
 
-  # Try to find the edit button. It should be near the review text
-  # First try to find the container with the review text
   container = review_container_by_text(@review&.body.to_s)
   opened = false
 
   if container
-    # Try clicking edit inside the container
     opened = click_edit_inside!(container)
-    if opened
-      # Wait for modal to appear
-      expect(page).to(have_css("[id^='edit-review-modal-']:not(.hidden)", wait: 2))
-    end
+    expect(page).to(have_css("[id^='edit-review-modal-']:not(.hidden)", wait: 2)) if opened
   end
 
-  # Fallback: try to find and click the edit button directly on the page
-  unless opened
-    # The edit button should be visible for the current user's review
-    if page.has_button?("Edit Review", wait: 2) || page.has_link?("Edit Review", wait: 2)
-      find(:button, "Edit Review", match: :first, wait: 2).click
+  next if opened
+
+  if page.has_button?("Edit Review", wait: 2) || page.has_link?("Edit Review", wait: 2)
+    find(:button, "Edit Review", match: :first, wait: 2).click
+    expect(page).to(have_css("[id^='edit-review-modal-']:not(.hidden)", wait: 2))
+  else
+    edit_button = page.first('[data-modal-toggle^="edit-review-modal-"]', wait: 2)
+    if edit_button
+      edit_button.click
       expect(page).to(have_css("[id^='edit-review-modal-']:not(.hidden)", wait: 2))
     else
-      # Last resort: try to find the button by data attribute
-      edit_button = page.first('[data-modal-toggle^="edit-review-modal-"]', wait: 2)
-      if edit_button
-        edit_button.click
-        expect(page).to(have_css("[id^='edit-review-modal-']:not(.hidden)", wait: 2))
-      else
-        raise "Could not find edit button for review with body: #{@review&.body}"
-      end
+      raise "Could not find edit button for review with body: #{@review&.body}"
     end
   end
 end
@@ -292,40 +289,27 @@ end
 When("I try to visit the edit page for that user's review") do
   visit location_path(@location)
   expect(page).to(have_current_path(location_path(@location), wait: 5))
-
-  # Wait for the review to be visible
   expect(page).to(have_content(@other_review.body, wait: 5))
 
-  # Verify that the edit button is NOT visible for another user's review
-  # The edit button should only be visible for the review owner
   container = review_container_by_text(@other_review.body)
 
   if container
-    # Check if edit button exists in the container (it shouldn't for other users)
-    has_edit_button = container.has_button?("Edit Review", wait: 0) ||
+    has_edit_button =
+      container.has_button?("Edit Review", wait: 0) ||
       container.has_link?("Edit Review", wait: 0) ||
       container.has_css?('[data-modal-toggle*="edit-review-modal"]', wait: 0)
 
-    # If edit control is exposed (which it shouldn't be), clicking it should not work
     if has_edit_button
       clicked = click_edit_inside!(container)
-      if clicked
-        # If clicked, we should still be on the same page (no navigation)
-        expect(page).to(have_current_path(location_path(@location), ignore_query: true))
-      end
+      expect(page).to(have_current_path(location_path(@location), ignore_query: true)) if clicked
     end
 
-    # Verify edit button is not visible for other user's review
     expect(container).not_to(have_button("Edit Review", wait: 0))
     expect(container).not_to(have_link("Edit Review", wait: 0))
   else
-    # If we can't find the container, at least verify the edit button isn't visible globally
-    # (though it might be visible for our own reviews, so we need to be careful)
-    # The key is that we're still on the location page
     expect(page).to(have_current_path(location_path(@location), ignore_query: true))
   end
 
-  # Verify we're still on the location page (no unauthorized access)
   expect(page).to(have_current_path(location_path(@location), ignore_query: true))
 end
 
@@ -367,16 +351,65 @@ Then("I should be on the location show page for {string}") do |name|
 end
 
 Then("I should be redirected to the login page from review") do
-  # When logged out the toggle isn’t shown; the modal DOM still exists.
-  visit current_path
-  within_modal do
-    form = first("form", minimum: 1)
-    raise "No form present in modal for logged-out submit" unless form
+  @location ||= find_location_by_name!("Reviewable Place")
 
-    strip_html5_validation(form)
-    page.execute_script("arguments[0].submit()", form.native)
+  modal_accessible = false
+  if page.has_css?("#add-review-modal", wait: 0)
+    begin
+      page.execute_script(<<~JS)
+        (function () {
+          var m = document.getElementById('add-review-modal');
+          if (!m) return;
+          m.classList.remove('hidden');
+          m.setAttribute('aria-hidden', 'false');
+        })();
+      JS
+      sleep(0.2)
+
+      if page.has_css?("#add-review-modal:not(.hidden) form", wait: 0)
+        within("#add-review-modal") do
+          form = first("form", minimum: 1)
+          if form
+            strip_html5_validation(form)
+            page.execute_script("arguments[0].submit()", form.native)
+            modal_accessible = true
+          end
+        end
+      end
+    rescue Capybara::ElementNotFound, Selenium::WebDriver::Error
+      # Modal not accessible, will use JS POST fallback below
+    end
   end
-  expect(page).to(have_current_path(new_session_path, ignore_query: false))
+
+  unless modal_accessible
+    page.execute_script(<<~JS)
+      (function () {
+        var form = document.createElement('form');
+        form.method = 'POST';
+        form.action = '#{location_reviews_path(@location)}';
+
+        var input = document.createElement('input');
+        input.type = 'hidden';
+        input.name = 'review[body]';
+        input.value = 'Test';
+        form.appendChild(input);
+
+        var csrf = document.querySelector('meta[name="csrf-token"]');
+        if (csrf) {
+          var csrfInput = document.createElement('input');
+          csrfInput.type = 'hidden';
+          csrfInput.name = 'authenticity_token';
+          csrfInput.value = csrf.content;
+          form.appendChild(csrfInput);
+        }
+        document.body.appendChild(form);
+        form.submit();
+      })();
+    JS
+    sleep(0.5)
+  end
+
+  expect(page).to(have_current_path(new_session_path, wait: 10))
 end
 
 Then("I should see a validation error for the review body") do
