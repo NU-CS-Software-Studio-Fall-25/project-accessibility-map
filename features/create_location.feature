@@ -68,4 +68,3 @@ Feature: Create Location
     And I click "Add Location"
     Then I should be redirected to the location show page
     And I should see "Location was successfully created."
-
