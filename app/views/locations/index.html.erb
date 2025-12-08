@@ -9,11 +9,14 @@
        data-controller="geolocation map"
        data-geolocation-locations-url-value="<%= locations_path(format: :json, query: params[:query]) %>"
        data-geolocation-initial-lat-value="<%= current_lat %>"
-       data-geolocation-initial-lng-value="<%= current_lng %>">
+       data-geolocation-initial-lng-value="<%= current_lng %>"
+       data-map-locations-url-value="<%= locations_path(format: :json, query: params[:query], _: Time.current.to_i) %>">
     <%
       # Build map URL - no radius filtering, just show all locations
+      # Add cache-busting parameter to ensure fresh data is always loaded
       map_params = { format: :json }
       map_params[:query] = params[:query] if params[:query].present?
+      map_params[:_] = Time.current.to_i # Cache-busting parameter
 
       map_url = locations_path(map_params)
 

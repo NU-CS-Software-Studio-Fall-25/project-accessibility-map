@@ -32,25 +32,26 @@ class LocationsController < ApplicationController
       end
     end
 
-    @locations = Location.paginate(page: params[:page], per_page: 10)
+    # Start with base query - no pagination yet
+    base_locations = Location.all
 
     # text search
     if params[:query].present?
-      @locations = @locations.merge(Location.search_locations(params[:query]))
+      base_locations = base_locations.merge(Location.search_locations(params[:query]))
         .reorder(nil) # ← remove pg_search ORDER BY
     end
 
     # favorites filter
     if params[:favorites_only] == "1" && current_user
       favorite_ids = current_user.favorite_locations.pluck(:id)
-      @locations = @locations.where(id: favorite_ids)
+      base_locations = base_locations.where(id: favorite_ids)
     end
 
     # feature filter
     if params[:feature_ids].present?
       feature_ids = params[:feature_ids].reject(&:blank?)
 
-      @locations = @locations
+      base_locations = base_locations
         .joins(:features)
         .where(features: { id: feature_ids })
         .group("locations.id")
@@ -61,8 +62,20 @@ class LocationsController < ApplicationController
     @favorite_location_ids = current_user&.favorite_locations&.pluck(:id)&.to_set || Set.new
 
     respond_to do |format|
-      format.html
-      format.json # This will automatically use index.json.jbuilder
+      format.html do
+        # For HTML, paginate the results for the list view
+        @locations = base_locations.paginate(page: params[:page], per_page: 10)
+      end
+      format.json do
+        # For JSON (map data), return ALL locations without pagination
+        # This ensures the map shows all locations, including newly added ones
+        @locations = base_locations
+        # Prevent caching of JSON responses to ensure newly added locations appear on the map
+        response.headers["Cache-Control"] = "no-cache, no-store, must-revalidate"
+        response.headers["Pragma"] = "no-cache"
+        response.headers["Expires"] = "0"
+        render(:index) # This will automatically use index.json.jbuilder
+      end
     end
   end
 
@@ -122,19 +135,8 @@ class LocationsController < ApplicationController
     # Extract and attach new pictures separately
     new_pictures = params[:location]&.delete(:pictures)
 
-    # Assign params to check for changes
+    # Assign params - validation will check coordinates if address changed
     @location.assign_attributes(location_params)
-
-    # Check if address fields changed and validate coordinates
-    address_changed = @location.will_save_change_to_address? ||
-      @location.will_save_change_to_city? ||
-      @location.will_save_change_to_state? ||
-      @location.will_save_change_to_zip? ||
-      @location.will_save_change_to_country?
-
-    if address_changed && (@location.latitude.blank? || @location.longitude.blank?)
-      @location.errors.add(:base, "Address could not be located. Please enter a valid address.")
-    end
 
     save_alt_texts
 
@@ -146,6 +148,8 @@ class LocationsController < ApplicationController
         format.html { redirect_to(@location, notice: "Location was successfully updated.", status: :see_other) }
         format.json { render(:show, status: :ok, location: @location) }
       else
+        # Log errors for debugging
+        Rails.logger.debug("Location update failed. Errors: #{@location.errors.full_messages.inspect}")
         format.html { render(:edit, status: :unprocessable_entity) }
         format.json { render(json: @location.errors, status: :unprocessable_entity) }
       end
