@@ -53,17 +53,19 @@ class Location < ApplicationRecord
       will_save_change_to_country?
   end
 
-  # Scope to sort locations by distance from given coordinates
-  # Uses Haversine formula to calculate distance in kilometers
-  def self.nearby(latitude, longitude, limit: 50)
-    return all if latitude.blank? || longitude.blank?
+  class << self
+    # Scope to sort locations by distance from given coordinates
+    # Uses Haversine formula to calculate distance in kilometers
+    def nearby(latitude, longitude, limit: 50)
+      return all if latitude.blank? || longitude.blank?
 
-    lat = connection.quote(latitude.to_f)
-    lng = connection.quote(longitude.to_f)
+      lat = connection.quote(latitude.to_f)
+      lng = connection.quote(longitude.to_f)
 
-    select("locations.*, (6371 * acos(cos(radians(#{lat})) * cos(radians(locations.latitude)) * cos(radians(locations.longitude) - radians(#{lng})) + sin(radians(#{lat})) * sin(radians(locations.latitude)))) AS distance")
-      .order("distance ASC")
-      .limit(limit)
+      select("locations.*, (6371 * acos(cos(radians(#{lat})) * cos(radians(locations.latitude)) * cos(radians(locations.longitude) - radians(#{lng})) + sin(radians(#{lat})) * sin(radians(locations.latitude)))) AS distance")
+        .order("distance ASC")
+        .limit(limit)
+    end
   end
 
   private

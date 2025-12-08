@@ -34,19 +34,57 @@ end
 
 Given("I am on the new location page") do
   visit new_location_path
+  # Disable geolocation immediately to prevent redirects
+  disable_geolocation
+  # Wait for page to load and verify we're on the right page
+  expect(page).to(have_current_path(new_location_path, wait: 10))
+  # Wait for the form to be ready - check for the input field by name attribute
+  expect(page).to(have_css("input[name='location[name]']", wait: 10))
+  expect(page).to(have_css("input[data-address-autocomplete-target='searchInput']", wait: 10))
+  # Give JavaScript controllers time to initialize
+  sleep(1.5)
 end
 
 When("I visit the new location page") do
   visit new_location_path
+  # Don't check for form fields here - this step is used in scenarios where
+  # the user might be redirected (e.g., when not authenticated)
+  # The calling scenario will verify what page we're on
 end
 
 When("I fill in the location name with {string}") do |name|
-  fill_in "Location Name", with: name
+  # Wait for the field to exist by name attribute or by label
+  # Try multiple selectors to handle both new and edit pages
+  if page.has_css?("input[name='location[name]']", wait: 10)
+    name_field = find("input[name='location[name]']")
+  elsif page.has_field?("Location Name", wait: 10)
+    name_field = find_field("Location Name")
+  else
+    # Last resort: wait a bit more and try again
+    sleep(1)
+    expect(page).to(have_css("input[name='location[name]']", wait: 10))
+    name_field = find("input[name='location[name]']")
+  end
+
+  # Check if disabled and wait for it to be enabled
+  if name_field[:disabled] == "true" || name_field.disabled?
+    # If disabled, wait for JavaScript to enable it
+    expect(page).to(have_css("input[name='location[name]']:not([disabled])", wait: 10))
+    name_field = find("input[name='location[name]']")
+  end
+  name_field.set(name)
 end
 
 When("I fill in the address search field with {string}") do |address|
+  # Wait for the address autocomplete input field to be present
+  # Give extra time for edit pages where JavaScript might need to initialize
+  expect(page).to(have_css("input[data-address-autocomplete-target='searchInput']", wait: 15))
   # Find the address autocomplete input field
   address_input = find("input[data-address-autocomplete-target='searchInput']")
+
+  # Clear any existing value first (especially important for edit pages)
+  address_input.set("")
+  sleep(0.2)
   address_input.set(address)
 
   # Wait a moment for autocomplete to potentially trigger

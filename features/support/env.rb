@@ -10,6 +10,23 @@ require "cucumber/rails"
 require "rspec/expectations"
 World(RSpec::Matchers)
 
+# Helper method to disable geolocation on the current page
+def disable_geolocation
+  page.execute_script(%{
+    if (navigator.geolocation && !navigator.geolocation._stubbed) {
+      const originalGetCurrentPosition = navigator.geolocation.getCurrentPosition;
+      navigator.geolocation.getCurrentPosition = function(success, error) {
+        if (error) {
+          error({ code: 1, message: "User denied Geolocation" });
+        }
+      };
+      navigator.geolocation._stubbed = true;
+    }
+  })
+rescue Capybara::NotSupportedByDriverError
+  # Ignore if driver doesn't support execute_script
+end
+
 # By default, any exception happening in your Rails application will bubble up
 # to Cucumber so that your scenario will fail. This is a different from how
 # your application behaves in the production environment, where an error page will
@@ -65,5 +82,31 @@ require "capybara/cucumber"
 # and need truncation strategy instead of transaction
 DatabaseCleaner.strategy = :truncation
 
+# Configure Chrome to deny geolocation permissions in tests
+Capybara.register_driver(:selenium_chrome_headless) do |app|
+  options = Selenium::WebDriver::Chrome::Options.new
+  options.add_argument("--headless")
+  options.add_argument("--disable-gpu")
+  options.add_argument("--no-sandbox")
+  options.add_argument("--disable-dev-shm-usage")
+
+  # Deny geolocation permissions to prevent automatic redirects
+  options.add_preference("profile.default_content_setting_values.geolocation", 2) # 2 = Block
+
+  Capybara::Selenium::Driver.new(app, browser: :chrome, options: options)
+end
+
 Capybara.default_driver = :selenium_chrome_headless
 Capybara.javascript_driver = :selenium_chrome_headless
+
+# Inject geolocation stub after visiting any page to prevent redirects
+AfterStep do |_scenario|
+  # Only inject if we're on a real page
+
+  current_url = page.current_url
+  if current_url.present? && !current_url.start_with?("about:") && !current_url.start_with?("data:")
+    disable_geolocation
+  end
+rescue
+  # Ignore errors if page isn't ready
+end

@@ -98,10 +98,18 @@ Given("I am on the edit page for the location {string}") do |location_name|
   raise "Location '#{location_name}' not found!" unless location
 
   visit edit_location_path(location)
+  # Disable geolocation immediately to prevent redirects
+  disable_geolocation
 
-  # Wait for the page to load and ensure address fields are populated
-  # The form should have the address pre-filled, but we need to wait for JavaScript
-  sleep(0.5)
+  # Wait for the page to load and verify we're on the edit page
+  expect(page).to(have_current_path(edit_location_path(location), wait: 10))
+
+  # Wait for the form fields to be present
+  expect(page).to(have_css("input[name='location[name]']", wait: 10))
+  expect(page).to(have_css("input[data-address-autocomplete-target='searchInput']", wait: 10))
+
+  # Wait for JavaScript controllers to initialize
+  sleep(1.5)
 
   # Ensure the address autocomplete validation runs and enables the submit button
   # If address fields exist, trigger validation

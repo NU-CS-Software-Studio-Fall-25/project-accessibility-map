@@ -33,7 +33,7 @@
 
 <script>
   document.addEventListener('DOMContentLoaded', function() {
-    const form = document.querySelector('form[action="<%= locations_path %>"]')
+    const form = document.querySelector('form[action="' + <%= locations_path.to_json %> + '"]')
     if (!form) return
 
     form.addEventListener('submit', function(e) {
@@ -63,13 +63,13 @@
       }
 
       // Preserve location params from current URL if not in form
-      const currentParams = new URLSearchParams(window.location.search)
+        const currentParams = new URLSearchParams(window.location.search)
       if (!url.searchParams.has('latitude') && currentParams.has('latitude')) {
         url.searchParams.set('latitude', currentParams.get('latitude'))
       }
       if (!url.searchParams.has('longitude') && currentParams.has('longitude')) {
         url.searchParams.set('longitude', currentParams.get('longitude'))
-      }
+            }
 
       // Remove page param to start from page 1 when searching/filtering
       url.searchParams.delete('page')

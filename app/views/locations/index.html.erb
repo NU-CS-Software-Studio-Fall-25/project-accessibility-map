@@ -17,20 +17,20 @@
     end
 
     # If no locations, use default center (Evanston, IL)
-    map_options = {
-      controls: true,
-      tooltips: { hover: false, html: true},
-      width: "100%",
-      height: "100%",
+      map_options = {
+        controls: true,
+        tooltips: { hover: false, html: true},
+        width: "100%",
+        height: "100%",
       id: "locations-map"
     }
 
     # If there are locations, mapkick will auto-center. If not, center on default location.
     if map_locations.empty?
       map_options[:library] = {
-        center: [current_lng, current_lat],
-        zoom: 13
-      }
+          center: [current_lng, current_lat],
+          zoom: 13
+        }
     end
   %>
   <div class="sm:block hidden flex-1 lg:flex-2 min-w-1/2 min-h-0"
