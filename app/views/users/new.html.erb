@@ -1,17 +1,17 @@
 <div class="h-full flex flex-col justify-center items-center mx-6">
   <% if alert = flash[:alert] %>
-    <p class="py-2 px-3 bg-red-50 mb-5 text-red-700 font-medium rounded-lg inline-block" id="alert"><%= alert %></p>
+    <p class="py-2 px-3 bg-red-50 mb-5 text-red-700 font-medium rounded-lg inline-block" id="alert" role="alert" aria-live="polite"><%= alert %></p>
   <% end %>
 
   <% if notice = flash[:notice] %>
-    <p class="py-2 px-3 bg-green-50 mb-5 text-green-700 font-medium rounded-lg inline-block" id="notice"><%= notice %></p>
+    <p class="py-2 px-3 bg-green-50 mb-5 text-green-700 font-medium rounded-lg inline-block" id="notice" role="status" aria-live="polite"><%= notice %></p>
   <% end %>
 
   <div class="w-full max-w-[400px] p-6 border border-gray-200 rounded-lg shadow-sm space-y-5">
     <h2 class="text-xl font-bold">Hello there!</h2>
     <%= form_with(model: @user, url: users_path, class: "space-y-5 text-sm") do |form| %>
       <% if form.object.errors.any? %>
-        <div class="rounded-md bg-red-50 p-4 text-red-700">
+        <div class="rounded-md bg-red-50 p-4 text-red-700" role="alert" aria-live="polite">
           <p class="font-semibold mb-2"><%= pluralize(form.object.errors.count, "error") %> prohibited this user from being saved:</p>
           <ul class="list-disc pl-5">
             <% form.object.errors.each do |error| %>

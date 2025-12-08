@@ -23,7 +23,7 @@
     <!-- Features list grouped by category -->
     <% Feature.order(:feature_category, :feature).group_by(&:feature_category).each do |category, features| %>
       <div class="mb-4 feature-category" data-category="<%= category.downcase.gsub(/\s+/, '-') %>">
-        <h4 class="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-2 px-1"><%= category %></h4>
+        <h3 class="text-xs font-semibold text-gray-600 uppercase tracking-wide mb-2 px-1"><%= category %></h3>
         <div class="space-y-1">
           <% features.each do |feature| %>
             <% checkbox_id = "feature_#{feature.id}" %>

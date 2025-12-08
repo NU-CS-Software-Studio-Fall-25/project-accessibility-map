@@ -25,6 +25,8 @@ class Location < ApplicationRecord
   }
   validates :name, length: { maximum: 60 }
 
+  validate :name_is_clean
+  validate :address_fields_are_clean
   validate :alt_texts_are_clean
 
   def full_address
@@ -66,6 +68,25 @@ class Location < ApplicationRecord
 
     unless /\A\d{5}(-\d{4})?\z/.match?(zip)
       errors.add(:zip, "must be in the format 12345 or 12345-6789 for United States")
+    end
+  end
+
+  def name_is_clean
+    return if name.blank?
+
+    if Obscenity.profane?(name)
+      errors.add(:name, "contains inappropriate language")
+    end
+  end
+
+  def address_fields_are_clean
+    [:address, :city, :state, :country].each do |field|
+      value = self[field]
+      next if value.blank?
+
+      if Obscenity.profane?(value)
+        errors.add(field, "contains inappropriate language")
+      end
     end
   end
 

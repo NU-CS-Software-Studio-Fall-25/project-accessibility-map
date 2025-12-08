@@ -129,30 +129,102 @@ export default class extends Controller {
   }
 
   displaySuggestions(suggestions) {
+    // Store suggestions for keyboard navigation
+    this.currentSuggestions = suggestions
+
     // Create/update suggestions dropdown
     let dropdown = this.element.querySelector('[data-suggestions-dropdown]')
 
     if (!dropdown) {
       dropdown = document.createElement('div')
       dropdown.setAttribute('data-suggestions-dropdown', '')
+      dropdown.setAttribute('id', 'address-suggestions')
+      dropdown.setAttribute('role', 'listbox')
+      dropdown.setAttribute('aria-label', 'Address suggestions')
       dropdown.className = 'absolute z-10 w-full mt-1 bg-white border border-gray-300 rounded-md shadow-lg max-h-60 overflow-auto'
       this.searchInputTarget.parentElement.appendChild(dropdown)
+
+      // Set up keyboard navigation
+      this.searchInputTarget.setAttribute('aria-expanded', 'true')
+      this.searchInputTarget.setAttribute('aria-controls', 'address-suggestions')
     }
 
     dropdown.innerHTML = ''
+    this.selectedIndex = -1
 
     if (suggestions.length === 0) {
-      dropdown.innerHTML = '<div class="px-4 py-2 text-sm text-gray-500">No suggestions found</div>'
+      dropdown.innerHTML = '<div class="px-4 py-2 text-sm text-gray-500" role="option">No suggestions found</div>'
+      this.searchInputTarget.setAttribute('aria-expanded', 'false')
       return
     }
 
-    suggestions.forEach(suggestion => {
+    suggestions.forEach((suggestion, index) => {
       const item = document.createElement('div')
-      item.className = 'px-4 py-2 text-sm cursor-pointer hover:bg-yellow-50 border-b border-gray-100 last:border-0'
+      item.setAttribute('role', 'option')
+      item.setAttribute('id', `suggestion-${index}`)
+      item.setAttribute('tabindex', '-1')
+      item.setAttribute('data-suggestion-index', index)
+      item.className = 'px-4 py-2 text-sm cursor-pointer hover:bg-yellow-50 focus:bg-yellow-50 border-b border-gray-100 last:border-0 focus:outline-none focus:ring-2 focus:ring-yellow-400'
       item.textContent = suggestion.full_address || suggestion.place_formatted
       item.addEventListener('click', () => this.selectSuggestion(suggestion))
+      item.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault()
+          this.selectSuggestion(suggestion)
+        }
+      })
       dropdown.appendChild(item)
     })
+
+    // Add keyboard event listener to search input if not already added
+    if (!this.keydownHandler) {
+      this.keydownHandler = this.handleKeydown.bind(this)
+      this.searchInputTarget.addEventListener('keydown', this.keydownHandler)
+    }
+  }
+
+  handleKeydown(event) {
+    const dropdown = this.element.querySelector('[data-suggestions-dropdown]')
+    if (!dropdown || !this.currentSuggestions) return
+
+    const items = dropdown.querySelectorAll('[role="option"]')
+    if (items.length === 0) return
+
+    switch(event.key) {
+      case 'ArrowDown':
+        event.preventDefault()
+        this.selectedIndex = Math.min(this.selectedIndex + 1, items.length - 1)
+        items[this.selectedIndex].focus()
+        items[this.selectedIndex].setAttribute('aria-selected', 'true')
+        // Remove aria-selected from other items
+        items.forEach((item, idx) => {
+          if (idx !== this.selectedIndex) item.removeAttribute('aria-selected')
+        })
+        break
+      case 'ArrowUp':
+        event.preventDefault()
+        this.selectedIndex = Math.max(this.selectedIndex - 1, -1)
+        if (this.selectedIndex >= 0) {
+          items[this.selectedIndex].focus()
+          items[this.selectedIndex].setAttribute('aria-selected', 'true')
+          items.forEach((item, idx) => {
+            if (idx !== this.selectedIndex) item.removeAttribute('aria-selected')
+          })
+        } else {
+          this.searchInputTarget.focus()
+        }
+        break
+      case 'Escape':
+        this.hideSuggestions()
+        this.searchInputTarget.focus()
+        break
+      case 'Enter':
+        if (this.selectedIndex >= 0 && items[this.selectedIndex] && this.currentSuggestions[this.selectedIndex]) {
+          event.preventDefault()
+          this.selectSuggestion(this.currentSuggestions[this.selectedIndex])
+        }
+        break
+    }
   }
 
   hideSuggestions() {
@@ -160,6 +232,11 @@ export default class extends Controller {
     if (dropdown) {
       dropdown.remove()
     }
+    if (this.searchInputTarget) {
+      this.searchInputTarget.setAttribute('aria-expanded', 'false')
+    }
+    this.selectedIndex = -1
+    this.currentSuggestions = null
   }
 
   showConfirmation(address) {

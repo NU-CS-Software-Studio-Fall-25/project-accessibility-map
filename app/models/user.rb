@@ -19,4 +19,25 @@ class User < ApplicationRecord
   has_and_belongs_to_many :favorite_locations, class_name: "Location", join_table: "favorites"
 
   normalizes :email_address, with: ->(e) { e.strip.downcase }
+
+  validate :username_is_clean
+  validate :email_address_is_clean
+
+  private
+
+  def username_is_clean
+    return if username.blank?
+
+    if Obscenity.profane?(username)
+      errors.add(:username, "contains inappropriate language")
+    end
+  end
+
+  def email_address_is_clean
+    return if email_address.blank?
+
+    if Obscenity.profane?(email_address)
+      errors.add(:email_address, "contains inappropriate language")
+    end
+  end
 end

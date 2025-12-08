@@ -3,9 +3,9 @@
     <div class="relative bg-white rounded-lg shadow-sm">
       <!-- Modal header -->
       <div class="flex items-center justify-between p-4 rounded-t border-b border-gray-200">
-        <h3 class="text-lg font-semibold text-gray-900">
+        <h2 class="text-lg font-semibold text-gray-900">
           Filter Locations
-        </h3>
+        </h2>
         <button type="button"
                 class="transition bg-transparent hover:bg-gray-100 rounded-lg text-sm w-8 h-8 ms-auto inline-flex justify-center items-center"
                 data-modal-toggle="filters-modal">
@@ -43,13 +43,78 @@
     const modal = document.getElementById('filters-modal');
     if (!modal) return;
 
+    let previouslyFocusedElement = null;
+
+    // Function to open modal
+    function openModal() {
+      previouslyFocusedElement = document.activeElement;
+      modal.classList.remove('hidden');
+      modal.setAttribute('aria-hidden', 'false');
+      // Focus first focusable element in modal
+      const firstFocusable = modal.querySelector('button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])');
+      if (firstFocusable) {
+        firstFocusable.focus();
+      }
+    }
+
+    // Function to close modal
+    function closeModal() {
+      modal.classList.add('hidden');
+      modal.setAttribute('aria-hidden', 'true');
+      // Restore focus to previously focused element
+      if (previouslyFocusedElement) {
+        previouslyFocusedElement.focus();
+      }
+    }
+
     // Close modal when clicking outside (on backdrop)
     modal.addEventListener('click', function(e) {
-      // Check if click is on the backdrop (the modal container itself, not its children)
       if (e.target === modal) {
-        modal.classList.add('hidden');
-        modal.setAttribute('aria-hidden', 'true');
+        closeModal();
       }
+    });
+
+    // Close modal on Escape key
+    modal.addEventListener('keydown', function(e) {
+      if (e.key === 'Escape' && !modal.classList.contains('hidden')) {
+        closeModal();
+      }
+    });
+
+    // Trap focus within modal
+    const focusableElements = modal.querySelectorAll('button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])');
+    const firstFocusable = focusableElements[0];
+    const lastFocusable = focusableElements[focusableElements.length - 1];
+
+    modal.addEventListener('keydown', function(e) {
+      if (e.key !== 'Tab' || modal.classList.contains('hidden')) return;
+
+      if (e.shiftKey) {
+        if (document.activeElement === firstFocusable) {
+          e.preventDefault();
+          lastFocusable.focus();
+        }
+      } else {
+        if (document.activeElement === lastFocusable) {
+          e.preventDefault();
+          firstFocusable.focus();
+        }
+      }
+    });
+
+    // Handle modal toggle buttons
+    document.querySelectorAll('[data-modal-toggle="filters-modal"]').forEach(button => {
+      button.addEventListener('click', function() {
+        if (modal.classList.contains('hidden')) {
+          openModal();
+        } else {
+          closeModal();
+        }
+      });
+    });
+
+    document.querySelectorAll('[data-modal-hide="filters-modal"]').forEach(button => {
+      button.addEventListener('click', closeModal);
     });
   });
 </script>
