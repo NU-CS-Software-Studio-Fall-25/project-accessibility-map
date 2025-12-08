@@ -1,4 +1,4 @@
-<%= form_with url: locations_path, method: :get, id: "filters-form", class: "space-y-4" do %>
+<%= form_with url: locations_path, method: :get, id: "filters-form", class: "space-y-4", data: { turbo_frame: "locations_list" } do %>
   <!-- Hidden query field to preserve search -->
   <%= hidden_field_tag :query, params[:query] %>
 

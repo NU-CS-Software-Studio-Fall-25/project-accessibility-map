@@ -1,0 +1,19 @@
+<%= turbo_frame_tag "locations_list" do %>
+  <section id="locations_list" class="flex-1 flex flex-col justify-start items-stretch gap-4 overflow-y-auto px-4 pb-4">
+    <% if @locations.any? %>
+      <% @locations.each do |location| %>
+        <%= render location %>
+      <% end %>
+      <div class="flickr_pagination">
+        <div class="py-2">
+          <%= will_paginate @locations,
+              params: params.permit(:query, :latitude, :longitude, :favorites_only, feature_ids: []),
+              page_links: false %>
+        </div>
+      </div>
+    <% else %>
+      <p class="text-sm font-normal text-gray-700 text-center my-10">No locations found.</p>
+    <% end %>
+  </section>
+<% end %>
+

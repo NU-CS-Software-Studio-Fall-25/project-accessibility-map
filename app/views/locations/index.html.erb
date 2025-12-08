@@ -44,20 +44,9 @@
 
     <%= render "locations/filters_modal" %>
 
-    <section id="locations_list" class="flex-1 flex flex-col justify-start items-stretch gap-4 overflow-y-auto px-4 pb-4">
-      <% if @locations.any? %>
-        <% @locations.each do |location| %>
-          <%= render location %>
-        <% end %>
-        <div class="flickr_pagination">
-          <div class="py-2">
-            <%= will_paginate @locations, :page_links => false %>
-          </div>
-        </div>
-      <% else %>
-        <p class="text-sm font-normal text-gray-700 text-center my-10">No locations found.</p>
-      <% end %>
-    </section>
+    <%= turbo_frame_tag "locations_list" do %>
+      <%= render "locations_list" %>
+    <% end %>
 
   </div>
 </div>

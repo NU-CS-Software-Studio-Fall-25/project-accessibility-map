@@ -10,13 +10,14 @@ class LocationsController < ApplicationController
   # GET /locations or /locations.json
   def index
     # Ensure location params are always present for map centering
-    # Redirect to same page with default location if not provided (HTML only)
+    # Don't redirect for Turbo Frame requests (they break frames)
     # For JSON requests, use defaults without redirecting
     unless params[:latitude].present? && params[:longitude].present?
       default_lat = 42.057853
       default_lng = -87.676143
 
-      if request.format.html?
+      if request.format.html? && request.headers["Turbo-Frame"].blank?
+        # Only redirect full page requests (not turbo frame requests)
         # Redirect HTML requests to ensure map is centered from the start
         redirect_params = params.to_unsafe_h.merge(
           latitude: default_lat,
@@ -26,7 +27,7 @@ class LocationsController < ApplicationController
         redirect_to(locations_path(redirect_params), allow_other_host: false)
         return
       else
-        # For JSON requests, set defaults without redirecting
+        # For JSON requests or Turbo Frame requests, set defaults without redirecting
         params[:latitude] = default_lat
         params[:longitude] = default_lng
       end
@@ -58,6 +59,37 @@ class LocationsController < ApplicationController
         .having("COUNT(DISTINCT features.id) = ?", feature_ids.count)
     end
 
+    # Sort by distance from coordinates if provided
+    if params[:latitude].present? && params[:longitude].present?
+      lat = params[:latitude].to_f
+      lng = params[:longitude].to_f
+
+      # Only sort if coordinates are valid (between -90/90 for lat, -180/180 for lng)
+      if lat.between?(-90, 90) && lng.between?(-180, 180)
+        # Use Haversine formula to calculate distance in kilometers
+        # 6371 is Earth's radius in kilometers
+        # Safely escape the numeric values
+        lat_escaped = ActiveRecord::Base.connection.quote(lat)
+        lng_escaped = ActiveRecord::Base.connection.quote(lng)
+
+        distance_sql = <<-SQL.squish
+          (
+            6371 * acos(
+              cos(radians(#{lat_escaped})) *
+              cos(radians(locations.latitude)) *
+              cos(radians(locations.longitude) - radians(#{lng_escaped})) +
+              sin(radians(#{lat_escaped})) *
+              sin(radians(locations.latitude))
+            )
+          ) AS distance
+        SQL
+
+        base_locations = base_locations
+          .select("locations.*, #{distance_sql}")
+          .order("distance ASC")
+      end
+    end
+
     # Preload favorite location IDs for current user to avoid N+1 queries
     @favorite_location_ids = current_user&.favorite_locations&.pluck(:id)&.to_set || Set.new
 
@@ -65,6 +97,11 @@ class LocationsController < ApplicationController
       format.html do
         # For HTML, paginate the results for the list view
         @locations = base_locations.paginate(page: params[:page], per_page: 24)
+
+        # If this is a Turbo Frame request, render just the partial
+        if request.headers["Turbo-Frame"].present?
+          render partial: "locations_list"
+        end
       end
       format.json do
         # For JSON (map data), return ALL locations without pagination
