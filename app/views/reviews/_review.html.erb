@@ -55,7 +55,7 @@
 
 <script>
   document.addEventListener('DOMContentLoaded', function() {
-    const modalId = 'edit-review-modal-<%= review.id %>';
+    const modalId = <%= "edit-review-modal-#{review.id}".to_json %>;
     const modal = document.getElementById(modalId);
     if (!modal) return;
 
