@@ -8,7 +8,14 @@ class PasswordsController < ApplicationController
   end
 
   def create
-    if (user = User.find_by(email_address: params[:email_address]))
+    email = params[:email_address]&.strip
+
+    if email.blank?
+      redirect_to(new_password_path, alert: "Email address is required.")
+      return
+    end
+
+    if (user = User.find_by(email_address: email))
       PasswordsMailer.reset(user).deliver_later
     end
 

@@ -11,12 +11,12 @@
     <h2 class="text-xl font-semibold text-heading">Welcome back!</h2>
     <%= form_with url: session_url, class: "contents space-y-5 text-sm" do |form| %>
       <div class="space-y-2">
-        <%= form.label :email_address, "Email address", class: "block font-medium" %>
+        <%= form.label :email_address, "Email address *", class: "block font-medium" %>
         <%= form.email_field :email_address, required: true, autofocus: true, autocomplete: "username", placeholder: "Enter your email address", value: params[:email_address], class: "text-sm block shadow-sm rounded-md border border-gray-200 focus:outline-blue-600 px-3 py-2 w-full" %>
       </div>
       <div class="space-y-2">
         <div class="flex justify-between items-center">
-          <%= form.label :password, "Password", class: "block font-medium" %>
+          <%= form.label :password, "Password *", class: "block font-medium" %>
           <%= link_to "Forgot password?", new_password_path, class: "text-gray-600 hover:underline underline-offset-4 hover:cursor-pointer" %>
           </div>
         <%= form.password_field :password, required: true, autocomplete: "current-password", placeholder: "Enter your password", maxlength: 72, class: "text-sm block shadow-sm rounded-md border border-gray-200 focus:outline-blue-600 px-3 py-2 w-full" %>
@@ -40,7 +40,7 @@
     <div>
       <%= link_to "/auth/google_oauth2", class: "w-full flex items-center justify-center gap-3 py-2.5 px-4 border border-gray-300 rounded-lg hover:bg-gray-50 hover:cursor-pointer focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-400" do %>
         <svg class="w-5 h-5" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 488 512">
-          <path d="M488 261.8C488 403.3 381.5 512 244 512 110.3 512 0 401.7 0 265.2 0 128.8 109.3 18.5 244 18.5c71.2 0 132.8 28.4 177.9 72.9l-63.5 61.4C333.6 128.1 292.8 106 244 106c-76.3 0-138.3 62.4-138.3 139.2s62 139.2 138.3 139.2c87.3 0 119.3-67.3 123.4-102.9H244v-79.5h236.1c2.3 12.7 3.9 26.4 3.9 41.4z"/>
+          <path d="M488 261.8C488 403.3 381.5 512 244 512 110.3 512 0 401.7 0 265.2 0 128.8 109.3 18.5 244 18.5c71.2 0 132.8 28.4 177.9 72.9l-63.5 61.4C333.6 128.1 292.8 106 244 106c-76.3 0-138.3 62.4-138.3 139.2s62 139.2 138.3 139.2c87.3 0 119.3-67.3 123.4-102.9H244v-79.5h236.1c2.3 12.7 3.9 26.4 3.9 41.4z" />
         </svg>
         <span class="text-sm font-medium text-gray-700">Sign in with Google</span>
       <% end %>

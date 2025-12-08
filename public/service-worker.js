@@ -3,8 +3,7 @@ const APP_SHELL = [
   "/",
   "/manifest.webmanifest",
   "/opendoors-192.png",
-  "/opendoors-512.png",
-  "/icon-maskable.png"
+  "/opendoors-512.png"
 ];
 
 self.addEventListener("install", (e) => {

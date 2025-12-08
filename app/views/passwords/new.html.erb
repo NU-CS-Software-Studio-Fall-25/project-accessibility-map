@@ -3,12 +3,16 @@
     <p class="py-2 px-3 bg-red-50 mb-5 text-red-700 font-medium rounded-lg inline-block" id="alert"><%= alert %></p>
   <% end %>
 
+  <% if notice = flash[:notice] %>
+    <p class="py-2 px-3 bg-green-50 mb-5 text-green-700 font-medium rounded-lg inline-block" id="notice"><%= notice %></p>
+  <% end %>
+
   <div class="w-full max-w-[400px] p-6 border border-gray-200 rounded-lg shadow-sm space-y-5">
     <h2 class="text-xl font-semibold">Forgot your password?</h2>
     <%= form_with url: passwords_path, class: "contents space-y-5 text-sm" do |form| %>
       <div class="space-y-2">
-        <%= form.label :email_address, "Email address", class: "block font-medium" %>
-        <%= form.email_field :email_address, required: true, autofocus: true, autocomplete: "username", placeholder: "Enter your email address", value: params[:email_address], class: "text-sm block shadow-sm rounded-md border border-gray-200 focus:outline-blue-600 px-3 py-2 w-full" %>
+        <%= form.label :email_address, "Email address *", class: "block font-medium" %>
+        <%= form.email_field :email_address, autofocus: true, autocomplete: "username", placeholder: "Enter your email address", value: params[:email_address], class: "text-sm block shadow-sm rounded-md border border-gray-200 focus:outline-blue-600 px-3 py-2 w-full" %>
       </div>
       <div class="w-full text-center space-y-4">
         <%= form.submit "Request password reset", class: "transition text-sm w-full text-center rounded-md py-2 bg-blue-600 hover:bg-blue-500 text-white inline-block font-medium" %>
