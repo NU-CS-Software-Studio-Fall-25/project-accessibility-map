@@ -12,7 +12,7 @@ end
 
 def open_new_review_ui_on_show!
   clicked = false
-  %w[Write\ a\ Review New\ Review Add\ Review].each do |label|
+  ["Write a Review", "New Review", "Add Review"].each do |label|
     if page.has_button?(label, wait: 0)
       click_button(label)
       clicked = true
@@ -35,7 +35,6 @@ def open_new_review_ui_on_show!
   # For happy-path scenarios, the next step will fail clearly if the textarea isn't present.
 end
 
-
 def open_edit_review_ui_on_show!
   # Click an edit control if present; some UIs use inline edit toggles
   if page.has_button?("Edit Review", wait: 0)
@@ -55,9 +54,9 @@ end
 
 def fill_review_body_with(text)
   if page.has_field?("review_body", wait: 0)
-    fill_in "review_body", with: text
+    fill_in("review_body", with: text)
   elsif page.has_field?("review[body]", wait: 0)
-    fill_in "review[body]", with: text
+    fill_in("review[body]", with: text)
   else
     raise "Could not find a review body field (looked for id 'review_body' or name 'review[body]')"
   end
@@ -78,15 +77,14 @@ end
 
 Then("I should be on the new review page for {string}") do |name|
   loc = Location.find_by!(name: name)
-  expect(page).to have_current_path(location_path(loc), ignore_query: true)
+  expect(page).to(have_current_path(location_path(loc), ignore_query: true))
 
   has_field =
     page.has_field?("review_body", wait: 0) ||
     page.has_field?("review[body]", wait: 0)
 
-  expect(has_field).to be(true), "Expected a review textarea (id='review_body' or name='review[body]') on the page"
+  expect(has_field).to(be(true), "Expected a review textarea (id='review_body' or name='review[body]') on the page")
 end
-
 
 Given("I have a review on {string} with body {string}") do |name, body|
   @location = find_location_by_name!(name)
@@ -140,12 +138,11 @@ When("I submit the review form") do
   end
 end
 
-
 # ----------------- assertions -----------------
 
 Then("I should be on the location show page for {string}") do |name|
   loc = find_location_by_name!(name)
-  expect(page).to have_current_path(location_path(loc), ignore_query: true)
+  expect(page).to(have_current_path(location_path(loc), ignore_query: true))
 end
 
 Then("I should be redirected to the login page from review") do
@@ -154,17 +151,19 @@ Then("I should be redirected to the login page from review") do
     page.has_field?("review_body", wait: 0) ||
     page.has_field?("review[body]", wait: 0)
 
-  expect(on_login || !form_visible).to be(true),
-    "Expected to be redirected to #{new_session_path} OR not see a review form when logged out"
+  expect(on_login || !form_visible).to(
+    be(true),
+    "Expected to be redirected to #{new_session_path} OR not see a review form when logged out",
+  )
 end
 
 Then("I should see a validation error for the review body") do
   # Find the review textarea
   field = page.first(:fillable_field, "review_body", wait: 0) ||
-          page.first(:fillable_field, "review[body]", wait: 0)
+    page.first(:fillable_field, "review[body]", wait: 0)
 
   # If the form is a modal or inline, the field should be present after a failed submit
-  expect(field).to be_present
+  expect(field).to(be_present)
 
   error_found = false
 
@@ -187,10 +186,8 @@ Then("I should see a validation error for the review body") do
   # d) Fallback: generic error text anywhere on the page
   error_found ||= page.has_text?(/can't be blank|required|too short|invalid/i)
 
-  expect(error_found).to be(true), "Expected a validation error near the review field or a generic error message"
+  expect(error_found).to(be(true), "Expected a validation error near the review field or a generic error message")
 end
-
-
 
 # ----------------- other-user setup -----------------
 
