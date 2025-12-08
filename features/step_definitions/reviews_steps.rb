@@ -256,7 +256,7 @@ Given("I am on the edit page for my review on {string}") do |name|
   # Wait for reviews to load
   expect(page).to(have_content(@review&.body.to_s, wait: 5))
 
-  # Try to find the edit button - it should be near the review text
+  # Try to find the edit button. It should be near the review text
   # First try to find the container with the review text
   container = review_container_by_text(@review&.body.to_s)
   opened = false
