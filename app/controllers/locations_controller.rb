@@ -64,7 +64,7 @@ class LocationsController < ApplicationController
     respond_to do |format|
       format.html do
         # For HTML, paginate the results for the list view
-        @locations = base_locations.paginate(page: params[:page], per_page: 10)
+        @locations = base_locations.paginate(page: params[:page], per_page: 24)
       end
       format.json do
         # For JSON (map data), return ALL locations without pagination
