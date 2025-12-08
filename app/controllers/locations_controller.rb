@@ -148,8 +148,6 @@ class LocationsController < ApplicationController
         format.html { redirect_to(@location, notice: "Location was successfully updated.", status: :see_other) }
         format.json { render(:show, status: :ok, location: @location) }
       else
-        # Log errors for debugging
-        Rails.logger.debug("Location update failed. Errors: #{@location.errors.full_messages.inspect}")
         format.html { render(:edit, status: :unprocessable_entity) }
         format.json { render(json: @location.errors, status: :unprocessable_entity) }
       end
