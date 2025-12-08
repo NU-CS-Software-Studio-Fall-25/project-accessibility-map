@@ -123,6 +123,16 @@ bundle exec rspec
 bundle exec cucumber
 ```
 
+### Generating Documentation
+
+```bash
+# Generate RDoc documentation
+bundle exec rake rdoc
+
+# View documentation
+open doc/index.html
+```
+
 ## 📋 Key Models
 
 - **Location**: Stores location information (name, address, coordinates, features)

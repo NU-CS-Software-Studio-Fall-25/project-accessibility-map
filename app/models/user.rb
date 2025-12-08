@@ -1,5 +1,8 @@
 # frozen_string_literal: true
 
+# Represents a user account in the system.
+# Users can create locations, write reviews, and favorite locations.
+# Supports both email/password authentication and OAuth (Google).
 class User < ApplicationRecord
   has_secure_password
   validates :email_address, presence: true, uniqueness: true

@@ -1,0 +1,132 @@
+<% content_for :title, current_user == @user ? "My Profile" : "#{@user.username}'s Profile" %>
+
+<div class="max-w-3xl mx-auto p-6">
+  <div class="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
+    <!-- Header -->
+    <div class="bg-gradient-to-r from-blue-500 to-blue-600 px-6 py-8">
+      <h1 class="text-2xl font-bold text-white"><%= current_user == @user ? "My Profile" : "#{@user.username}'s Profile" %></h1>
+    </div>
+
+    <!-- Profile Content -->
+    <div class="p-6 space-y-6">
+      <!-- Profile Photo and Username -->
+      <div class="flex items-center gap-6">
+        <div class="flex-shrink-0">
+          <% if @user.photo_url.present? %>
+            <%= image_tag @user.photo_url, class: "w-24 h-24 rounded-full object-cover border-4 border-white shadow-lg", alt: @user.username %>
+          <% elsif @user.profile_photo.attached? %>
+            <%= image_tag @user.profile_photo, class: "w-24 h-24 rounded-full object-cover border-4 border-white shadow-lg", alt: @user.username %>
+          <% else %>
+            <div class="w-24 h-24 rounded-full bg-blue-500 flex items-center justify-center border-4 border-white shadow-lg">
+              <span class="text-3xl font-bold text-white"><%= @user.username[0].upcase %></span>
+            </div>
+          <% end %>
+        </div>
+        <div>
+          <h2 class="text-2xl font-bold text-gray-900"><%= @user.username %></h2>
+          <p class="text-gray-600 mt-1"><%= @user.email_address %></p>
+        </div>
+      </div>
+
+      <!-- Divider -->
+      <hr class="border-gray-200">
+
+      <!-- Edit Profile Form (only shown for own profile) -->
+      <% if current_user == @user %>
+        <div class="space-y-4">
+          <h2 class="text-lg font-semibold text-gray-900">Edit Profile</h2>
+
+          <%= form_with model: @user, url: update_profile_users_path, method: :patch, local: true, class: "space-y-4" do |f| %>
+            <% if @user.errors.any? %>
+              <div class="rounded-md bg-red-50 p-4 text-red-700" role="alert" aria-live="polite">
+                <p class="font-semibold mb-2"><%= pluralize(@user.errors.count, "error") %> prevented this profile from being saved:</p>
+                <ul class="list-disc pl-5">
+                  <% @user.errors.each do |error| %>
+                    <li><%= error.full_message %></li>
+                  <% end %>
+                </ul>
+              </div>
+            <% end %>
+
+            <div class="space-y-2">
+              <%= f.label :username, class: "block text-sm font-medium text-gray-700" %>
+              <%= f.text_field :username, class: "shadow-sm text-sm w-full rounded-md border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-300" %>
+            </div>
+
+            <div class="space-y-2">
+              <%= f.label :profile_photo, "Profile Photo", class: "block text-sm font-medium text-gray-700" %>
+              <%= f.file_field :profile_photo, accept: "image/*", class: "shadow-sm text-xs text-gray-600 w-full rounded-md border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-300 file:mr-4 file:py-1 file:px-3 file:rounded file:border-0 file:text-sm file:font-medium file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100" %>
+              <p class="text-xs text-gray-500">Upload a new profile picture to replace the current one</p>
+            </div>
+
+            <div class="flex flex-row-reverse">
+              <%= f.submit "Update Profile", class: "text-sm px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 font-medium transition-colors cursor-pointer" %>
+            </div>
+          <% end %>
+        </div>
+
+        <!-- Divider -->
+        <hr class="border-gray-200">
+      <% end %>
+
+      <!-- Account Information -->
+      <div class="space-y-4">
+        <h2 class="text-lg font-semibold text-gray-900">Account Information</h2>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div class="space-y-1">
+            <p class="text-sm font-medium text-gray-600">Username</p>
+            <p class="text-sm text-gray-900"><%= @user.username %></p>
+          </div>
+
+          <div class="space-y-1">
+            <p class="text-sm font-medium text-gray-600">Email</p>
+            <p class="text-sm text-gray-900"><%= @user.email_address %></p>
+          </div>
+
+          <div class="space-y-1">
+            <p class="text-sm font-medium text-gray-600">Member Since</p>
+            <p class="text-sm text-gray-900"><%= @user.created_at.strftime("%B %d, %Y") %></p>
+          </div>
+
+          <% if @user.provider.present? %>
+            <div class="space-y-1">
+              <p class="text-sm font-medium text-gray-600">Sign-in Method</p>
+              <p class="text-sm text-gray-900 capitalize"><%= @user.provider %></p>
+            </div>
+          <% end %>
+        </div>
+      </div>
+
+      <!-- Divider -->
+      <hr class="border-gray-200">
+
+      <!-- Activity Stats -->
+      <div class="space-y-4">
+        <h2 class="text-lg font-semibold text-gray-900">Activity</h2>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div class="bg-blue-50 rounded-lg p-4 text-center">
+            <p class="text-3xl font-bold text-blue-600"><%= @user.locations.count %></p>
+            <p class="text-sm text-gray-600 mt-1">Locations Added</p>
+          </div>
+
+          <div class="bg-green-50 rounded-lg p-4 text-center">
+            <p class="text-3xl font-bold text-green-600"><%= @user.reviews.count %></p>
+            <p class="text-sm text-gray-600 mt-1">Reviews Written</p>
+          </div>
+
+          <div class="bg-purple-50 rounded-lg p-4 text-center">
+            <p class="text-3xl font-bold text-purple-600"><%= @user.favorite_locations.count %></p>
+            <p class="text-sm text-gray-600 mt-1">Favorites</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Actions -->
+      <div class="flex flex-row-reverse gap-2 pt-4">
+        <%= link_to "Back", :back, class: "text-sm py-2 px-4 font-medium text-gray-900 focus:outline-none bg-white rounded-lg border border-gray-200 hover:bg-gray-100 focus:z-10 focus:ring-4 focus:ring-gray-100 transition-colors" %>
+      </div>
+    </div>
+  </div>
+</div>

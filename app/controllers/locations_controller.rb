@@ -9,14 +9,18 @@ class LocationsController < ApplicationController
 
   # GET /locations or /locations.json
   def index
+    # Remove blank query parameter to avoid issues
+    params.delete(:query) if params[:query].blank?
+
     # Ensure location params are always present for map centering
-    # Redirect to same page with default location if not provided (HTML only)
+    # Don't redirect for Turbo Frame requests (they break frames)
     # For JSON requests, use defaults without redirecting
     unless params[:latitude].present? && params[:longitude].present?
       default_lat = 42.057853
       default_lng = -87.676143
 
-      if request.format.html?
+      if request.format.html? && request.headers["Turbo-Frame"].blank?
+        # Only redirect full page requests (not turbo frame requests)
         # Redirect HTML requests to ensure map is centered from the start
         redirect_params = params.to_unsafe_h.merge(
           latitude: default_lat,
@@ -26,7 +30,7 @@ class LocationsController < ApplicationController
         redirect_to(locations_path(redirect_params), allow_other_host: false)
         return
       else
-        # For JSON requests, set defaults without redirecting
+        # For JSON requests or Turbo Frame requests, set defaults without redirecting
         params[:latitude] = default_lat
         params[:longitude] = default_lng
       end
@@ -41,21 +45,23 @@ class LocationsController < ApplicationController
         .reorder(nil) # ← remove pg_search ORDER BY
     end
 
-    # favorites filter
-    if params[:favorites_only] == "1" && current_user
-      favorite_ids = current_user.favorite_locations.pluck(:id)
-      base_locations = base_locations.where(id: favorite_ids)
-    end
-
-    # feature filter
+    # feature filter - OR logic (locations matching ANY selected feature)
     if params[:feature_ids].present?
       feature_ids = params[:feature_ids].reject(&:blank?)
 
-      base_locations = base_locations
-        .joins(:features)
-        .where(features: { id: feature_ids })
-        .group("locations.id")
-        .having("COUNT(DISTINCT features.id) = ?", feature_ids.count)
+      # Only apply filter if there are valid feature IDs
+      if feature_ids.any?
+        base_locations = base_locations
+          .joins(:features)
+          .where(features: { id: feature_ids })
+          .distinct
+      end
+    end
+
+    # favorites filter - AND logic (must be favorites AND match feature filters if any)
+    if params[:favorites_only] == "1" && current_user
+      favorite_ids = current_user.favorite_locations.pluck(:id)
+      base_locations = base_locations.where(id: favorite_ids)
     end
 
     # Preload favorite location IDs for current user to avoid N+1 queries
@@ -64,7 +70,12 @@ class LocationsController < ApplicationController
     respond_to do |format|
       format.html do
         # For HTML, paginate the results for the list view
-        @locations = base_locations.paginate(page: params[:page], per_page: 10)
+        @locations = base_locations.paginate(page: params[:page], per_page: 24)
+
+        # If this is a Turbo Frame request, render just the partial
+        if request.headers["Turbo-Frame"].present?
+          render(partial: "locations_list")
+        end
       end
       format.json do
         # For JSON (map data), return ALL locations without pagination
@@ -148,8 +159,6 @@ class LocationsController < ApplicationController
         format.html { redirect_to(@location, notice: "Location was successfully updated.", status: :see_other) }
         format.json { render(:show, status: :ok, location: @location) }
       else
-        # Log errors for debugging
-        Rails.logger.debug("Location update failed. Errors: #{@location.errors.full_messages.inspect}")
         format.html { render(:edit, status: :unprocessable_entity) }
         format.json { render(json: @location.errors, status: :unprocessable_entity) }
       end

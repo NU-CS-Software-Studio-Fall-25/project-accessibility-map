@@ -1,5 +1,8 @@
 # frozen_string_literal: true
 
+# Represents a physical location that can be reviewed for accessibility.
+# Locations belong to users and can have multiple reviews and accessibility features.
+# Locations support image uploads and geocoding for map display.
 class Location < ApplicationRecord
   belongs_to :user
   has_many :reviews, dependent: :destroy

@@ -1,4 +1,4 @@
-<%= link_to location_path(location), id: dom_id(location), class: "w-full flex flex-col justify-center items-start gap-2 border border-gray-200 rounded-xl p-4 transition hover:shadow-md cursor-pointer" do %>
+<%= link_to location_path(location), id: dom_id(location), class: "w-full flex flex-col justify-center items-start gap-2 border border-gray-200 rounded-xl p-4 transition hover:shadow-md cursor-pointer", data: { turbo_frame: "_top" } do %>
   <div>
     <h3 class="font-bold text-md">
       <%= location.name %>

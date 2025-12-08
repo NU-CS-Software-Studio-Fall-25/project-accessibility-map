@@ -5,14 +5,13 @@ Rails.application.routes.draw do
   match "/auth/:provider/callback", to: "sessions#create", via: [:get, :post]
 
   resources :passwords, param: :token
-  resources :users, only: [:new, :create] do
+  resources :users, only: [:new, :create, :show] do
     collection do
       get :profile
       patch :update_profile
     end
   end
-  # resources :reviews
-  #
+  # Reviews are nested under locations, not a top-level resource
   resources :locations do
     resources :reviews, only: [:create, :update, :destroy]
     member do
@@ -27,10 +26,7 @@ Rails.application.routes.draw do
   # Can be used by load balancers and uptime monitors to verify that the app is live.
   get "up" => "rails/health#show", as: :rails_health_check
 
-  # Render dynamic PWA files from app/views/pwa/* (remember to link manifest in application.html.erb)
-  # get "manifest" => "rails/pwa#manifest", as: :pwa_manifest
-  # get "service-worker" => "rails/pwa#service_worker", as: :pwa_service_worker
-
+  # PWA is handled via static files (manifest.webmanifest and service-worker.js in public/)
   # Defines the root path route ("/")
   root to: "locations#index"
 end

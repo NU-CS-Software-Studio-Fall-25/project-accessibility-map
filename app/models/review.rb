@@ -1,5 +1,8 @@
 # frozen_string_literal: true
 
+# Represents a user review for a location.
+# Reviews must be at least 10 characters and are filtered for profanity.
+# Reviews belong to both a location and the user who created them.
 class Review < ApplicationRecord
   belongs_to :location
   belongs_to :user
