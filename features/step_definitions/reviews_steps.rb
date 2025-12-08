@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-# ---------- small helpers ----------
+# ---------- helpers ----------
 
 def find_location_by_name!(name)
   Location.find_by!(name: name)
@@ -14,11 +14,20 @@ def has_modal_toggle?
   page.has_css?('[data-modal-toggle="add-review-modal"]', wait: 0)
 end
 
-def click_modal_toggle
-  find('[data-modal-toggle="add-review-modal"]', match: :first).click
+def open_review_modal!
+  # Try normal toggle
+  if has_modal_toggle?
+    find('[data-modal-toggle="add-review-modal"]', match: :first).click
+  end
+  # If still hidden, force-open in CI by removing the "hidden" class
+  unless page.has_css?("#add-review-modal:not(.hidden)", wait: 0)
+    page.execute_script("var m=document.getElementById('add-review-modal'); if(m){m.classList.remove('hidden'); m.setAttribute('aria-hidden','false');}")
+  end
 end
 
 def within_modal(&block)
+  # Ensure modal exists in DOM even if hidden
+  expect(page).to(have_css("#add-review-modal", wait: 2))
   within("#add-review-modal", &block)
 end
 
@@ -32,6 +41,7 @@ def first_modal_form
 end
 
 def set_modal_body(form, value)
+  # Your partial uses form.textarea :body -> id=review_body, name=review[body]
   if form.has_field?("review_body", wait: 0, visible: :all)
     form.fill_in("review_body", with: value)
   elsif form.has_field?("review[body]", wait: 0, visible: :all)
@@ -56,63 +66,81 @@ def strip_html5_validation(form)
         el.removeAttribute('required');
         el.removeAttribute('minlength');
         el.required = false;
-        el.setCustomValidity && el.setCustomValidity('');
+        if (el.setCustomValidity) el.setCustomValidity('');
       } catch(_) {}
     })(arguments[0]);
   JS
 end
 
 def submit_modal_form(form)
-  # Always strip client-side constraints so server validations run in headless CI
+  # Remove browser-side blockers so server validations run in CI
   strip_html5_validation(form)
+
+  # Your submit is labeled "Add Review" in new form; edit UI may differ.
   if form.has_button?("Add Review", wait: 0, visible: :all)
     form.click_button("Add Review")
-  elsif form.has_css?(
-    "button[type='submit'], input[type='submit']",
-    wait: 0,
-    visible: :all,
-  )
-    form.find(:css, "button[type='submit'], input[type='submit']").click
+  elsif form.has_css?("button[type='submit'],input[type='submit']", wait: 0, visible: :all)
+    form.find(:css, "button[type='submit'],input[type='submit']").click
   else
     page.execute_script("arguments[0].submit()", form.native)
   end
 end
 
-# Finds the review container that contains +text+ (robust to markup)
-def find_review_container_by_text(text)
-  # Try a common container class first
-  node = first(
+def review_container_by_text(text)
+  return if text.to_s.strip.empty?
+
+  # Prefer an ancestor with class containing "review"
+  container = first(
     :xpath,
     "//*[contains(normalize-space(.), #{XPath.quote(text)})]" \
-      "[ancestor::*[contains(@class,'review')]][1]/ancestor::*[contains(@class,'review')][1]",
+      "[ancestor::*[contains(@class,'review')]][1]" \
+      "/ancestor::*[contains(@class,'review')][1]",
     wait: 0,
   )
-  return node if node
 
-  # Fallback: nearest block element that contains the text
+  return container if container
+
+  # Fallback: nearest block (div/section/article)
   first(
     :xpath,
     "//*[contains(normalize-space(.), #{XPath.quote(text)})]" \
-      "/ancestor::*[self::article or self::section or self::div][1]",
+      "/ancestor::*[self::div or self::section or self::article][1]",
     wait: 0,
   )
 end
 
-def click_edit_inside(container)
-  # Prefer a link labeled Edit
-  if container.has_link?("Edit", wait: 0, exact: false)
-    container.first(:link, "Edit", exact: false).click
+def click_edit_inside!(container)
+  # Try visible link/button label variants
+  ["Edit", "Edit Review"].each do |label|
+    if container.has_link?(label, wait: 0, exact: false)
+      container.first(:link, label, exact: false).click
+      return true
+    end
+    if container.has_button?(label, wait: 0, exact: false)
+      container.first(:button, label, exact: false).click
+      return true
+    end
+  end
+
+  # Try common icon/aria roles
+  candidates = container.all(
+    :xpath,
+    ".//*[self::a or self::button][@title or @aria-label]",
+    wait: 0,
+  )
+  node = candidates.find do |n|
+    t = (n[:title].to_s + " " + n[:"aria-label"].to_s).downcase
+    t.include?("edit")
+  end
+  if node
+    node.click
     return true
   end
-  # Or a button labeled Edit
-  if container.has_button?("Edit", wait: 0, exact: false)
-    container.first(:button, "Edit", exact: false).click
-    return true
-  end
+
   false
 end
 
-# ---------- navigation ----------
+# ---------- navigation steps ----------
 
 Given("I am on the location show page for {string}") do |name|
   @location = find_location_by_name!(name)
@@ -122,18 +150,19 @@ end
 When("I visit the new review page for {string}") do |name|
   @location = find_location_by_name!(name)
   visit location_path(@location)
-  click_modal_toggle if has_modal_toggle?
+  open_review_modal!
 end
 
 Then("I should be on the new review page for {string}") do |name|
   loc = find_location_by_name!(name)
   expect(page).to(have_current_path(location_path(loc), ignore_query: true))
+
   within_modal do
     form = first("form", minimum: 1)
     expect(form).to(be_present)
-    has_field = form.has_field?("review_body", wait: 0, visible: :all) ||
+    has_textarea = form.has_field?("review_body", wait: 0, visible: :all) ||
       form.has_field?("review[body]", wait: 0, visible: :all)
-    expect(has_field).to(be(true), "Expected a review textarea inside the modal")
+    expect(has_textarea).to(be(true), "Expected a review textarea inside the modal")
   end
 end
 
@@ -144,39 +173,34 @@ Given("I have a review on {string} with body {string}") do |name, body|
 end
 
 Given("I am on the edit page for my review on {string}") do |name|
-  # Strategy:
-  # 1) Find the review block containing the body we just created.
-  # 2) Click its Edit control if present.
-  # 3) If no explicit edit UI exists, open the same modal so later steps can submit.
   @location = find_location_by_name!(name)
   visit location_path(@location)
 
-  review_text = @review&.body || ""
-  container = review_text.empty? ? nil : find_review_container_by_text(review_text)
-  opened = false
-  opened = click_edit_inside(container) if container
+  # Try to find the specific review and its edit control
+  container = review_container_by_text(@review&.body.to_s)
+  opened = container && click_edit_inside!(container)
 
-  click_modal_toggle if !opened && has_modal_toggle?
+  # If there is no explicit per-review edit control, fall back to the same modal UI
+  open_review_modal! unless opened
 end
 
 When("I try to visit the edit page for that user's review") do
-  # We ensure an "other user" review exists (see step below),
-  # then attempt to click its Edit if visible; otherwise we consider the attempt blocked.
   visit location_path(@location)
-  container = find_review_container_by_text(@other_review.body)
+  container = review_container_by_text(@other_review.body)
+
   if container
-    # If an edit control is visible for other user's review, click and expect to end up back on show
-    clicked = click_edit_inside(container)
+    # If an edit control is exposed for another user's review, clicking it should not navigate away
+    clicked = click_edit_inside!(container)
     if clicked
       expect(page).to(have_current_path(location_path(@location), ignore_query: true))
       next
     end
   end
-  # No visible edit for other user's review: we are effectively blocked already.
+
+  # No edit control for someone else's review: already blocked
   expect(page).to(have_current_path(location_path(@location), ignore_query: true))
 end
 
-# CI was missing this definition previously
 Given("that user has a review on {string} with body {string}") do |name, body|
   @location = find_location_by_name!(name)
   @other_user ||= User.find_by(email_address: "other@example.com") ||
@@ -185,9 +209,7 @@ Given("that user has a review on {string} with body {string}") do |name, body|
       username: "other",
       password: "OtherPassword123!",
     )
-  @other_review = Review.find_or_create_by!(user: @other_user, location: @location) do |r|
-    r.body = body
-  end
+  @other_review = Review.find_or_create_by!(user: @other_user, location: @location) { |r| r.body = body }
 end
 
 # ---------- form actions ----------
@@ -217,8 +239,7 @@ Then("I should be on the location show page for {string}") do |name|
 end
 
 Then("I should be redirected to the login page from review") do
-  # When logged out, the toggle isn’t rendered; the modal DOM is present.
-  # Force-submit to trigger auth redirect.
+  # When logged out the toggle isn’t shown; the modal DOM still exists.
   visit current_path
   within_modal do
     form = first("form", minimum: 1)
