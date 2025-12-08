@@ -2,6 +2,10 @@
 # Enable all linters by default
 EnableDefaultLinters: true
 
+# Exclude vendor directory (bundled gems) and other non-project files
+exclude:
+  - "vendor/**/*"
+
 # Linter configuration
 linters:
   # Enforce consistent ERB tag spacing
