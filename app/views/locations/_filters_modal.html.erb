@@ -59,7 +59,7 @@
       applyButton = document.getElementById('apply-filters-btn');
     }
 
-    // Function to submit form to Turbo Frame
+    // Function to submit form with full page reload
     function submitFilters() {
       const url = new URL(form.action, window.location.origin);
 
@@ -95,12 +95,18 @@
         url.searchParams.set('longitude', currentParams.get('longitude'));
       }
 
-      // Update the Turbo Frame
-      const frame = document.querySelector('turbo-frame#locations_list');
-      if (frame) {
-        frame.src = url.toString();
-      }
+      // Remove page param to start from page 1 when filters change
+      url.searchParams.delete('page');
+
+      // Full page reload
+      window.location.href = url.toString();
     }
+
+    // Prevent default form submission
+    form.addEventListener('submit', function(e) {
+      e.preventDefault();
+      submitFilters();
+    });
 
     // Handle submit button click
     if (applyButton) {

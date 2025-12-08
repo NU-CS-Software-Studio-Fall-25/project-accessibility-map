@@ -36,32 +36,59 @@ class LocationsController < ApplicationController
       end
     end
 
-    # Start with base query - no pagination yet
-    base_locations = Location.all
+    # Get coordinates for distance calculation
+    lat = params[:latitude].to_f
+    lng = params[:longitude].to_f
 
-    # text search
+    # Start with base query - apply all filters with AND logic
+    # Logic: search_query AND show_favorites AND (feature_1 OR feature_2 OR ...)
+    filtered_locations = Location.all
+
+    # 1. Text search filter (AND)
     if params[:query].present?
-      base_locations = base_locations.merge(Location.search_locations(params[:query]))
-        .reorder(nil) # ← remove pg_search ORDER BY
+      filtered_locations = filtered_locations.merge(Location.search_locations(params[:query]))
+        .reorder(nil) # Remove pg_search ORDER BY
     end
 
-    # feature filter - OR logic (locations matching ANY selected feature)
+    # 2. Favorites filter (AND)
+    if params[:favorites_only] == "1" && current_user
+      favorite_ids = current_user.favorite_locations.pluck(:id)
+      filtered_locations = filtered_locations.where(id: favorite_ids)
+    end
+
+    # 3. Feature filter - OR logic within features, AND with other filters
+    # Locations matching ANY selected feature (feature_1 OR feature_2 OR ...)
     if params[:feature_ids].present?
       feature_ids = params[:feature_ids].reject(&:blank?)
 
       # Only apply filter if there are valid feature IDs
       if feature_ids.any?
-        base_locations = base_locations
+        filtered_locations = filtered_locations
           .joins(:features)
           .where(features: { id: feature_ids })
           .distinct
       end
     end
 
-    # favorites filter - AND logic (must be favorites AND match feature filters if any)
-    if params[:favorites_only] == "1" && current_user
-      favorite_ids = current_user.favorite_locations.pluck(:id)
-      base_locations = base_locations.where(id: favorite_ids)
+    # Now apply distance sorting to the filtered results and limit to first 50
+    # Distance sorting is done using coordinates (for DB query and sorting only)
+    # We need to apply distance calculation to the already-filtered locations
+    filtered_ids = filtered_locations.pluck(:id)
+
+    # Apply distance calculation and sorting to filtered locations
+    # Use the nearby scope but override the limit to apply it after filtering
+    if filtered_ids.any?
+      lat_sql = Location.connection.quote(lat)
+      lng_sql = Location.connection.quote(lng)
+
+      base_locations = Location
+        .where(id: filtered_ids)
+        .select("locations.*, (6371 * acos(cos(radians(#{lat_sql})) * cos(radians(locations.latitude)) * cos(radians(locations.longitude) - radians(#{lng_sql})) + sin(radians(#{lat_sql})) * sin(radians(locations.latitude)))) AS distance")
+        .order("distance ASC")
+        .limit(50) # Limit to first 50 after all filters are applied
+    else
+      # No locations match the filters
+      base_locations = Location.none
     end
 
     # Preload favorite location IDs for current user to avoid N+1 queries
@@ -69,19 +96,14 @@ class LocationsController < ApplicationController
 
     respond_to do |format|
       format.html do
-        # For HTML, paginate the results for the list view
+        # For HTML, paginate the results for the list view (10 per page)
         @locations = base_locations.paginate(page: params[:page], per_page: 10)
-
-        # If this is a Turbo Frame request, render just the partial
-        if request.headers["Turbo-Frame"].present?
-          render(partial: "locations_list")
-        end
       end
       format.json do
-        # For JSON (map data), return ALL locations without pagination
-        # This ensures the map shows all locations, including newly added ones
-        @locations = base_locations
-        # Prevent caching of JSON responses to ensure newly added locations appear on the map
+        # For JSON (map data), return only the paginated locations
+        # This ensures the map shows only the locations in the current page
+        @locations = base_locations.paginate(page: params[:page], per_page: 10)
+        # Prevent caching of JSON responses
         response.headers["Cache-Control"] = "no-cache, no-store, must-revalidate"
         response.headers["Pragma"] = "no-cache"
         response.headers["Expires"] = "0"

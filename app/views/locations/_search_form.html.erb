@@ -1,4 +1,14 @@
-<%= form_with url: locations_path, method: :get, class: "w-full flex flex-col gap-2 px-4 pt-4", data: { turbo_frame: "locations_list" } do %>
+<%= form_with url: locations_path, method: :get, class: "w-full flex flex-col gap-2 px-4 pt-4" do %>
+  <!-- Hidden fields to preserve filter and location params -->
+  <%= hidden_field_tag :latitude, params[:latitude] if params[:latitude].present? %>
+  <%= hidden_field_tag :longitude, params[:longitude] if params[:longitude].present? %>
+  <%= hidden_field_tag :favorites_only, params[:favorites_only] if params[:favorites_only].present? %>
+  <% if params[:feature_ids].present? %>
+    <% params[:feature_ids].each do |id| %>
+      <%= hidden_field_tag "feature_ids[]", id %>
+    <% end %>
+  <% end %>
+
   <div class="flex-1 relative">
     <label for="search_query" class="sr-only">Search locations</label>
     <div class="absolute inset-y-0 start-0 flex items-center ps-3 pointer-events-none">
@@ -23,36 +33,49 @@
 
 <script>
   document.addEventListener('DOMContentLoaded', function() {
-    const form = document.querySelector('form[data-turbo-frame="locations_list"]')
+    const form = document.querySelector('form[action="<%= locations_path %>"]')
     if (!form) return
 
     form.addEventListener('submit', function(e) {
-      const queryInput = form.querySelector('#search_query')
-      if (queryInput && !queryInput.value.trim()) {
-        e.preventDefault()
-        // Remove query param from URL and reload the frame
-        const url = new URL(window.location.pathname, window.location.origin)
-        // Preserve other params except query and page
-        const currentParams = new URLSearchParams(window.location.search)
-        ['latitude', 'longitude', 'favorites_only', 'feature_ids'].forEach(param => {
-          if (param === 'feature_ids') {
-            currentParams.getAll(param).forEach(val => {
-              url.searchParams.append(param, val)
-            })
-          } else {
-            const value = currentParams.get(param)
-            if (value) {
-              url.searchParams.set(param, value)
-            }
-          }
-        })
+      e.preventDefault() // Always prevent default to handle query parameter removal
 
-        // Update the turbo frame
-        const frame = document.querySelector('turbo-frame#locations_list')
-        if (frame) {
-          frame.src = url.toString()
+      const queryInput = form.querySelector('#search_query')
+      const queryValue = queryInput ? queryInput.value.trim() : ''
+
+      // Build URL
+      const url = new URL(form.action, window.location.origin)
+
+      // Get all form data
+      const formData = new FormData(form)
+
+      // Add all form fields to URL, but skip query if empty
+      for (const [key, value] of formData.entries()) {
+        // Skip empty query parameter
+        if (key === 'query' && !queryValue) {
+          continue
+        }
+
+        if (key === 'feature_ids[]') {
+          url.searchParams.append('feature_ids[]', value)
+        } else {
+          url.searchParams.set(key, value)
         }
       }
+
+      // Preserve location params from current URL if not in form
+      const currentParams = new URLSearchParams(window.location.search)
+      if (!url.searchParams.has('latitude') && currentParams.has('latitude')) {
+        url.searchParams.set('latitude', currentParams.get('latitude'))
+      }
+      if (!url.searchParams.has('longitude') && currentParams.has('longitude')) {
+        url.searchParams.set('longitude', currentParams.get('longitude'))
+      }
+
+      // Remove page param to start from page 1 when searching/filtering
+      url.searchParams.delete('page')
+
+      // Full page reload
+      window.location.href = url.toString()
     })
   })
 </script>

@@ -10,51 +10,26 @@ export default class extends Controller {
   }
 
   connect() {
-    // Wait a bit for mapkick to initialize the map
-    // Always start with initial coordinates (either from URL params or default fallback)
-    // The map should already be centered and filtered from server-side
-    if (this.hasInitialLatValue && this.hasInitialLngValue) {
-      // Map should already be centered from server-side, just ensure it stays centered
-      setTimeout(() => {
-        this.updateMapWithLocation(this.initialLatValue, this.initialLngValue)
-      }, 500)
-    }
-
-    // Try to get user's actual location to update the map if different
-    // Only update if user's location is significantly different from current location
-    // This prevents unnecessary reloads when using default location
-    setTimeout(() => {
-      this.requestLocation()
-    }, 1000) // Slightly longer delay to let initial map load first
+    // Prompt for user's location on page load
+    // If denied or unavailable, use Evanston, IL default coordinates
+    this.requestLocation()
   }
 
   async requestLocation() {
     if (!navigator.geolocation) {
-      // Geolocation not supported - already using default, no need to update
+      // Geolocation not supported - use default Evanston, IL coordinates
+      this.useFallbackLocation()
       return
     }
 
     try {
       const position = await this.getCurrentPosition()
       const { latitude, longitude } = position.coords
-
-      // Only update if user's location is significantly different from current location
-      // This prevents unnecessary reloads when already using default or similar location
-      const currentLat = this.hasInitialLatValue ? this.initialLatValue : this.fallbackLatValue
-      const currentLng = this.hasInitialLngValue ? this.initialLngValue : this.fallbackLngValue
-
-      // Calculate distance in km (rough approximation)
-      const latDiff = Math.abs(latitude - currentLat)
-      const lngDiff = Math.abs(longitude - currentLng)
-      const distance = Math.sqrt(latDiff * latDiff + lngDiff * lngDiff) * 111 // rough km conversion
-
-      // Only update if location is more than 1km away (prevents unnecessary updates)
-      if (distance > 1) {
-        this.updateMapWithLocation(latitude, longitude)
-      }
+      // User granted permission - use their location
+      this.updateMapWithLocation(latitude, longitude)
     } catch (error) {
-      // Location permission denied or error - already using default, no need to update
-      // Don't call useFallbackLocation() as we're already using it
+      // Location permission denied or error - use default Evanston, IL coordinates
+      this.useFallbackLocation()
     }
   }
 
@@ -73,6 +48,8 @@ export default class extends Controller {
   }
 
   useFallbackLocation() {
+    // Default to Evanston, IL coordinates
+    // These coordinates are only used for querying DB and sorting locations
     this.updateMapWithLocation(this.fallbackLatValue, this.fallbackLngValue)
   }
 
@@ -86,29 +63,11 @@ export default class extends Controller {
     const urlLat = urlParams.get('latitude')
     const urlLng = urlParams.get('longitude')
 
-    if (!urlLat || !urlLng) {
-      // No location in URL, reload with location params
-      this.reloadWithLocationParams(lat, lng)
-      return
-    }
-
-    // Calculate distance between current URL location and new location
-    const currentLat = parseFloat(urlLat)
-    const currentLng = parseFloat(urlLng)
-    const distance = this.calculateDistance(currentLat, currentLng, lat, lng)
-
-    // Only reload if the location is significantly different (more than 1km)
-    // This prevents unnecessary reloads and flashing when location is similar
-    const significantDistance = 1.0 // kilometers
-
-    if (distance < significantDistance) {
-      // Location is very close, just ensure map is centered without reloading
-      this.waitForMap(() => {
-        this.centerMap(lat, lng)
-      }, 20) // Shorter wait since map should be ready
-    } else {
-      // Location is significantly different, reload with new params to update map center
-      // Note: We're not filtering by radius, just updating the center coordinates
+    // If coordinates are different, reload page with new coordinates
+    // This will trigger a fresh query with distance-based sorting
+    if (!urlLat || !urlLng ||
+        Math.abs(parseFloat(urlLat) - lat) > 0.0001 ||
+        Math.abs(parseFloat(urlLng) - lng) > 0.0001) {
       this.reloadWithLocationParams(lat, lng)
     }
   }
@@ -213,14 +172,12 @@ export default class extends Controller {
     const newUrl = new URL(window.location.href)
     newUrl.searchParams.set('latitude', lat)
     newUrl.searchParams.set('longitude', lng)
-    // Note: No radius parameter - we're not filtering by radius, just centering the map
+    // Remove page param to start from page 1
+    newUrl.searchParams.delete('page')
 
-    // Use Turbo for a soft reload if available
-    if (window.Turbo) {
-      window.Turbo.visit(newUrl.toString(), { action: 'replace' })
-    } else {
-      window.location.href = newUrl.toString()
-    }
+    // Full page reload to refresh the entire page with new coordinates
+    // This ensures the DB query uses the new coordinates for sorting
+    window.location.href = newUrl.toString()
   }
 
   centerMap(lat, lng) {
