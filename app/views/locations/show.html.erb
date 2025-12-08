@@ -4,6 +4,9 @@
   <% if notice.present? %>
     <p class="py-2 px-3 bg-green-50 text-green-700 font-medium rounded-md inline-block" id="notice" role="status" aria-live="polite"><%= notice %></p>
   <% end %>
+  <% if alert.present? %>
+    <p class="py-2 px-3 bg-red-50 text-red-700 font-medium rounded-md inline-block" id="alert" role="alert" aria-live="polite"><%= alert %></p>
+  <% end %>
 
   <section class="flex flex-col justify-between gap-2">
     <h1 class="text-3xl font-bold"><%= @location.name %></h1>
@@ -211,4 +214,29 @@
 
   document.addEventListener('DOMContentLoaded', setupAddReviewModal);
   document.addEventListener('turbo:load', setupAddReviewModal);
+
+  // Open modal if there are review errors after form submission
+  function openModalIfErrors() {
+    // Check if there's an alert (error) message
+    const alertMessage = document.getElementById('alert');
+    if (alertMessage && alertMessage.textContent.includes('Review')) {
+      const modal = document.getElementById('add-review-modal');
+      const backdrop = document.getElementById('add-review-modal-backdrop');
+      if (modal && backdrop) {
+        // Small delay to ensure DOM is ready
+        setTimeout(() => {
+          modal.classList.remove('hidden');
+          backdrop.classList.remove('hidden');
+          // Trigger Flowbite modal show if available
+          if (typeof window.Flowbite !== 'undefined') {
+            const modalInstance = new window.Flowbite.Modal(modal);
+            modalInstance.show();
+          }
+        }, 100);
+      }
+    }
+  }
+
+  document.addEventListener('DOMContentLoaded', openModalIfErrors);
+  document.addEventListener('turbo:load', openModalIfErrors);
 </script>

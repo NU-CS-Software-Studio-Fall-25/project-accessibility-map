@@ -16,6 +16,7 @@ class ReviewsController < ApplicationController
       else
         format.html do
           @reviews = @location.reviews.order(created_at: :desc)
+          flash.now[:alert] = "Review could not be saved. #{@review.errors.full_messages.join(", ")}"
           render("locations/show", status: :unprocessable_entity)
         end
         format.json { render(json: @review.errors, status: :unprocessable_entity) }
@@ -32,6 +33,7 @@ class ReviewsController < ApplicationController
       else
         format.html do
           @reviews = @location.reviews.order(created_at: :desc)
+          flash.now[:alert] = "Review could not be updated. #{@review.errors.full_messages.join(", ")}"
           render("locations/show", status: :unprocessable_entity)
         end
         format.json { render(json: @review.errors, status: :unprocessable_entity) }

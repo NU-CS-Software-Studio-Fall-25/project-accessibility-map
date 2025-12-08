@@ -7,7 +7,12 @@ class Review < ApplicationRecord
   belongs_to :location
   belongs_to :user
 
-  validates :body, length: { minimum: 10, message: "Review must have at least 10 characters" }
+  validates :body, length: {
+    minimum: 10,
+    maximum: 250,
+    too_short: "must have at least 10 characters",
+    too_long: "must be no more than 250 characters",
+  }
   validate :body_is_clean
 
   private

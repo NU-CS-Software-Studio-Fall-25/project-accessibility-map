@@ -18,7 +18,14 @@
   <div class="space-y-2">
     <%= f.label :name, "Location Name", class: "block font-medium" %>
     <%= f.text_field :name, placeholder: "ex. Moge Tee",
-          class: "shadow-sm text-sm w-full rounded-md border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-yellow-400" %>
+          class: "shadow-sm text-sm w-full rounded-md border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-yellow-400 #{'border-red-500' if location.errors[:name].any?}" %>
+    <% if location.errors[:name].any? %>
+      <p class="text-red-600 text-sm mt-1">
+        <% location.errors[:name].each do |error| %>
+          <%= error %><br>
+        <% end %>
+      </p>
+    <% end %>
   </div>
 
   <div class="space-y-2">

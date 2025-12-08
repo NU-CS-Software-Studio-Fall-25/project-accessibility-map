@@ -61,9 +61,9 @@ RSpec.describe("Reviews", type: :request) do
         # Rails renders validation errors with 422
         expect(response).to(have_http_status(:unprocessable_entity))
 
-        # The model validation message from your spec/model is:
-        # "Review must have at least 10 characters"
-        expect(response.body).to(include("Review must have at least 10 characters"))
+        # The model validation message is:
+        # "Body must have at least 10 characters"
+        expect(response.body).to(include("must have at least 10 characters"))
       end
     end
 

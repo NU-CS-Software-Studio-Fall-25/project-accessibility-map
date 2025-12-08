@@ -22,10 +22,11 @@ class LocationsController < ApplicationController
       if request.format.html? && request.headers["Turbo-Frame"].blank?
         # Only redirect full page requests (not turbo frame requests)
         # Redirect HTML requests to ensure map is centered from the start
-        redirect_params = params.to_unsafe_h.merge(
+        # Only include permitted parameters to avoid issues
+        redirect_params = params.permit(:query, :latitude, :longitude, :page, :favorites_only, feature_ids: []).to_h.merge(
           latitude: default_lat,
           longitude: default_lng,
-        ).except(:controller, :action, :format)
+        )
 
         redirect_to(locations_path(redirect_params), allow_other_host: false)
         return

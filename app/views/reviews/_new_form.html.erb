@@ -1,4 +1,4 @@
-<%= form_with(model: [location, review], class: "space-y-4 text-sm", data: { turbo_frame: "_top" }) do |form| %>
+<%= form_with(model: [location, review], class: "space-y-4 text-sm") do |form| %>
   <% if review.errors.any? %>
     <div id="error_explanation" class="bg-red-50 text-red-700 px-3 py-2 font-medium rounded-md mt-3" role="alert" aria-live="polite">
       <p class="font-semibold"><%= pluralize(review.errors.count, "error") %> prohibited this review from being saved:</p>
@@ -12,7 +12,14 @@
 
   <div>
     <%= form.label :body, "Add Review", class: "sr-only hidden" %>
-    <%= form.textarea :body, minlength: 25, required: true, placeholder: "Enter your review", rows: "4", class: "shadow-sm text-sm block p-2.5 w-full text-gray-900 bg-gray-50 rounded-lg border border-gray-300 focus:ring-blue-500 focus:border-blue-500" %>
+    <%= form.textarea :body, placeholder: "Enter your review (10-250 characters)", rows: "4", class: "shadow-sm text-sm block p-2.5 w-full text-gray-900 bg-gray-50 rounded-lg border border-gray-300 focus:ring-blue-500 focus:border-blue-500 #{'border-red-500' if review.errors[:body].any?}" %>
+    <% if review.errors[:body].any? %>
+      <p class="text-red-600 text-sm mt-1">
+        <% review.errors[:body].each do |error| %>
+          <%= error %><br>
+        <% end %>
+      </p>
+    <% end %>
   </div>
 
   <div class="flex flex-row-reverse gap-2">
